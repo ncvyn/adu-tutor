@@ -9,11 +9,26 @@ import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools'
 import { HydrationScript } from 'solid-js/web'
 import { Suspense } from 'solid-js'
 
-import styleCss from '../styles.css?url'
+import styleCss from '@/styles.css?url'
 
 export const Route = createRootRouteWithContext()({
   head: () => ({
-    links: [{ rel: 'stylesheet', href: styleCss }],
+    links: [
+      { rel: 'stylesheet', href: styleCss },
+      { rel: 'icon', href: '/favicon.ico' },
+    ],
+    meta: [
+      {
+        charset: 'utf-8',
+      },
+      {
+        name: 'viewport',
+        content: 'width=device-width, initial-scale=1, viewport-fit=cover',
+      },
+      {
+        title: 'AdU-Tutor',
+      },
+    ],
   }),
   shellComponent: RootComponent,
 })

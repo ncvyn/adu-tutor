@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/solid-router'
-// lucide-solid
+import Dock from '@/components/dock'
 
 export const Route = createFileRoute('/')({ component: App })
 
@@ -8,6 +8,8 @@ function App() {
     <div class="min-h-screen">
       <p>Welcome to AdU-Tutor</p>
       <button class="btn btn-primary">Test button</button>
+
+      <Dock />
     </div>
   )
 }
