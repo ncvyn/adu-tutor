@@ -11,7 +11,7 @@
     "format": "prettier",
     "check": "prettier --write . && eslint --fix",
     "deploy": "pnpm run build && wrangler deploy",
-    "start": "node .output/server/index.mjs"
+    "cf-typegen": "pnpx wrangler typegen"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.13.8",

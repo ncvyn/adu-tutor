@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/solid-router'
-import Dock from '@/components/dock'
+import Dock from '@/components/Dock'
 
 export const Route = createFileRoute('/')({ component: App })
 
