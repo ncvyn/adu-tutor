@@ -1,4 +1,4 @@
-import { MessageCircle, BookCopy, UserRound } from 'lucide-solid'
+import { BookCopy, MessageCircle, UserRound } from 'lucide-solid'
 
 export const Dock = () => {
   return (
