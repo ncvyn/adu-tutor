@@ -1,13 +1,12 @@
 import { createFileRoute } from '@tanstack/solid-router'
-import { Dock, Navbar } from '@/components'
+import { HomePage, LandingPage } from '@/pages'
 
 export const Route = createFileRoute('/')({ component: App })
 
 function App() {
   return (
     <div class="min-h-screen">
-      <Navbar />
-      <Dock />
+      <LandingPage />
     </div>
   )
 }
