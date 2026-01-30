@@ -15,4 +15,11 @@
     "MICROSOFT_CLIENT_ID": "dc546708-afbc-4b91-a622-c835f62312f1",
     "MICROSOFT_TENANT_ID": "adbf07db-0edd-4169-8481-6740e4e99866",
   },
+  "d1_databases": [
+    {
+      "binding": "adu_tutor_d1",
+      "database_name": "adu-tutor-d1",
+      "migrations_dir": "drizzle/migrations",
+    },
+  ],
 }
