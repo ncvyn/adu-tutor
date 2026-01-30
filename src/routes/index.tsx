@@ -11,7 +11,7 @@ function App() {
 
   return (
     <div class="min-h-screen">
-      <Show when={session()} fallback={<LandingPage />}>
+      <Show when={session().data} fallback={<LandingPage />}>
         <HomePage />
       </Show>
       <Show when={session().error}>
