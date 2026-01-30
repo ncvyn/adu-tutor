@@ -11,7 +11,8 @@
     "format": "prettier",
     "check": "prettier --write . && eslint --fix",
     "deploy": "pnpm run build && wrangler deploy",
-    "cf-typegen": "pnpx wrangler typegen"
+    "cf-typegen": "pnpm wrangler types",
+    "wrangler:dev": "pnpm build && pnpm wrangler dev"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.13.8",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@tanstack/devtools-vite": "^0.3.11",
     "@tanstack/eslint-config": "^0.3.2",
+    "@types/node": "^25.1.0",
     "daisyui": "^5.5.14",
     "prettier": "^3.5.3",
     "typescript": "^5.7.2",
