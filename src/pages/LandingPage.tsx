@@ -1,11 +1,26 @@
 import { createSignal } from 'solid-js'
+import { authClient } from '@/lib/auth-client'
+
 import AdULogo from '@/adulogo.png'
 
 export const LandingPage = () => {
   const [isLoading, setIsLoading] = createSignal(false)
   const logIn = async () => {
-    setIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await authClient.signIn.social(
+      {
+        provider: 'microsoft',
+        callbackURL: '/',
+      },
+      {
+        onRequest: (_) => {
+          setIsLoading(true)
+        },
+        onError: (ctx) => {
+          alert(ctx.error.message)
+        },
+      },
+    )
+
     setIsLoading(false)
   }
 
