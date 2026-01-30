@@ -1,15 +1,15 @@
-import { LibraryBig, MessageCircle, UserRound } from 'lucide-solid'
+import { MessageCircle, BookCopy, UserRound } from 'lucide-solid'
 
-export default function Dock() {
+export const Dock = () => {
   return (
-    <div class="dock dock-xl">
+    <div class="dock dock-lg lg:flex xl:hidden">
       <button>
         <MessageCircle />
         <span class="dock-label">Messages</span>
       </button>
 
       <button>
-        <LibraryBig />
+        <BookCopy />
         <span class="dock-label">Info Hub</span>
       </button>
 
