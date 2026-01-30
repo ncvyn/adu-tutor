@@ -4,20 +4,20 @@ import { authClient } from '@/lib/auth-client'
 import { Show } from 'solid-js'
 import { CircleX } from 'lucide-solid'
 
-const { data: session, error } = await authClient.getSession()
-
 export const Route = createFileRoute('/')({ component: App })
 
 function App() {
+  const session = authClient.useSession()
+
   return (
     <div class="min-h-screen">
-      <Show when={session} fallback={<LandingPage />}>
+      <Show when={session()} fallback={<LandingPage />}>
         <HomePage />
       </Show>
-      <Show when={error}>
+      <Show when={session().error}>
         <div role="alert" class="alert alert-error">
           <CircleX />
-          <span>{error?.message}</span>
+          <span>{session().error?.message}</span>
         </div>
       </Show>
     </div>
