@@ -16,7 +16,7 @@ export const LandingPage = () => {
           setIsLoading(true)
         },
         onError: (ctx) => {
-          alert(ctx.error.message)
+          alert(ctx.error.code + ctx.error.statusText + ctx.error.message)
         },
       },
     )
