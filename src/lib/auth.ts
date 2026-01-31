@@ -2,10 +2,12 @@ import { betterAuth } from 'better-auth'
 import { tanstackStartCookies } from 'better-auth/tanstack-start/solid'
 import { env } from 'cloudflare:workers'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { user, session, account, verification } from '@/../auth-schema'
 
 export const auth = betterAuth({
   database: drizzleAdapter(env.adu_tutor_d1, {
     provider: 'sqlite',
+    schema: { user, session, account, verification },
   }),
   socialProviders: {
     microsoft: {
