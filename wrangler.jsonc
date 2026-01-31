@@ -19,7 +19,7 @@
     {
       "binding": "adu_tutor_d1",
       "database_name": "adu-tutor-d1",
-      "migrations_dir": "drizzle/migrations",
+      "migrations_dir": "./migrations",
     },
   ],
 }
