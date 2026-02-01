@@ -5,10 +5,14 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { drizzle } from 'drizzle-orm/d1'
 import { account, session, user, verification } from '@/../auth-schema'
 
-const db = drizzle(env.adu_tutor_d1)
 const schema = { user, session, account, verification }
+const db = drizzle(env.adu_tutor_d1, { schema })
 
 export const auth = betterAuth({
+  trustedOrigins: [
+    'http://localhost:3000',
+    'https://adu-tutor.ncvyn.workers.dev',
+  ],
   database: drizzleAdapter(db, {
     provider: 'sqlite',
     schema: schema,

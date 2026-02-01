@@ -11,7 +11,7 @@
     },
   },
   "vars": {
-    "BETTER_AUTH_API": "https://adu-tutor.ncvyn.workers.dev",
+    "BETTER_AUTH_URL": "https://adu-tutor.ncvyn.workers.dev",
     "MICROSOFT_CLIENT_ID": "dc546708-afbc-4b91-a622-c835f62312f1",
     "MICROSOFT_TENANT_ID": "adbf07db-0edd-4169-8481-6740e4e99866",
   },
@@ -19,6 +19,8 @@
     {
       "binding": "adu_tutor_d1",
       "database_name": "adu-tutor-d1",
+      "database_id": "e44a8358-57ff-4abd-ba22-a2d289d13f57",
+      "remote": true,
       "migrations_dir": "./migrations",
     },
   ],

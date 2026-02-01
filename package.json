@@ -19,6 +19,7 @@
     "@cloudflare/workers-types": "^4.20260124.0",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/router-plugin": "^1.133.21",
+    "@tanstack/solid-query": "^5.90.23",
     "@tanstack/solid-router": "^1.133.20",
     "@tanstack/solid-router-devtools": "^1.133.20",
     "@tanstack/solid-router-ssr-query": "^1.132.25",
