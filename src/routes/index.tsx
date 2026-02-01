@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/solid-router'
-import { HomePage, LandingPage } from '@/pages'
-import { authClient } from '@/lib/auth-client'
 import { Show } from 'solid-js'
 import { CircleX } from 'lucide-solid'
+import { HomePage, LandingPage } from '@/pages'
+import { authClient } from '@/lib/auth-client'
 
 export const Route = createFileRoute('/')({ component: App })
 
