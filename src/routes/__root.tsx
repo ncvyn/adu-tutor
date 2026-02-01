@@ -9,6 +9,9 @@ import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools'
 import { HydrationScript } from 'solid-js/web'
 import { Suspense } from 'solid-js'
 
+import { Notifications } from '@/components/Notifications'
+import { NotificationsProvider } from '@/lib/notifications'
+
 import styleCss from '@/styles.css?url'
 
 export const Route = createRootRouteWithContext()({
@@ -40,12 +43,17 @@ function RootComponent() {
         <HydrationScript />
       </head>
       <body>
-        <HeadContent />
-        <Suspense>
-          <Outlet />
-          {process.env.NODE_ENV === 'development' && <TanStackRouterDevtools />}
-        </Suspense>
-        <Scripts />
+        <NotificationsProvider>
+          <HeadContent />
+          <Suspense>
+            <Notifications />
+            <Outlet />
+            {process.env.NODE_ENV === 'development' && (
+              <TanStackRouterDevtools />
+            )}
+          </Suspense>
+          <Scripts />
+        </NotificationsProvider>
       </body>
     </html>
   )

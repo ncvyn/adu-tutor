@@ -9,10 +9,6 @@ const schema = { user, session, account, verification }
 const db = drizzle(env.adu_tutor_d1, { schema })
 
 export const auth = betterAuth({
-  trustedOrigins: [
-    'http://localhost:3000',
-    'https://adu-tutor.ncvyn.workers.dev',
-  ],
   database: drizzleAdapter(db, {
     provider: 'sqlite',
     schema: schema,
@@ -36,9 +32,22 @@ export const auth = betterAuth({
       role: {
         type: ['tutor', 'tutee'],
         required: true,
-        defaultValue: 'tutor',
+        defaultValue: 'tutee',
         input: false,
       },
+      xp: {
+        type: 'number',
+        required: true,
+        defaultValue: 0,
+        input: false,
+      },
+    },
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 10 * 60, // in seconds
+      strategy: 'compact',
     },
   },
   plugins: [tanstackStartCookies()],

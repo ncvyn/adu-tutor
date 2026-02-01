@@ -1,27 +1,32 @@
 import { createSignal } from 'solid-js'
-import { authClient } from '@/lib/auth-client'
+import { logIn } from '@/lib/auth-client'
+import { useNotifications } from '@/lib/notifications'
 
 import AdULogo from '@/adulogo.png'
 
 export const LandingPage = () => {
   const [isLoading, setIsLoading] = createSignal(false)
-  const logIn = async () => {
-    await authClient.signIn.social(
-      {
-        provider: 'microsoft',
-        callbackURL: '/',
-      },
-      {
-        onRequest: (_) => {
-          setIsLoading(true)
-        },
-        onError: (ctx) => {
-          alert(ctx.error.code + ctx.error.statusText + ctx.error.message)
-        },
-      },
-    )
+  const { notify } = useNotifications()
 
-    setIsLoading(false)
+  const handleLogIn = async () => {
+    if (isLoading()) return
+
+    setIsLoading(true)
+    try {
+      const result = await logIn()
+      if (!result.success) {
+        notify({
+          type: 'error',
+          message:
+            `ERROR ${result.error.code}: ${result.error.statusText ?? ''}`.trim(),
+        })
+        return
+      }
+
+      notify({ type: 'success', message: 'Redirecting...' })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -34,7 +39,7 @@ export const LandingPage = () => {
             online tutoring services.
           </p>
           <button
-            onClick={logIn}
+            onClick={handleLogIn}
             classList={{ loading: isLoading() }}
             class="btn btn-primary"
           >
