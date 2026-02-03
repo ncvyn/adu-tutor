@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { createSignal } from 'solid-js'
-import { logIn } from '@/lib/auth-client'
-import { useNotifications } from '@/lib/notifications'
+import { signIn } from '@/lib/auth-client'
 
 import AdULogo from '@/adulogo.png'
 
@@ -9,26 +8,13 @@ export const Route = createFileRoute('/')({ component: Index })
 
 function Index() {
   const [isLoading, setIsLoading] = createSignal(false)
-  const { notify } = useNotifications()
 
-  const handleLogIn = async () => {
+  const handleSignIn = async () => {
     if (isLoading()) return
 
     setIsLoading(true)
-    try {
-      const result = await logIn()
-      if (!result.success) {
-        notify({
-          type: 'error',
-          message: `Error! ${result.error.message}`,
-        })
-        return
-      }
-
-      notify({ type: 'success', message: 'Redirecting...' })
-    } finally {
-      setIsLoading(false)
-    }
+    await signIn()
+    setIsLoading(false)
   }
 
   return (
@@ -44,7 +30,7 @@ function Index() {
             online tutoring services.
           </p>
           <button
-            onClick={handleLogIn}
+            onClick={handleSignIn}
             classList={{ loading: isLoading() }}
             class="btn btn-primary"
           >

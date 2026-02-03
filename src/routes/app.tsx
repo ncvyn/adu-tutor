@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/solid-router'
 import { Show, createEffect } from 'solid-js'
 import { authClient } from '@/lib/auth-client'
-import { Dock, Navbar } from '@/components'
+import { Dock, Navbar, LoadingScreen } from '@/components'
 
 export const Route = createFileRoute('/app')({ component: App })
 
@@ -19,14 +19,7 @@ function App() {
   return (
     <>
       <Navbar />
-      <Show
-        when={session().data}
-        fallback={
-          <div class="min-h-screen flex items-center justify-center">
-            <span class="loading loading-spinner loading-lg" />
-          </div>
-        }
-      >
+      <Show when={session().data} fallback={<LoadingScreen />}>
         <p>Logged in!</p>
       </Show>
       <Dock />

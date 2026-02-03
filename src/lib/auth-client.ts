@@ -1,30 +1,22 @@
 import { createAuthClient } from 'better-auth/solid'
+import { useNotifications } from '@/lib/notifications'
+const { notify } = useNotifications()
 
 export const authClient = createAuthClient()
 
-type AuthError = {
-  message: string
-}
-
-type AuthResult =
-  | { success: true; session?: any }
-  | {
-      success: false
-      error: AuthError
-    }
-
-export async function logIn(): Promise<AuthResult> {
+export async function signIn() {
   try {
     await authClient.signIn.social({
       provider: 'microsoft',
       callbackURL: '/app',
     })
   } catch (error) {
-    const err: AuthError = {
-      message: 'Logged in failed',
-    }
-    return { success: false, error: err }
+    notify({
+      type: 'error',
+      message: `Error! Logging in failed.`,
+    })
   }
+  notify({ type: 'success', message: 'Redirecting...' })
 
   await authClient.revokeOtherSessions()
   return { success: true }
