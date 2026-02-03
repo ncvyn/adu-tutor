@@ -1,5 +1,10 @@
-import { createContext, useContext, createSignal } from 'solid-js'
-import { createUniqueId, onCleanup } from 'solid-js'
+import {
+  createContext,
+  createSignal,
+  createUniqueId,
+  onCleanup,
+  useContext,
+} from 'solid-js'
 import type { JSX } from 'solid-js'
 
 type NotificationType = 'info' | 'success' | 'warning' | 'error'
@@ -12,7 +17,7 @@ export type AppNotification = {
 }
 
 type NotificationsContextValue = {
-  notifications: () => AppNotification[]
+  notifications: () => Array<AppNotification>
   notify: (notification: Omit<AppNotification, 'id'>) => string
   dismiss: (id: string) => void
 }
@@ -20,7 +25,9 @@ type NotificationsContextValue = {
 const NotificationsContext = createContext<NotificationsContextValue>()
 
 export function NotificationsProvider(props: { children: JSX.Element }) {
-  const [notifications, setNotifications] = createSignal<AppNotification[]>([])
+  const [notifications, setNotifications] = createSignal<
+    Array<AppNotification>
+  >([])
 
   const dismiss = (id: string) => {
     setNotifications((current) => current.filter((item) => item.id !== id))

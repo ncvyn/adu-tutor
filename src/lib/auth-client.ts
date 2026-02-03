@@ -3,9 +3,7 @@ import { createAuthClient } from 'better-auth/solid'
 export const authClient = createAuthClient()
 
 type AuthError = {
-  code: string
-  statusText?: string
-  message?: string
+  message: string
 }
 
 type AuthResult =
@@ -16,26 +14,16 @@ type AuthResult =
     }
 
 export async function logIn(): Promise<AuthResult> {
-  let failure: AuthError | null = null
-
-  await authClient.signIn.social(
-    {
+  try {
+    await authClient.signIn.social({
       provider: 'microsoft',
-      callbackURL: '/',
-    },
-    {
-      onError: (ctx) => {
-        failure = {
-          code: ctx.error.code,
-          statusText: ctx.error.statusText,
-          message: ctx.error.message,
-        }
-      },
-    },
-  )
-
-  if (failure) {
-    return { success: false, error: failure }
+      callbackURL: '/app',
+    })
+  } catch (error) {
+    const err: AuthError = {
+      message: 'Logged in failed',
+    }
+    return { success: false, error: err }
   }
 
   await authClient.revokeOtherSessions()
