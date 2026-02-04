@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { createSignal } from 'solid-js'
 import { signIn, useAuthGuard } from '@/lib/auth-client'
+import { useNotifications } from '@/lib/notifications'
 
 import AdULogo from '@/adulogo.png'
 
@@ -10,20 +11,18 @@ function Index() {
   useAuthGuard({ requireGuest: true })
 
   const [isLoading, setIsLoading] = createSignal(false)
+  const { notify } = useNotifications()
 
   const handleSignIn = async () => {
     if (isLoading()) return
 
     setIsLoading(true)
-    await signIn()
+    await signIn(notify)
     setIsLoading(false)
   }
 
   return (
-    <div
-      class="hero min-h-screen bg-base-200"
-      classList={{ loading: isLoading() }}
-    >
+    <div class="hero min-h-screen bg-base-200">
       <div class="hero-content text-center">
         <div class="max-w-md">
           <h1 class="text-5xl font-bold">Welcome to AdU-Tutor</h1>

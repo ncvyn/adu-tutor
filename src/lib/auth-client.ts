@@ -1,7 +1,7 @@
 import { createAuthClient } from 'better-auth/solid'
 import { useNavigate } from '@tanstack/solid-router'
 import { createEffect, createSignal } from 'solid-js'
-import { useNotifications } from '@/lib/notifications'
+import type { AppNotification } from '@/lib/notifications'
 
 export const authClient = createAuthClient()
 
@@ -48,21 +48,41 @@ export function useAuthGuard(options: AuthGuardOptions = {}) {
 /*
  * Sign in with BA client
  */
-export async function signIn(): Promise<void> {
-  const { notify } = useNotifications()
-
+export async function signIn(
+  notify: (notification: Omit<AppNotification, 'id'>) => string,
+): Promise<void> {
   try {
     await authClient.signIn.social({
       provider: 'microsoft',
-      callbackURL: '/app',
+      callbackURL: '/info-hub',
     })
+
+    notify({ type: 'success', message: 'Redirecting...' })
+    await authClient.revokeOtherSessions()
   } catch (error) {
     notify({
       type: 'error',
       message: `Error! Signing in failed.`,
     })
   }
-  notify({ type: 'success', message: 'Redirecting...' })
+}
 
-  await authClient.revokeOtherSessions()
+/*
+ * Sign out with BA client
+ */
+export async function signOut(
+  notify: (notification: Omit<AppNotification, 'id'>) => string,
+): Promise<void> {
+  const navigate = useNavigate()
+
+  try {
+    await authClient.signOut()
+    notify({ type: 'success', message: 'Redirecting...' })
+    navigate({ to: '/', replace: true })
+  } catch (error) {
+    notify({
+      type: 'error',
+      message: `Error! Signing out failed.`,
+    })
+  }
 }

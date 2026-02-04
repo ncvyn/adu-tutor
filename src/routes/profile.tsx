@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show } from 'solid-js'
-import { useAuthGuard } from '@/lib/auth-client'
+import { useAuthGuard, signOut } from '@/lib/auth-client'
 import { Dock, LoadingScreen, Navbar } from '@/components'
 import { useNotifications } from '@/lib/notifications'
 
@@ -8,7 +8,6 @@ export const Route = createFileRoute('/profile')({ component: Profile })
 
 function Profile() {
   const session = useAuthGuard({ requireAuth: true })
-
   const { notify } = useNotifications()
 
   return (
@@ -20,6 +19,9 @@ function Profile() {
           onClick={() => notify({ type: 'info', message: 'Test notification' })}
         >
           Test notification
+        </button>
+        <button class="btn btn-neutral" onClick={() => signOut(notify)}>
+          Signout
         </button>
       </Show>
       <Dock />
