@@ -1,7 +1,7 @@
 export const LoadingScreen = () => {
   return (
-    <div class="min-h-screen flex items-center justify-center">
-      <span class="loading loading-spinner loading-lg" />
+    <div class="flex min-h-screen items-center justify-center">
+      <span class="loading loading-lg loading-spinner" />
     </div>
   )
 }

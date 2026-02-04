@@ -21,7 +21,7 @@ function Index() {
 
   return (
     <div
-      class="hero bg-base-200 min-h-screen"
+      class="hero min-h-screen bg-base-200"
       classList={{ loading: isLoading() }}
     >
       <div class="hero-content text-center">

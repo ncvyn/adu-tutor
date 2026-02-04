@@ -5,11 +5,11 @@ export const Notifications = () => {
   const { notifications, dismiss } = useNotifications()
 
   return (
-    <div class="toast toast-end toast-top z-50 pointer-events-none gap-2">
+    <div class="pointer-events-none toast toast-end toast-top z-50 gap-2">
       <For each={notifications()}>
         {(notification) => (
           <div
-            class="alert pointer-events-auto"
+            class="pointer-events-auto alert alert-soft"
             classList={{
               'alert-success': notification.type === 'success',
               'alert-error': notification.type === 'error',
@@ -19,7 +19,7 @@ export const Notifications = () => {
           >
             <span>{notification.message}</span>
             <button
-              class="btn btn-sm btn-ghost"
+              class="btn btn-ghost btn-sm"
               onClick={() => dismiss(notification.id)}
             >
               ✕

@@ -1,8 +1,8 @@
 export const Navbar = () => {
   return (
-    <div class="navbar hidden xl:flex bg-base-300 shadow-sm">
+    <div class="navbar hidden bg-base-300 shadow-sm xl:flex">
       <div class="navbar-start">
-        <a class="btn btn-ghost text-xl">AdU-Tutor</a>
+        <a class="btn text-xl btn-ghost">AdU-Tutor</a>
       </div>
       <div class="navbar-center">
         <ul class="menu menu-horizontal">
