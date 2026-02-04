@@ -1,12 +1,14 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { createSignal } from 'solid-js'
-import { signIn } from '@/lib/auth-client'
+import { signIn, useAuthGuard } from '@/lib/auth-client'
 
 import AdULogo from '@/adulogo.png'
 
 export const Route = createFileRoute('/')({ component: Index })
 
 function Index() {
+  useAuthGuard({ requireGuest: true })
+
   const [isLoading, setIsLoading] = createSignal(false)
 
   const handleSignIn = async () => {

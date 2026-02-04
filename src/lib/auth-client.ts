@@ -1,10 +1,53 @@
 import { createAuthClient } from 'better-auth/solid'
+import { useNavigate } from '@tanstack/solid-router'
+import { createEffect } from 'solid-js'
 import { useNotifications } from '@/lib/notifications'
-const { notify } = useNotifications()
 
 export const authClient = createAuthClient()
 
-export async function signIn() {
+export type AuthGuardOptions = {
+  /** Require authentication (redirect if NOT logged in) */
+  requireAuth?: boolean
+  /** Require guest (redirect if IS logged in) */
+  requireGuest?: boolean
+  /** Where to redirect */
+  redirectTo?: string
+}
+
+/**
+ * Flexible auth guard hook
+ */
+export function useAuthGuard(options: AuthGuardOptions = {}) {
+  const { requireAuth = false, requireGuest = false, redirectTo } = options
+
+  const session = authClient.useSession()
+  const navigate = useNavigate()
+
+  createEffect(() => {
+    const { isPending, data } = session()
+
+    if (isPending) return
+
+    // Redirect if user should be authenticated but isn't
+    if (requireAuth && !data) {
+      navigate({ to: redirectTo || '/', replace: true })
+    }
+
+    // Redirect if user should be guest but is authenticated
+    if (requireGuest && data) {
+      navigate({ to: redirectTo || '/app', replace: true })
+    }
+  })
+
+  return session
+}
+
+/*
+ * Sign in with BA client
+ */
+export async function signIn(): Promise<void> {
+  const { notify } = useNotifications()
+
   try {
     await authClient.signIn.social({
       provider: 'microsoft',
@@ -13,11 +56,10 @@ export async function signIn() {
   } catch (error) {
     notify({
       type: 'error',
-      message: `Error! Logging in failed.`,
+      message: `Error! Signing in failed.`,
     })
   }
   notify({ type: 'success', message: 'Redirecting...' })
 
   await authClient.revokeOtherSessions()
-  return { success: true }
 }
