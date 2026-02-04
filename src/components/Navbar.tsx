@@ -1,3 +1,5 @@
+import { Link } from '@tanstack/solid-router'
+
 export const Navbar = () => {
   return (
     <div class="navbar hidden bg-base-300 shadow-sm xl:flex">
@@ -7,15 +9,21 @@ export const Navbar = () => {
       <div class="navbar-center">
         <ul class="menu menu-horizontal">
           <li>
-            <a>Messages</a>
+            <Link to="/messages" class="btn btn-ghost select-none">
+              Messages
+            </Link>
           </li>
           <li>
-            <a>Info Hub</a>
+            <Link to="/info-hub" class="btn btn-ghost select-none">
+              Info Hub
+            </Link>
           </li>
         </ul>
       </div>
       <div class="navbar-end">
-        <a class="btn">Profile</a>
+        <Link to="/profile" class="btn select-none">
+          Profile
+        </Link>
       </div>
     </div>
   )

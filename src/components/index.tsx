@@ -1,3 +1,4 @@
 export * from './Dock'
 export * from './Navbar'
 export * from './LoadingScreen'
+export * from './Notifications'

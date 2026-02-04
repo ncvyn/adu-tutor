@@ -35,7 +35,7 @@ export function useAuthGuard(options: AuthGuardOptions = {}) {
 
     // Redirect if user should be guest but is authenticated
     if (requireGuest && data) {
-      navigate({ to: redirectTo || '/app', replace: true })
+      navigate({ to: redirectTo || '/info-hub', replace: true })
     }
   })
 
