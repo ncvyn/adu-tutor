@@ -1,6 +1,6 @@
 import { createAuthClient } from 'better-auth/solid'
 import { useNavigate } from '@tanstack/solid-router'
-import { createEffect } from 'solid-js'
+import { createEffect, createSignal } from 'solid-js'
 import { useNotifications } from '@/lib/notifications'
 
 export const authClient = createAuthClient()
@@ -22,19 +22,22 @@ export function useAuthGuard(options: AuthGuardOptions = {}) {
 
   const session = authClient.useSession()
   const navigate = useNavigate()
+  const [hasRedirected, setHasRedirected] = createSignal(false)
 
   createEffect(() => {
     const { isPending, data } = session()
 
-    if (isPending) return
+    if (isPending || hasRedirected()) return
 
     // Redirect if user should be authenticated but isn't
     if (requireAuth && !data) {
+      setHasRedirected(true)
       navigate({ to: redirectTo || '/', replace: true })
     }
 
     // Redirect if user should be guest but is authenticated
     if (requireGuest && data) {
+      setHasRedirected(true)
       navigate({ to: redirectTo || '/info-hub', replace: true })
     }
   })
