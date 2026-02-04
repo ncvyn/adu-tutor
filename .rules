@@ -1,0 +1,230 @@
+// AdU-Tutor - SolidStart + TanStack Router + Cloudflare Workers
+
+// ====================
+// CORE PRINCIPLES
+// ====================
+
+// Prefer functional components with TypeScript
+// Use strict TypeScript mode with proper type safety
+// Follow functional programming patterns where appropriate
+// Prioritize server-side rendering (SSR) for better performance
+// Optimize for Cloudflare Workers environment
+
+// ====================
+// SOLID.JS BEST PRACTICES
+// ====================
+
+const solidjsPractices = [
+  "Use createSignal() for local reactive state",
+  "Use createMemo() for derived/computed values",
+  "Use createEffect() sparingly - prefer reactive primitives",
+  "Use Show, For, and Switch components instead of conditional JS",
+  "Avoid destructuring props - it breaks reactivity",
+  "Use splitProps() when you need to separate props",
+  "Prefer createResource() for async data fetching",
+  "Use Suspense boundaries for loading states",
+  "Use ErrorBoundary for error handling",
+  "Leverage fine-grained reactivity - avoid unnecessary wrappers",
+];
+
+// ====================
+// TANSTACK ROUTER
+// ====================
+
+const tanstackRouterPractices = [
+  "Use file-based routing in src/routes/",
+  "Define route loaders for data fetching",
+  "Use route.lazy() for code splitting",
+  "Implement proper route types with type safety",
+  "Use route params and search params with validation",
+  "Leverage route context for shared data",
+  "Use TanStack Query integration for data caching",
+  "Implement proper error handling per route",
+  "Use route meta for SEO optimization",
+];
+
+// ====================
+// TANSTACK QUERY (SOLID QUERY)
+// ====================
+
+const tanstackQueryPractices = [
+  "Use createQuery() for GET requests with caching",
+  "Use createMutation() for POST/PUT/DELETE operations",
+  "Implement proper query keys following ['entity', id, ...params] pattern",
+  "Use queryClient.invalidateQueries() after mutations",
+  "Set appropriate staleTime and cacheTime",
+  "Leverage suspense mode with Suspense boundaries",
+  "Use optimistic updates for better UX",
+  "Implement proper error and loading states",
+];
+
+// ====================
+// DRIZZLE ORM
+// ====================
+
+const drizzleORMPractices = [
+  "Define schemas in auth-schema.ts or separate schema files",
+  "Use Drizzle's type-safe query builder",
+  "Leverage Drizzle's relations for joins",
+  "Run migrations using 'drizzle-kit generate' and 'drizzle-kit migrate'",
+  "Use transactions for multi-step database operations",
+  "Implement proper indexes for query performance",
+  "Use prepared statements for repeated queries",
+  "Type database queries properly with InferModel",
+];
+
+// ====================
+// BETTER AUTH
+// ====================
+
+const betterAuthPractices = [
+  "Use Better Auth hooks for authentication state",
+  "Implement proper session management",
+  "Use middleware for protected routes",
+  "Leverage OAuth providers when needed",
+  "Implement proper CSRF protection",
+  "Use secure cookies for session storage",
+  "Handle auth errors gracefully",
+  "Implement role-based access control (RBAC) if needed",
+];
+
+// ====================
+// TAILWIND CSS V4 + DAISYUI
+// ====================
+
+const tailwindPractices = [
+  "Use Tailwind v4's new @import and @theme syntax",
+  "Leverage DaisyUI components for consistent UI",
+  "Use semantic color tokens (primary, secondary, accent, etc.)",
+  "Implement responsive design with mobile-first approach",
+  "Use Tailwind's arbitrary values [value] when needed",
+  "Group related utilities using parentheses in v4",
+  "Implement dark mode using data-theme attribute (DaisyUI)",
+  "Use @apply sparingly - prefer utility classes in JSX",
+  "Keep Tailwind config minimal, let v4 handle defaults",
+  "Use CSS variables for theme customization",
+];
+
+// ====================
+// CLOUDFLARE WORKERS
+// ====================
+
+const cloudflareWorkersPractices = [
+  "Keep bundle size small - Workers have size limits",
+  "Use env bindings for environment variables",
+  "Leverage Cloudflare D1 for database (if applicable)",
+  "Use Cloudflare KV for key-value storage",
+  "Implement proper error handling for edge runtime",
+  "Use Durable Objects for stateful operations if needed",
+  "Optimize for cold start performance",
+  "Use wrangler.jsonc for configuration",
+  "Test locally with 'wrangler dev'",
+];
+
+// ====================
+// FILE STRUCTURE
+// ====================
+
+const fileStructureGuidelines = `
+src/
+├── routes/              # File-based routing (TanStack Router)
+│   ├── __root.tsx      # Root layout
+│   ├── index.tsx       # Home page
+│   └── ...
+├── components/          # Reusable UI components
+├── lib/                # Utilities and helpers
+├── db/                 # Database schema and queries
+├── auth/               # Authentication logic
+├── styles/             # Global styles (if needed)
+└── types/              # Shared TypeScript types
+`;
+
+// ====================
+// TYPESCRIPT CONVENTIONS
+// ====================
+
+const typeScriptConventions = [
+  "Use .tsx extension for components with JSX",
+  "Enable strict mode in tsconfig.json",
+  "Use explicit return types for functions",
+  "Prefer interfaces for object shapes",
+  "Use type for unions, intersections, and utilities",
+  "Leverage TypeScript's utility types (Partial, Pick, Omit, etc.)",
+  "Use const assertions for literal types",
+  "Avoid 'any' - use 'unknown' if type is truly unknown",
+  "Use type guards for runtime type checking",
+  "Leverage satisfies operator for type validation",
+];
+
+// ====================
+// CODE QUALITY
+// ====================
+
+const codeQualityGuidelines = [
+  "Run 'pnpm check' before committing (Prettier + ESLint)",
+  "Write descriptive variable and function names",
+  "Keep functions small and focused (single responsibility)",
+  "Use early returns to reduce nesting",
+  "Add comments for complex business logic only",
+  "Use JSDoc for public API documentation",
+  "Prefer composition over inheritance",
+  "Handle errors explicitly - don't silently fail",
+  "Use const for immutable values, let for mutable",
+  "Avoid premature optimization",
+];
+
+// ====================
+// PERFORMANCE
+// ====================
+
+const performanceGuidelines = [
+  "Use code splitting with route.lazy()",
+  "Lazy load heavy components with lazy()",
+  "Optimize images - use modern formats (WebP, AVIF)",
+  "Leverage SolidJS's fine-grained reactivity",
+  "Avoid unnecessary re-renders with createMemo()",
+  "Use Suspense for progressive loading",
+  "Minimize bundle size - check with 'pnpm build'",
+  "Use TanStack Query for request deduplication",
+  "Implement proper caching strategies",
+];
+
+// ====================
+// ACCESSIBILITY
+// ====================
+
+const a11yGuidelines = [
+  "Use semantic HTML elements",
+  "Add aria-labels for icon-only buttons",
+  "Ensure keyboard navigation works",
+  "Use DaisyUI's accessible components",
+  "Test with screen readers",
+  "Maintain sufficient color contrast",
+  "Use focus indicators for interactive elements",
+  "Provide alt text for images",
+];
+
+// ====================
+// TESTING
+// ====================
+
+const testingGuidelines = [
+  "Run tests with 'pnpm test' (Vitest)",
+  "Write unit tests for utility functions",
+  "Test components with Solid Testing Library",
+  "Test API routes and server functions",
+  "Mock external dependencies",
+  "Aim for meaningful test coverage, not 100%",
+];
+
+// ====================
+// DEPLOYMENT
+// ====================
+
+const deploymentGuidelines = [
+  "Build with 'pnpm build' before deploying",
+  "Deploy to Cloudflare with 'pnpm deploy'",
+  "Use environment variables for secrets",
+  "Test in production-like environment first",
+  "Monitor performance and errors post-deployment",
+];
