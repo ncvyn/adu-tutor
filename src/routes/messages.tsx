@@ -1,17 +1,17 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show } from 'solid-js'
-import { useAuthGuard } from '@/lib/auth-client'
+import { useSessionReady } from '@/lib/use-session-ready'
 import { Dock, LoadingScreen, Navbar } from '@/components'
 
 export const Route = createFileRoute('/messages')({ component: Messages })
 
 function Messages() {
-  const session = useAuthGuard({ requireAuth: true })
+  const { session, isReady } = useSessionReady({ requireAuth: true })
 
   return (
     <>
       <Navbar />
-      <Show when={session().data} fallback={<LoadingScreen />}>
+      <Show when={isReady() && session().data} fallback={<LoadingScreen />}>
         <section class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-24">
           <header class="flex flex-col gap-1">
             <h1 class="text-2xl font-semibold">Messages</h1>

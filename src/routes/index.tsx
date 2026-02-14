@@ -1,14 +1,16 @@
 import { createFileRoute } from '@tanstack/solid-router'
-import { createSignal } from 'solid-js'
-import { signIn, useAuthGuard } from '@/lib/auth-client'
+import { createSignal, Show } from 'solid-js'
+import { signIn } from '@/lib/auth-client'
+import { useSessionReady } from '@/lib/use-session-ready'
 import { useNotifications } from '@/lib/notifications'
+import { LoadingScreen } from '@/components'
 
 import AdULogo from '@/adulogo.png'
 
 export const Route = createFileRoute('/')({ component: Index })
 
 function Index() {
-  useAuthGuard({ requireGuest: true })
+  const { isReady } = useSessionReady({ requireGuest: true })
 
   const [isLoading, setIsLoading] = createSignal(false)
   const { notify } = useNotifications()
@@ -22,24 +24,26 @@ function Index() {
   }
 
   return (
-    <div class="hero min-h-screen bg-base-200">
-      <div class="hero-content text-center">
-        <div class="max-w-md">
-          <h1 class="text-5xl font-bold">Welcome to AdU-Tutor</h1>
-          <p class="py-6">
-            AdU-Tutor is a platform that connects students with tutors for
-            online tutoring services.
-          </p>
-          <button
-            onClick={handleSignIn}
-            classList={{ loading: isLoading() }}
-            class="btn btn-primary"
-          >
-            <img class="w-6" src={AdULogo} alt="Adamson University logo" />
-            Login with AdU Mail
-          </button>
+    <Show when={isReady()} fallback={<LoadingScreen />}>
+      <div class="hero min-h-screen bg-base-200">
+        <div class="hero-content text-center">
+          <div class="max-w-md">
+            <h1 class="text-5xl font-bold">Welcome to AdU-Tutor</h1>
+            <p class="py-6">
+              AdU-Tutor is a platform that connects students with tutors for
+              online tutoring services.
+            </p>
+            <button
+              onClick={handleSignIn}
+              classList={{ loading: isLoading() }}
+              class="btn btn-primary"
+            >
+              <img class="w-6" src={AdULogo} alt="Adamson University logo" />
+              Login with AdU Mail
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Show>
   )
 }

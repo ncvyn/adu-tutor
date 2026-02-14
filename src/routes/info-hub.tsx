@@ -1,20 +1,17 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show } from 'solid-js'
-import { useAuthGuard } from '@/lib/auth-client'
+import { useSessionReady } from '@/lib/use-session-ready'
 import { Dock, LoadingScreen, Navbar } from '@/components'
-import { useNotifications } from '@/lib/notifications'
 
 export const Route = createFileRoute('/info-hub')({ component: InfoHub })
 
 function InfoHub() {
-  const session = useAuthGuard({ requireAuth: true })
-
-  const { notify } = useNotifications()
+  const { session, isReady } = useSessionReady({ requireAuth: true })
 
   return (
     <>
       <Navbar />
-      <Show when={session().data} fallback={<LoadingScreen />}>
+      <Show when={isReady() && session().data} fallback={<LoadingScreen />}>
         <div class="card w-96 bg-base-100 shadow-sm">
           <div class="card-body">
             <h2 class="card-title">Card Title</h2>
