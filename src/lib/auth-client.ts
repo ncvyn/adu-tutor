@@ -78,7 +78,7 @@ export async function signOut(
   try {
     await authClient.signOut()
     notify({ type: 'success', message: 'Redirecting...' })
-    navigate({ to: '/', replace: true })
+    await navigate({ to: '/', replace: true })
   } catch (error) {
     notify({
       type: 'error',

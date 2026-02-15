@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/solid-router'
-import { createSignal, Show } from 'solid-js'
-import { signIn } from '@/lib/auth-client'
-import { useSessionReady } from '@/lib/use-session-ready'
+import { Show, createSignal } from 'solid-js'
+import { signIn, useAuthGuard  } from '@/lib/auth-client'
 import { useNotifications } from '@/lib/notifications'
 import { LoadingScreen } from '@/components'
 
@@ -10,7 +9,7 @@ import AdULogo from '@/adulogo.png'
 export const Route = createFileRoute('/')({ component: Index })
 
 function Index() {
-  const { isReady } = useSessionReady({ requireGuest: true })
+  const session = useAuthGuard({ requireGuest: true })
 
   const [isLoading, setIsLoading] = createSignal(false)
   const { notify } = useNotifications()
@@ -24,7 +23,7 @@ function Index() {
   }
 
   return (
-    <Show when={isReady()} fallback={<LoadingScreen />}>
+    <Show when={session().data} fallback={<LoadingScreen />}>
       <div class="hero min-h-screen bg-base-200">
         <div class="hero-content text-center">
           <div class="max-w-md">
