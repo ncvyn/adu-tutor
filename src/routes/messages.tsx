@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show } from 'solid-js'
 import { useAuthGuard } from '@/lib/auth-client'
-import { Dock, LoadingScreen, Navbar } from '@/components'
+import { Dock, LoadingScreen, Navbar, SearchUsers } from '@/components'
 
 export const Route = createFileRoute('/messages')({ component: Messages })
 
@@ -22,6 +22,13 @@ function Messages() {
                 <span class="text-sm font-semibold tracking-wide uppercase opacity-60">
                   Tutors
                 </span>
+              </div>
+              <div class="mt-3">
+                <SearchUsers
+                  onSelect={(user) => {
+                    console.log('Selected user:', user)
+                  }}
+                />
               </div>
               <div class="mt-4 grid grid-cols-3 gap-3"></div>
             </aside>
@@ -56,7 +63,7 @@ function Messages() {
                     You • 9:44 AM
                   </div>
                   <div class="chat-bubble chat-bubble-primary">
-                    Absolutely. I’ll have the updated flow ready by 2 PM. Does
+                    Absolutely. I'll have the updated flow ready by 2 PM. Does
                     that work?
                   </div>
                 </div>

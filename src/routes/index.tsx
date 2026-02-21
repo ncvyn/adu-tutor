@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show, createSignal } from 'solid-js'
-import { signIn, useAuthGuard  } from '@/lib/auth-client'
+import { signIn, useAuthGuard } from '@/lib/auth-client'
 import { useNotifications } from '@/lib/notifications'
 import { LoadingScreen } from '@/components'
 
@@ -23,7 +23,10 @@ function Index() {
   }
 
   return (
-    <Show when={session().data} fallback={<LoadingScreen />}>
+    <Show
+      when={!session().isPending && !session().data}
+      fallback={<LoadingScreen />}
+    >
       <div class="hero min-h-screen bg-base-200">
         <div class="hero-content text-center">
           <div class="max-w-md">
