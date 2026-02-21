@@ -2,7 +2,7 @@ import { For, Show, createEffect, createSignal, on } from 'solid-js'
 import { Search } from 'lucide-solid'
 import { searchUsers } from '@/lib/search-users'
 
-type UserResult = {
+export type UserResult = {
   id: string
   name: string
 }
