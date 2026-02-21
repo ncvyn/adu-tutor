@@ -3,7 +3,7 @@ import { getRequestHeaders } from '@tanstack/solid-start/server'
 import { drizzle } from 'drizzle-orm/d1'
 import { and, like, ne } from 'drizzle-orm'
 import { env } from 'cloudflare:workers'
-import { user } from '@/../auth-schema'
+import { user } from '@/schemas/auth'
 import { auth } from '@/lib/auth'
 
 export const searchUsers = createServerFn({ method: 'GET' })

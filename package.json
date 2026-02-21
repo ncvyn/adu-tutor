@@ -15,19 +15,19 @@
     "wrangler:dev": "pnpm build && pnpm wrangler dev"
   },
   "dependencies": {
-    "@cloudflare/vite-plugin": "^1.23.0",
-    "@cloudflare/workers-types": "^4.20260203.0",
-    "@tailwindcss/vite": "^4.1.18",
-    "@tanstack/router-plugin": "^1.158.0",
-    "@tanstack/solid-router": "^1.158.0",
-    "@tanstack/solid-router-devtools": "^1.158.0",
-    "@tanstack/solid-router-ssr-query": "^1.158.0",
-    "@tanstack/solid-start": "^1.158.0",
+    "@cloudflare/vite-plugin": "^1.25.2",
+    "@cloudflare/workers-types": "^4.20260228.0",
+    "@tailwindcss/vite": "^4.2.0",
+    "@tanstack/router-plugin": "^1.161.4",
+    "@tanstack/solid-router": "^1.161.4",
+    "@tanstack/solid-router-devtools": "^1.161.4",
+    "@tanstack/solid-router-ssr-query": "^1.161.4",
+    "@tanstack/solid-start": "^1.161.4",
     "better-auth": "^1.4.18",
     "drizzle-orm": "^0.45.1",
     "lucide-solid": "^0.544.0",
     "solid-js": "^1.9.11",
-    "tailwindcss": "^4.1.18",
+    "tailwindcss": "^4.2.0",
     "vite": "^7.3.1",
     "vite-plugin-lucide-preprocess": "^1.4.6",
     "vite-tsconfig-paths": "^5.1.4"
@@ -35,14 +35,14 @@
   "devDependencies": {
     "@tanstack/devtools-vite": "^0.3.12",
     "@tanstack/eslint-config": "^0.3.4",
-    "@types/node": "^25.2.0",
-    "daisyui": "^5.5.17",
-    "drizzle-kit": "^0.31.8",
+    "@types/node": "^25.3.0",
+    "daisyui": "^5.5.19",
+    "drizzle-kit": "^0.31.9",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "^5.9.3",
     "vite": "^7.1.7",
     "vite-plugin-solid": "^2.11.10",
-    "wrangler": "^4.62.0"
+    "wrangler": "^4.67.0"
   }
 }

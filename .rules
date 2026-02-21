@@ -63,7 +63,7 @@ const tanstackQueryPractices = [
 // ====================
 
 const drizzleORMPractices = [
-  "Define schemas in auth-schema.ts or separate schema files",
+  "Define schemas as seperate schema files in src/schemas",
   "Use Drizzle's type-safe query builder",
   "Leverage Drizzle's relations for joins",
   "Run migrations using 'drizzle-kit generate' and 'drizzle-kit migrate'",

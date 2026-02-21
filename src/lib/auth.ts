@@ -3,7 +3,7 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start/solid'
 import { env } from 'cloudflare:workers'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { drizzle } from 'drizzle-orm/d1'
-import { account, session, user, verification } from '@/../auth-schema'
+import { account, session, user, verification } from '@/schemas/auth'
 
 const schema = { user, session, account, verification }
 const db = drizzle(env.adu_tutor_d1, { schema })
