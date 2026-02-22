@@ -13,6 +13,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as InfoHubRouteImport } from './routes/info-hub'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiWsRouteImport } from './routes/api/ws'
 import { Route as ApiMessagesRouteImport } from './routes/api/messages'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -36,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWsRoute = ApiWsRouteImport.update({
+  id: '/api/ws',
+  path: '/api/ws',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMessagesRoute = ApiMessagesRouteImport.update({
   id: '/api/messages',
   path: '/api/messages',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
   '/api/messages': typeof ApiMessagesRoute
+  '/api/ws': typeof ApiWsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
   '/api/messages': typeof ApiMessagesRoute
+  '/api/ws': typeof ApiWsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/messages': typeof MessagesRoute
   '/profile': typeof ProfileRoute
   '/api/messages': typeof ApiMessagesRoute
+  '/api/ws': typeof ApiWsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/profile'
     | '/api/messages'
+    | '/api/ws'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/profile'
     | '/api/messages'
+    | '/api/ws'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/profile'
     | '/api/messages'
+    | '/api/ws'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -105,6 +117,7 @@ export interface RootRouteChildren {
   MessagesRoute: typeof MessagesRoute
   ProfileRoute: typeof ProfileRoute
   ApiMessagesRoute: typeof ApiMessagesRoute
+  ApiWsRoute: typeof ApiWsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -138,6 +151,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ws': {
+      id: '/api/ws'
+      path: '/api/ws'
+      fullPath: '/api/ws'
+      preLoaderRoute: typeof ApiWsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/messages': {
       id: '/api/messages'
       path: '/api/messages'
@@ -161,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   MessagesRoute: MessagesRoute,
   ProfileRoute: ProfileRoute,
   ApiMessagesRoute: ApiMessagesRoute,
+  ApiWsRoute: ApiWsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
