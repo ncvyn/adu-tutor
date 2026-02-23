@@ -1,6 +1,10 @@
 import { DurableObject } from 'cloudflare:workers'
 import { drizzle } from 'drizzle-orm/d1'
-import { message as messageTable } from '@/schemas/chat'
+import { and, eq } from 'drizzle-orm'
+import {
+  conversation as conversationTable,
+  message as messageTable,
+} from '@/schemas/chat'
 
 interface IncomingMessage {
   type: 'message'
@@ -19,7 +23,7 @@ interface OutgoingMessage {
 }
 
 export class ChatRoom extends DurableObject<Env> {
-  async fetch(request: Request): Promise<Response> {
+  fetch(request: Request): Response {
     const url = new URL(request.url)
     const userId = url.searchParams.get('userId')
 
@@ -44,16 +48,61 @@ export class ChatRoom extends DurableObject<Env> {
     try {
       const data = JSON.parse(raw as string) as IncomingMessage
 
-      if (data.type !== 'message' || !data.content?.trim()) return
+      if (!data.content.trim()) return
 
       // Persist to D1
       const db = drizzle(this.env.adu_tutor_d1)
       const now = Date.now()
       const id = crypto.randomUUID()
 
+      // Find or create conversation if conversationId is missing
+      let conversationId = data.conversationId
+
+      if (!conversationId) {
+        // Extract minUserId and maxUserId from connected socket tags
+        // or derive from the Durable Object name
+        const tags = this.ctx
+          .getWebSockets()
+          .flatMap((s) => this.ctx.getTags(s))
+        const uniqueUserIds = [...new Set(tags)].sort()
+        const [minUserId, maxUserId] = uniqueUserIds
+
+        if (minUserId && maxUserId) {
+          // Try to find existing conversation
+          const [existing] = await db
+            .select()
+            .from(conversationTable)
+            .where(
+              and(
+                eq(conversationTable.minUserId, minUserId),
+                eq(conversationTable.maxUserId, maxUserId),
+              ),
+            )
+            .limit(1)
+            .then((rows) => rows[0] ?? null)
+
+          if (existing) {
+            conversationId = existing.id
+          } else {
+            // Create a new conversation
+            const [created] = await db
+              .insert(conversationTable)
+              .values({
+                id: crypto.randomUUID(),
+                minUserId,
+                maxUserId,
+              })
+              .returning()
+            conversationId = created.id
+          }
+        }
+      }
+
+      if (!conversationId) return // Still can't determine conversation
+
       await db.insert(messageTable).values({
         id,
-        conversationId: data.conversationId,
+        conversationId,
         senderId: data.senderId,
         content: data.content.trim(),
       })
@@ -62,7 +111,7 @@ export class ChatRoom extends DurableObject<Env> {
       const outgoing: OutgoingMessage = {
         type: 'message',
         id,
-        conversationId: data.conversationId,
+        conversationId,
         senderId: data.senderId,
         content: data.content.trim(),
         createdAt: now,
@@ -83,10 +132,11 @@ export class ChatRoom extends DurableObject<Env> {
   }
 
   async webSocketClose(ws: WebSocket, code: number, reason: string) {
-    ws.close(code, reason)
+    // The WebSocket is already closing/closed; no need to call ws.close() again.
+    // Cloudflare's Hibernation API handles cleanup automatically.
   }
 
   async webSocketError(ws: WebSocket) {
-    ws.close(1011, 'Unexpected error')
+    await ws.close(1011, 'Unexpected error')
   }
 }

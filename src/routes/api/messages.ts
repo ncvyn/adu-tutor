@@ -67,6 +67,7 @@ async function validateRequest(request: Request) {
       ),
     )
     .limit(1)
+    .then((rows) => rows[0] ?? null)
 
   return { session, s, r, db, minUserId, maxUserId, existingConversation }
 }

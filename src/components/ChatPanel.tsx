@@ -1,6 +1,6 @@
-import { Show, For, createSignal, createEffect } from 'solid-js'
-import { useChat } from '@/lib/use-chat'
+import { For, Show, createEffect, createSignal } from 'solid-js'
 import type { UserResult } from '@/components/SearchUsers'
+import { useChat } from '@/lib/use-chat'
 
 export const ChatPanel = (props: {
   senderId: string
@@ -17,7 +17,7 @@ export const ChatPanel = (props: {
   // Auto-scroll to bottom when new messages arrive
   createEffect(() => {
     chat.messages()
-    messagesEndRef?.scrollIntoView({ behavior: 'smooth' })
+    messagesEndRef.scrollIntoView({ behavior: 'smooth' })
   })
 
   const getInitials = (name: string) =>
@@ -113,7 +113,7 @@ export const ChatPanel = (props: {
               )
             }}
           </For>
-          <div ref={messagesEndRef!} />
+          <div ref={messagesEndRef} />
         </Show>
       </div>
 

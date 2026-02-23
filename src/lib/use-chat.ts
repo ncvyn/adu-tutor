@@ -14,7 +14,7 @@ interface ChatOptions {
 }
 
 export function useChat(options: ChatOptions) {
-  const [messages, setMessages] = createSignal<ChatMessage[]>([])
+  const [messages, setMessages] = createSignal<Array<ChatMessage>>([])
   const [isConnected, setIsConnected] = createSignal(false)
   const [isLoading, setIsLoading] = createSignal(true)
 
@@ -29,10 +29,7 @@ export function useChat(options: ChatOptions) {
     try {
       const res = await fetch(`/api/messages?${params}`)
       if (res.ok) {
-        const data = (await res.json()) as {
-          conversation: unknown
-          messages: ChatMessage[]
-        }
+        const data = await res.json()
         setMessages(data.messages)
       }
     } catch {
