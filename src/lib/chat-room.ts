@@ -79,7 +79,6 @@ export class ChatRoom extends DurableObject<Env> {
               ),
             )
             .limit(1)
-            .then((rows) => rows[0] ?? null)
 
           if (existing) {
             conversationId = existing.id
