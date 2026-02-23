@@ -1,4 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js'
+import { useNotifications } from './notifications'
 
 export interface ChatMessage {
   id: string
@@ -13,6 +14,17 @@ interface ChatOptions {
   recipientId: string
 }
 
+interface Conversation {
+  id: string
+  minUserId: string
+  maxUserId: string
+}
+
+interface MessagesApiResponse {
+  conversation: Conversation | null
+  messages: Array<ChatMessage>
+}
+
 export function useChat(options: ChatOptions) {
   const [messages, setMessages] = createSignal<Array<ChatMessage>>([])
   const [isConnected, setIsConnected] = createSignal(false)
@@ -24,21 +36,31 @@ export function useChat(options: ChatOptions) {
   const { senderId, recipientId } = options
   const params = `s=${senderId}&r=${recipientId}`
 
+  const { notify } = useNotifications()
+
   // Fetch existing message history via the REST endpoint
   async function loadHistory() {
     setIsLoading(true)
     try {
       const res = await fetch(`/api/messages?${params}`)
       if (res.ok) {
-        const data = await res.json()
+        const data: MessagesApiResponse = await res.json()
         setMessages(data.messages)
         // Store the conversation ID if one exists
         if (data.conversation?.id) {
           setConversationId(data.conversation.id)
         }
+      } else {
+        notify({
+          type: 'error',
+          message: `Failed to load message history. ${res.statusText}`,
+        })
       }
     } catch {
-      // History fetch failed, start with empty
+      notify({
+        type: 'info',
+        message: 'No history found. Creating a new one...',
+      })
     } finally {
       setIsLoading(false)
     }
@@ -73,7 +95,10 @@ export function useChat(options: ChatOptions) {
           ])
         }
       } catch {
-        // Ignore malformed messages
+        notify({
+          type: 'warning',
+          message: 'Malformed message received.',
+        })
       }
     })
 

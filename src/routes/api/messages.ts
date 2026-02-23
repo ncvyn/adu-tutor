@@ -80,7 +80,7 @@ export const Route = createFileRoute('/api/messages')({
 
         const { existingConversation, db } = result
 
-        if (!existingConversation) {
+        if (!existingConversation.id) {
           return Response.json({ conversation: null, messages: [] })
         }
 
@@ -114,7 +114,7 @@ export const Route = createFileRoute('/api/messages')({
           )
         }
 
-        if (!existingConversation) {
+        if (!existingConversation.id) {
           const [created] = await db
             .insert(conversation)
             .values({

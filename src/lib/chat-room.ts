@@ -49,7 +49,7 @@ export class ChatRoom extends DurableObject<Env> {
     try {
       const data = JSON.parse(raw as string) as IncomingMessage
 
-      if (!data.content?.trim()) return
+      if (!data.content.trim()) return
 
       // Validate required fields
       if (!data.senderId || !data.recipientId) return
@@ -79,7 +79,7 @@ export class ChatRoom extends DurableObject<Env> {
           )
           .limit(1)
 
-        if (existing) {
+        if (existing.id) {
           conversationId = existing.id
         } else {
           // Create a new conversation
@@ -125,13 +125,5 @@ export class ChatRoom extends DurableObject<Env> {
     } catch (err) {
       console.error('webSocketMessage error:', err)
     }
-  }
-
-  async webSocketClose(ws: WebSocket, code: number, reason: string) {
-    // Cloudflare's Hibernation API handles cleanup automatically.
-  }
-
-  async webSocketError(ws: WebSocket) {
-    await ws.close(1011, 'Unexpected error')
   }
 }

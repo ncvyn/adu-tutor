@@ -12,12 +12,14 @@ export const ChatPanel = (props: {
   })
 
   const [input, setInput] = createSignal('')
-  let messagesEndRef!: HTMLDivElement
+  let messagesEndRef: HTMLDivElement | undefined
 
   // Auto-scroll to bottom when new messages arrive
   createEffect(() => {
     chat.messages()
-    messagesEndRef?.scrollIntoView({ behavior: 'smooth' })
+    const end = messagesEndRef
+    if (end === undefined) return
+    end.scrollIntoView({ behavior: 'smooth' })
   })
 
   const getInitials = (name: string) =>
@@ -65,7 +67,7 @@ export const ChatPanel = (props: {
           <div class="flex flex-col">
             <h2 class="text-lg font-semibold">{props.recipient.name}</h2>
             <span class="text-xs tracking-wide uppercase opacity-60">
-              {chat.isConnected() ? 'Online' : 'Connecting...'}
+              {chat.isConnected() ? 'Connected' : 'Connecting...'}
             </span>
           </div>
         </div>
