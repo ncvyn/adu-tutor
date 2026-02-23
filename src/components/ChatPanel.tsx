@@ -94,16 +94,16 @@ export const ChatPanel = (props: {
             {(msg) => {
               const isSender = msg.senderId === props.senderId
               return (
-                <div class={isSender ? 'chat().end chat' : 'chat-start chat'}>
-                  <div class="chat().header text-sm font-semibold opacity-80">
+                <div class={isSender ? 'chat-end chat' : 'chat-start chat'}>
+                  <div class="chat-header text-sm font-semibold opacity-80">
                     {isSender ? 'You' : props.recipient.name}
                     {' • '}
                     {formatTime(msg.createdAt)}
                   </div>
                   <div
-                    class="chat().bubble"
+                    class="chat-bubble"
                     classList={{
-                      'chat().bubble-primary': isSender,
+                      'chat-bubble-primary': isSender,
                       'bg-base-200': !isSender,
                     }}
                   >
