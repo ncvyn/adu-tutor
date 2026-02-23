@@ -17,7 +17,7 @@ export const ChatPanel = (props: {
   // Auto-scroll to bottom when new messages arrive
   createEffect(() => {
     chat.messages()
-    messagesEndRef.scrollIntoView({ behavior: 'smooth' })
+    messagesEndRef?.scrollIntoView({ behavior: 'smooth' })
   })
 
   const getInitials = (name: string) =>
