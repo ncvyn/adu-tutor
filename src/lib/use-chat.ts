@@ -86,6 +86,7 @@ export function useChat(options: ChatOptions) {
         type: 'message',
         conversationId,
         senderId,
+        recepientId,
         content,
       }),
     )
