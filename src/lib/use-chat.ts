@@ -17,6 +17,7 @@ export function useChat(options: ChatOptions) {
   const [messages, setMessages] = createSignal<Array<ChatMessage>>([])
   const [isConnected, setIsConnected] = createSignal(false)
   const [isLoading, setIsLoading] = createSignal(true)
+  const [conversationId, setConversationId] = createSignal<string>('')
 
   let ws: WebSocket | null = null
 
@@ -31,6 +32,10 @@ export function useChat(options: ChatOptions) {
       if (res.ok) {
         const data = await res.json()
         setMessages(data.messages)
+        // Store the conversation ID if one exists
+        if (data.conversation?.id) {
+          setConversationId(data.conversation.id)
+        }
       }
     } catch {
       // History fetch failed, start with empty
@@ -52,6 +57,10 @@ export function useChat(options: ChatOptions) {
       try {
         const data = JSON.parse(event.data) as ChatMessage & { type: string }
         if (data.type === 'message') {
+          // Track the conversation ID from incoming messages
+          if (data.conversationId && !conversationId()) {
+            setConversationId(data.conversationId)
+          }
           setMessages((prev) => [
             ...prev,
             {
@@ -78,15 +87,15 @@ export function useChat(options: ChatOptions) {
   }
 
   // Send a message through the WebSocket
-  function send(conversationId: string, content: string) {
+  function send(content: string) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return
 
     ws.send(
       JSON.stringify({
         type: 'message',
-        conversationId,
+        conversationId: conversationId(), // Pass known ID or empty string
         senderId,
-        recepientId,
+        recipientId,
         content,
       }),
     )

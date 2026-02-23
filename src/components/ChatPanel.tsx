@@ -32,11 +32,7 @@ export const ChatPanel = (props: {
     const content = input().trim()
     if (!content) return
 
-    // For the first message, we may not have a conversationId yet.
-    // The Durable Object will persist it either way.
-    // We derive a placeholder that the server will resolve.
-    const conversationId = '' // Server handles find-or-create
-    chat.send(conversationId, content)
+    chat.send(content)
     setInput('')
   }
 

@@ -10,7 +10,7 @@ interface IncomingMessage {
   type: 'message'
   conversationId: string
   senderId: string
-  recepientId: string
+  recipientId: string
   content: string
 }
 
@@ -49,7 +49,10 @@ export class ChatRoom extends DurableObject<Env> {
     try {
       const data = JSON.parse(raw as string) as IncomingMessage
 
-      if (!data.content.trim()) return
+      if (!data.content?.trim()) return
+
+      // Validate required fields
+      if (!data.senderId || !data.recipientId) return
 
       const db = drizzle(this.env.adu_tutor_d1)
       const now = Date.now()
@@ -119,12 +122,12 @@ export class ChatRoom extends DurableObject<Env> {
           // Socket is likely closed
         }
       }
-    } catch {
-      // Ignore malformed messages
+    } catch (err) {
+      console.error('webSocketMessage error:', err)
     }
   }
+
   async webSocketClose(ws: WebSocket, code: number, reason: string) {
-    // The WebSocket is already closing/closed; no need to call ws.close() again.
     // Cloudflare's Hibernation API handles cleanup automatically.
   }
 
