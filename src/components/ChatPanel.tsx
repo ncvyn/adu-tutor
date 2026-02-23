@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createSignal } from 'solid-js'
+import { For, Show, createEffect, createSignal, createMemo } from 'solid-js'
 import type { UserResult } from '@/components/SearchUsers'
 import { useChat } from '@/lib/use-chat'
 
@@ -6,17 +6,19 @@ export const ChatPanel = (props: {
   senderId: string
   recipient: UserResult
 }) => {
-  const chat = useChat({
-    senderId: props.senderId,
-    recipientId: props.recipient.id,
-  })
+  const chat = createMemo(() =>
+    useChat({
+      senderId: props.senderId,
+      recipientId: props.recipient.id,
+    }),
+  )
 
   const [input, setInput] = createSignal('')
   let messagesEndRef: HTMLDivElement | undefined
 
   // Auto-scroll to bottom when new messages arrive
   createEffect(() => {
-    chat.messages()
+    chat().messages()
     const end = messagesEndRef
     if (end === undefined) return
     end.scrollIntoView({ behavior: 'smooth' })
@@ -34,7 +36,7 @@ export const ChatPanel = (props: {
     const content = input().trim()
     if (!content) return
 
-    chat.send(content)
+    chat().send(content)
     setInput('')
   }
 
@@ -67,7 +69,7 @@ export const ChatPanel = (props: {
           <div class="flex flex-col">
             <h2 class="text-lg font-semibold">{props.recipient.name}</h2>
             <span class="text-xs tracking-wide uppercase opacity-60">
-              {chat.isConnected() ? 'Connected' : 'Connecting...'}
+              {chat().isConnected() ? 'Connected' : 'Connecting...'}
             </span>
           </div>
         </div>
@@ -76,32 +78,32 @@ export const ChatPanel = (props: {
       {/* Messages */}
       <div class="flex-1 space-y-4 overflow-y-auto px-6 py-6">
         <Show
-          when={!chat.isLoading()}
+          when={!chat().isLoading()}
           fallback={
             <div class="flex h-full items-center justify-center">
               <span class="loading loading-md loading-spinner" />
             </div>
           }
         >
-          <Show when={chat.messages().length === 0}>
+          <Show when={chat().messages().length === 0}>
             <div class="flex h-full items-center justify-center">
               <p class="text-sm opacity-60">No messages yet. Say hello!</p>
             </div>
           </Show>
-          <For each={chat.messages()}>
+          <For each={chat().messages()}>
             {(msg) => {
               const isSender = msg.senderId === props.senderId
               return (
-                <div class={isSender ? 'chat-end chat' : 'chat-start chat'}>
-                  <div class="chat-header text-sm font-semibold opacity-80">
+                <div class={isSender ? 'chat().end chat' : 'chat-start chat'}>
+                  <div class="chat().header text-sm font-semibold opacity-80">
                     {isSender ? 'You' : props.recipient.name}
                     {' • '}
                     {formatTime(msg.createdAt)}
                   </div>
                   <div
-                    class="chat-bubble"
+                    class="chat().bubble"
                     classList={{
-                      'chat-bubble-primary': isSender,
+                      'chat().bubble-primary': isSender,
                       'bg-base-200': !isSender,
                     }}
                   >
@@ -127,7 +129,7 @@ export const ChatPanel = (props: {
         />
         <button
           class="btn btn-primary"
-          disabled={!input().trim() || !chat.isConnected()}
+          disabled={!input().trim() || !chat().isConnected()}
           onClick={handleSend}
         >
           Send
