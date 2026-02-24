@@ -1,10 +1,43 @@
 {
-  "name": "adu-tutor_devcontainer",
+  "name": "adu-tutor-ssh",
   "image": "mcr.microsoft.com/devcontainers/base:alpine",
+
+  // Features: Node.js LTS
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"
     }
   },
-  "postCreateCommand": "apk update && apk add fish neovim git && sudo chsh \"$(id -un)\" --shell \"/usr/bin/fish\" && mkdir -p ~/.config/nvim && git clone https://github.com/LazyVim/starter ~/.config/nvim"
+
+  // Workspace settings
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+
+  // Lifecycle commands
+  "onCreateCommand": "apk update && apk add fish neovim git openssh",
+  "postCreateCommand": [
+    "sudo chsh \"$(id -un)\" --shell \"/usr/bin/fish\"",
+    "mkdir -p ~/.config/nvim",
+    "git clone https://github.com/LazyVim/starter ~/.config/nvim"
+  ],
+
+  // User and environment
+  "containerUser": "vscode",
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+
+  // SSH-specific environment
+  "remoteEnv": {
+    "TERM": "xterm-256color",
+    "LANG": "en_US.UTF-8"
+  },
+
+  // Networking
+  "forwardPorts": [22],
+  "portsAttributes": {
+    "22": {
+      "label": "SSH",
+      "protocol": "tcp"
+    }
+  }
 }
