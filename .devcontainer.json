@@ -1,0 +1,10 @@
+{
+  "name": "adu-tutor_devcontainer",
+  "image": "mcr.microsoft.com/devcontainers/base:alpine",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+  "postCreateCommand": "apk update && apk add fish neovim git && sudo chsh \"$(id -un)\" --shell \"/usr/bin/fish\" && mkdir -p ~/.config/nvim && git clone https://github.com/LazyVim/starter ~/.config/nvim"
+}
