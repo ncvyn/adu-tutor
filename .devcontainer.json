@@ -1,0 +1,10 @@
+{
+  "name": "adu-tutor",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/meaningful-ooo/devcontainer-features/fish:2": {}
+  }
+}
