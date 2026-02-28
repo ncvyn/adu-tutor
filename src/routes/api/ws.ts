@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/solid-router'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
 import { env } from 'cloudflare:workers'
 import { auth } from '@/lib/auth'
+import { authMiddleware } from '@/lib/middleware'
 
 function getConversationPair(s: string, r: string) {
   return s.localeCompare(r) <= 0
@@ -11,6 +12,7 @@ function getConversationPair(s: string, r: string) {
 
 export const Route = createFileRoute('/api/ws')({
   server: {
+    middleware: [authMiddleware],
     handlers: {
       GET: async ({ request }: { request: Request }) => {
         const headers = getRequestHeaders()

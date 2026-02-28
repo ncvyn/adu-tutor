@@ -8,6 +8,8 @@ import { env } from 'cloudflare:workers'
 import { auth } from '@/lib/auth'
 import { conversation, message } from '@/schemas/chat'
 
+import { authMiddleware } from '@/lib/middleware'
+
 function getConversationPair(s: string, r: string) {
   return s.localeCompare(r) <= 0
     ? { minUserId: s, maxUserId: r }
@@ -75,6 +77,7 @@ async function validateRequest(request: Request) {
 
 export const Route = createFileRoute('/api/messages')({
   server: {
+    middleware: [authMiddleware],
     handlers: {
       GET: async ({ request }: { request: Request }) => {
         const result = await validateRequest(request)
