@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show } from 'solid-js'
 import { signOut, useAuthGuard } from '@/lib/auth-client'
-import { Dock, LoadingScreen, Navbar } from '@/components'
-import { useNotifications } from '@/lib/notifications'
+import { Dock, LoadingScreen, Navbar, useNotifications } from '@/components'
 
 export const Route = createFileRoute('/profile')({ component: Profile })
 

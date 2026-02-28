@@ -1,5 +1,5 @@
 import { For, Show, createEffect, createSignal, createMemo } from 'solid-js'
-import type { UserResult } from '@/components/SearchUsers'
+import type { UserResult } from '@/components'
 import { useChat } from '@/lib/use-chat'
 
 export const ChatPanel = (props: {

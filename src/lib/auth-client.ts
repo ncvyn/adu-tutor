@@ -1,7 +1,7 @@
 import { createAuthClient } from 'better-auth/solid'
 import { useNavigate } from '@tanstack/solid-router'
 import { createEffect, createSignal } from 'solid-js'
-import type { AppNotification } from '@/lib/notifications'
+import type { AppNotification } from '@/components'
 
 export const authClient = createAuthClient()
 

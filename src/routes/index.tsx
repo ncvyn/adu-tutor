@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show, createSignal } from 'solid-js'
 import { signIn, useAuthGuard } from '@/lib/auth-client'
-import { useNotifications } from '@/lib/notifications'
-import { LoadingScreen } from '@/components'
+import { LoadingScreen, useNotifications } from '@/components'
 
 import AdULogo from '@/adulogo.png'
 

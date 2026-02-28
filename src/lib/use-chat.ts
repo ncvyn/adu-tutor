@@ -1,5 +1,5 @@
 import { createSignal, onCleanup } from 'solid-js'
-import { useNotifications } from './notifications'
+import { useNotifications } from '@/components'
 
 export interface ChatMessage {
   id: string

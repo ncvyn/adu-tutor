@@ -9,8 +9,10 @@ import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools'
 import { HydrationScript } from 'solid-js/web'
 import { Suspense } from 'solid-js'
 
-import { Notifications } from '@/components/Notifications'
-import { NotificationsProvider } from '@/lib/notifications'
+import {
+  Notifications,
+  NotificationsProvider,
+} from '@/components/Notifications'
 
 import styleCss from '@/styles.css?url'
 
