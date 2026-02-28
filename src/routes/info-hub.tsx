@@ -12,7 +12,7 @@ function InfoHub() {
     <>
       <Navbar />
       <Show when={session().data} fallback={<LoadingScreen />}>
-        <div class="card w-96 bg-base-100 shadow-sm">
+        <div class="card my-5 w-96 bg-base-100 shadow-sm">
           <div class="card-body">
             <h2 class="card-title">Card Title</h2>
             <p>

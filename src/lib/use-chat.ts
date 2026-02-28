@@ -6,7 +6,7 @@ export interface ChatMessage {
   conversationId: string
   senderId: string
   content: string
-  createdAt: number
+  createdAt: string
 }
 
 interface ChatOptions {

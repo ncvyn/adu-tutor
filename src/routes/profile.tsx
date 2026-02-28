@@ -13,15 +13,19 @@ function Profile() {
     <>
       <Navbar />
       <Show when={session().data} fallback={<LoadingScreen />}>
-        <button
-          class="btn btn-neutral"
-          onClick={() => notify({ type: 'info', message: 'Test notification' })}
-        >
-          Test notification
-        </button>
-        <button class="btn btn-neutral" onClick={() => signOut(notify)}>
-          Signout
-        </button>
+        <div class="my-5">
+          <button
+            class="btn btn-neutral"
+            onClick={() =>
+              notify({ type: 'info', message: 'Test notification' })
+            }
+          >
+            Test notification
+          </button>
+          <button class="btn btn-neutral" onClick={() => signOut(notify)}>
+            Signout
+          </button>
+        </div>
       </Show>
       <Dock />
     </>

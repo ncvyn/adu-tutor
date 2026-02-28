@@ -21,7 +21,7 @@ function Messages() {
       <Navbar />
       <Show when={session().data} fallback={<LoadingScreen />}>
         {(data) => (
-          <section class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-24">
+          <section class="mx-auto my-5 flex w-full flex-col gap-6 px-4 pb-24 xl:max-w-2/3">
             <div class="grid gap-6 lg:grid-cols-[minmax(0,320px)_1fr]">
               <aside class="rounded-box border border-base-300 bg-base-100 p-5">
                 <div class="flex items-center justify-between">

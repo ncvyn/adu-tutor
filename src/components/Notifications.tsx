@@ -1,12 +1,12 @@
 import {
+  For,
   createContext,
   createSignal,
   createUniqueId,
   onCleanup,
   useContext,
-  For,
-  type JSX,
 } from 'solid-js'
+import type { JSX } from 'solid-js'
 
 type NotificationType = 'info' | 'success' | 'warning' | 'error'
 
