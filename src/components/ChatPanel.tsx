@@ -2,7 +2,7 @@ import { For, Show, createEffect, createMemo, createSignal } from 'solid-js'
 import type { UserResult } from '@/components'
 import { useChat } from '@/lib/use-chat'
 
-const THRESHOLD_MS = 2 * 60 * 1000 // 2 minutes
+const THRESHOLD_MS = 3 * 60 * 1000 // 3 minutes
 
 export const ChatPanel = (props: {
   senderId: string
@@ -20,7 +20,9 @@ export const ChatPanel = (props: {
 
   createEffect(() => {
     chat().messages()
-    messagesEndRef?.scrollIntoView({ behavior: 'smooth' })
+    queueMicrotask(() => {
+      messagesEndRef?.scrollIntoView({ behavior: 'instant' })
+    })
   })
 
   const getInitials = (name: string) =>
@@ -67,7 +69,7 @@ export const ChatPanel = (props: {
   const isConnected = () => chat().isConnected()
 
   return (
-    <section class="flex h-128 flex-col rounded-box border border-base-300 bg-base-100">
+    <section class="flex h-full min-h-0 flex-col rounded-box border border-base-300 bg-base-100">
       <header class="flex items-center justify-between border-b border-base-300 px-6 py-4">
         <div class="flex items-center gap-3">
           <div class="avatar avatar-placeholder">
@@ -97,7 +99,7 @@ export const ChatPanel = (props: {
         </div>
       </header>
 
-      <div class="flex-1 overflow-y-auto px-6 py-6">
+      <div class="min-h-0 flex-1 overflow-y-auto px-6 py-6">
         <Show
           when={!isLoading()}
           fallback={
