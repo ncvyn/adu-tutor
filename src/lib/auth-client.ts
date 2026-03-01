@@ -72,9 +72,8 @@ export async function signIn(
  */
 export async function signOut(
   notify: (notification: Omit<AppNotification, 'id'>) => string,
+  navigate: (options: { to: string; replace?: boolean }) => Promise<void>,
 ): Promise<void> {
-  const navigate = useNavigate()
-
   try {
     await authClient.signOut()
     notify({ type: 'success', message: 'Redirecting...' })

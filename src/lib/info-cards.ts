@@ -8,13 +8,6 @@ import { infoCard } from '@/schemas/info'
 
 export const getInfoCards = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const headers = getRequestHeaders()
-    const session = await auth.api.getSession({ headers })
-
-    if (!session) {
-      throw new Error('Unauthorized')
-    }
-
     const db = drizzle(env.adu_tutor_d1)
 
     return await db.select().from(infoCard).orderBy(desc(infoCard.createdAt))
