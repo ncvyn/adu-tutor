@@ -36,6 +36,7 @@ function Messages() {
 
               <Show
                 when={selectedUser()}
+                keyed
                 fallback={
                   <section class="flex items-center justify-center rounded-box border border-base-300 bg-base-100">
                     <p class="text-sm opacity-60">
@@ -45,10 +46,7 @@ function Messages() {
                 }
               >
                 {(recipient) => (
-                  <ChatPanel
-                    senderId={data().user.id}
-                    recipient={recipient()}
-                  />
+                  <ChatPanel senderId={data().user.id} recipient={recipient} />
                 )}
               </Show>
             </div>

@@ -8,18 +8,16 @@ export const ChatPanel = (props: {
   senderId: string
   recipient: UserResult
 }) => {
-  const chat = createMemo(() =>
-    useChat({
-      senderId: props.senderId,
-      recipientId: props.recipient.id,
-    }),
-  )
+  const chat = useChat({
+    senderId: props.senderId,
+    recipientId: props.recipient.id,
+  })
 
   const [input, setInput] = createSignal('')
   let messagesEndRef: HTMLDivElement | undefined
 
   createEffect(() => {
-    chat().messages()
+    chat.messages()
     queueMicrotask(() => {
       messagesEndRef?.scrollIntoView({ behavior: 'instant' })
     })
@@ -36,7 +34,7 @@ export const ChatPanel = (props: {
   const handleSend = () => {
     const content = input().trim()
     if (!content) return
-    chat().send(content)
+    chat.send(content)
     setInput('')
   }
 
@@ -64,9 +62,9 @@ export const ChatPanel = (props: {
     return `${date}, ${time}`
   }
 
-  const messages = () => chat().messages()
-  const isLoading = () => chat().isLoading()
-  const isConnected = () => chat().isConnected()
+  const messages = () => chat.messages()
+  const isLoading = () => chat.isLoading()
+  const isConnected = () => chat.isConnected()
 
   return (
     <section class="flex h-full min-h-0 flex-col rounded-box border border-base-300 bg-base-100">

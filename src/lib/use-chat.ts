@@ -25,6 +25,9 @@ interface MessagesApiResponse {
   messages: Array<ChatMessage>
 }
 
+const MAX_RECONNECT_DELAY = 30000 // 30 seconds
+const INITIAL_RECONNECT_DELAY = 1000 // 1 second
+
 export function useChat(options: ChatOptions) {
   const [messages, setMessages] = createSignal<Array<ChatMessage>>([])
   const [isConnected, setIsConnected] = createSignal(false)
@@ -32,13 +35,15 @@ export function useChat(options: ChatOptions) {
   const [conversationId, setConversationId] = createSignal<string>('')
 
   let ws: WebSocket | null = null
+  let reconnectDelay = INITIAL_RECONNECT_DELAY
+  let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
+  let isIntentionallyClosed = false
 
   const { senderId, recipientId } = options
   const params = `s=${senderId}&r=${recipientId}`
 
   const { notify } = useNotifications()
 
-  // Fetch existing message history via the REST endpoint
   async function loadHistory() {
     setIsLoading(true)
     try {
@@ -46,7 +51,7 @@ export function useChat(options: ChatOptions) {
       if (res.ok) {
         const data: MessagesApiResponse = await res.json()
         setMessages(data.messages)
-        // Store the conversation ID if one exists
+
         if (data.conversation?.id) {
           setConversationId(data.conversation.id)
         }
@@ -66,35 +71,65 @@ export function useChat(options: ChatOptions) {
     }
   }
 
-  // Open WebSocket connection
+  function scheduleReconnect() {
+    if (isIntentionallyClosed) return
+
+    console.log(`[WS] Scheduling reconnect in ${reconnectDelay}ms`)
+    reconnectTimeout = setTimeout(() => {
+      console.log('[WS] Attempting reconnect...')
+      connect()
+    }, reconnectDelay)
+
+    reconnectDelay = Math.min(reconnectDelay * 2, MAX_RECONNECT_DELAY)
+  }
+
   function connect() {
+    if (ws) {
+      ws.close()
+      ws = null
+    }
+
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    ws = new WebSocket(`${protocol}//${window.location.host}/api/ws?${params}`)
+    const wsUrl = `${protocol}//${window.location.host}/api/ws?${params}`
+    console.log('[WS] Connecting to:', wsUrl)
+    ws = new WebSocket(wsUrl)
 
     ws.addEventListener('open', () => {
+      console.log('[WS] Connected!')
       setIsConnected(true)
+
+      reconnectDelay = INITIAL_RECONNECT_DELAY
     })
 
     ws.addEventListener('message', (event) => {
+      console.log('[WS] Raw message received:', event.data)
       try {
         const data = JSON.parse(event.data) as ChatMessage & { type: string }
+        console.log('[WS] Parsed message:', data)
         if (data.type === 'message') {
-          // Track the conversation ID from incoming messages
           if (data.conversationId && !conversationId()) {
             setConversationId(data.conversationId)
           }
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: data.id,
-              conversationId: data.conversationId,
-              senderId: data.senderId,
-              content: data.content,
-              createdAt: data.createdAt,
-            },
-          ])
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === data.id)) {
+              return prev
+            }
+            const newMessages = [
+              ...prev,
+              {
+                id: data.id,
+                conversationId: data.conversationId,
+                senderId: data.senderId,
+                content: data.content,
+                createdAt: data.createdAt,
+              },
+            ]
+            console.log('[WS] Updated messages array:', newMessages)
+            return newMessages
+          })
         }
-      } catch {
+      } catch (err) {
+        console.error('[WS] Parse error:', err)
         notify({
           type: 'warning',
           message: 'Malformed message received.',
@@ -102,23 +137,26 @@ export function useChat(options: ChatOptions) {
       }
     })
 
-    ws.addEventListener('close', () => {
+    ws.addEventListener('close', (event) => {
+      console.log('[WS] Closed:', event.code, event.reason)
       setIsConnected(false)
+      ws = null
+      scheduleReconnect()
     })
 
-    ws.addEventListener('error', () => {
+    ws.addEventListener('error', (event) => {
+      console.error('[WS] Error:', event)
       setIsConnected(false)
     })
   }
 
-  // Send a message through the WebSocket
   function send(content: string) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return
 
     ws.send(
       JSON.stringify({
         type: 'message',
-        conversationId: conversationId(), // Pass known ID or empty string
+        conversationId: conversationId(),
         senderId,
         recipientId,
         content,
@@ -126,18 +164,20 @@ export function useChat(options: ChatOptions) {
     )
   }
 
-  // Disconnect the WebSocket
   function disconnect() {
+    isIntentionallyClosed = true
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout)
+      reconnectTimeout = null
+    }
     if (ws) {
       ws.close()
       ws = null
     }
   }
 
-  // Start everything
   loadHistory().then(() => connect())
 
-  // Cleanup on component unmount
   onCleanup(() => disconnect())
 
   return {
