@@ -74,9 +74,7 @@ export function useChat(options: ChatOptions) {
   function scheduleReconnect() {
     if (isIntentionallyClosed) return
 
-    console.log(`[WS] Scheduling reconnect in ${reconnectDelay}ms`)
     reconnectTimeout = setTimeout(() => {
-      console.log('[WS] Attempting reconnect...')
       connect()
     }, reconnectDelay)
 
@@ -91,21 +89,17 @@ export function useChat(options: ChatOptions) {
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
     const wsUrl = `${protocol}//${window.location.host}/api/ws?${params}`
-    console.log('[WS] Connecting to:', wsUrl)
     ws = new WebSocket(wsUrl)
 
     ws.addEventListener('open', () => {
-      console.log('[WS] Connected!')
       setIsConnected(true)
 
       reconnectDelay = INITIAL_RECONNECT_DELAY
     })
 
     ws.addEventListener('message', (event) => {
-      console.log('[WS] Raw message received:', event.data)
       try {
         const data = JSON.parse(event.data) as ChatMessage & { type: string }
-        console.log('[WS] Parsed message:', data)
         if (data.type === 'message') {
           if (data.conversationId && !conversationId()) {
             setConversationId(data.conversationId)
@@ -124,12 +118,10 @@ export function useChat(options: ChatOptions) {
                 createdAt: data.createdAt,
               },
             ]
-            console.log('[WS] Updated messages array:', newMessages)
             return newMessages
           })
         }
       } catch (err) {
-        console.error('[WS] Parse error:', err)
         notify({
           type: 'warning',
           message: 'Malformed message received.',
@@ -137,15 +129,14 @@ export function useChat(options: ChatOptions) {
       }
     })
 
-    ws.addEventListener('close', (event) => {
-      console.log('[WS] Closed:', event.code, event.reason)
+    ws.addEventListener('close', () => {
       setIsConnected(false)
       ws = null
       scheduleReconnect()
     })
 
-    ws.addEventListener('error', (event) => {
-      console.error('[WS] Error:', event)
+    ws.addEventListener('error', () => {
+      notify({ type: 'error', message: 'WebSocket error occurred.' })
       setIsConnected(false)
     })
   }
