@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createSignal, on } from 'solid-js'
 import { Search } from 'lucide-solid'
-import { searchUsers } from '@/lib/search-users'
+import { searchUsers } from '@/server/search-users.functions'
 
 export type UserResult = {
   id: string

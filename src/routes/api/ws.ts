@@ -4,7 +4,7 @@ import { env } from 'cloudflare:workers'
 import { drizzle } from 'drizzle-orm/d1'
 import { inArray } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
-import { authMiddleware } from '@/lib/middleware'
+import { middleware } from '@/lib/middleware'
 import { user } from '@/schemas/auth'
 
 function getConversationPair(s: string, r: string) {
@@ -15,7 +15,7 @@ function getConversationPair(s: string, r: string) {
 
 export const Route = createFileRoute('/api/ws')({
   server: {
-    middleware: [authMiddleware],
+    middleware: [middleware],
     handlers: {
       GET: async ({ request }: { request: Request }) => {
         const headers = getRequestHeaders()

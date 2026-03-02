@@ -5,9 +5,11 @@ import { eq } from 'drizzle-orm'
 import { env } from 'cloudflare:workers'
 import { auth } from '@/lib/auth'
 import { user } from '@/schemas/auth'
+import { middleware } from '@/lib/middleware'
 
-export const getUserProfile = createServerFn({ method: 'GET' }).handler(
-  async () => {
+export const getUserProfile = createServerFn({ method: 'GET' })
+  .middleware([middleware])
+  .handler(async () => {
     const headers = getRequestHeaders()
     const session = await auth.api.getSession({ headers })
 
@@ -24,5 +26,4 @@ export const getUserProfile = createServerFn({ method: 'GET' }).handler(
       .limit(1)
 
     return userProfile
-  },
-)
+  })

@@ -2,8 +2,12 @@ import { createFileRoute } from '@tanstack/solid-router'
 import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import type { InfoCard } from '@/schemas/info'
 import { useAuthGuard } from '@/lib/auth-client'
-import { Dock, LoadingScreen, Navbar, useNotifications  } from '@/components'
-import { createInfoCard, deleteInfoCard, getInfoCards } from '@/lib/info-cards'
+import { Dock, LoadingScreen, Navbar, useNotifications } from '@/components'
+import {
+  createInfoCard,
+  deleteInfoCard,
+  getInfoCards,
+} from '@/server/info-cards.functions'
 
 export const Route = createFileRoute('/info-hub')({ component: InfoHub })
 

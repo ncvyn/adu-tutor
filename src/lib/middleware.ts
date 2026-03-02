@@ -3,7 +3,7 @@ import { createMiddleware } from '@tanstack/solid-start'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
 import { auth } from '@/lib/auth'
 
-export const authMiddleware = createMiddleware().server(async ({ next }) => {
+export const middleware = createMiddleware().server(async ({ next }) => {
   const headers = getRequestHeaders()
   const session = await auth.api.getSession({ headers })
 
