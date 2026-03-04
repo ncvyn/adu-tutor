@@ -4,27 +4,11 @@ import { and, asc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 
 import { conversation, message } from '@/schemas/chat'
-import { getConversationPair } from '@/server/messages-helper.server'
+import {
+  getConversationPair,
+  type ConversationDetails,
+} from '@/server/messages-helper.server'
 import { middleware } from '@/lib/middleware'
-
-interface Message {
-  id: string
-  conversationId: string
-  senderId: string
-  content: string
-  createdAt: string
-}
-
-interface Conversation {
-  id: string
-  minUserId: string
-  maxUserId: string
-}
-
-interface ConversationDetails {
-  conversation: Conversation | null
-  messages: Array<Message>
-}
 
 export const getMessages = createServerFn({ method: 'GET' })
   .inputValidator((data: { senderId: string; recipientId: string }) => data)
