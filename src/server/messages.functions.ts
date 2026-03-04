@@ -7,15 +7,15 @@ import { conversation, message } from '@/schemas/chat'
 import {
   getConversationPair,
   type ConversationDetails,
-} from '@/server/messages-helper.server'
+} from '@/server/helper.server'
 import { middleware } from '@/lib/middleware'
 
 export const getMessages = createServerFn({ method: 'GET' })
   .inputValidator((data: { senderId: string; recipientId: string }) => data)
   .middleware([middleware])
   .handler(async ({ data }) => {
-    const { senderId: sender, recipientId: receiver } = data
-    const { minUserId, maxUserId } = getConversationPair(sender, receiver)
+    const { senderId: s, recipientId: r } = data
+    const { minUserId, maxUserId } = getConversationPair(s, r)
 
     const [existingConversation] = await db
       .select()

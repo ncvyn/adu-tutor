@@ -6,12 +6,7 @@ import { db } from '@/lib/db'
 import { auth } from '@/lib/auth'
 import { middleware } from '@/lib/middleware'
 import { user } from '@/schemas/auth'
-
-function getConversationPair(s: string, r: string) {
-  return s.localeCompare(r) <= 0
-    ? { minUserId: s, maxUserId: r }
-    : { minUserId: r, maxUserId: s }
-}
+import { getConversationPair } from '@/server/helper.server'
 
 export const Route = createFileRoute('/api/ws')({
   server: {
