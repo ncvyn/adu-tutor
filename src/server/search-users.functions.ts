@@ -1,8 +1,7 @@
 import { createServerFn } from '@tanstack/solid-start'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
-import { drizzle } from 'drizzle-orm/d1'
 import { and, like, ne } from 'drizzle-orm'
-import { env } from 'cloudflare:workers'
+import { db } from '@/lib/db'
 import { user } from '@/schemas/auth'
 import { auth } from '@/lib/auth'
 
@@ -15,8 +14,6 @@ export const searchUsers = createServerFn({ method: 'GET' })
     if (!session) {
       throw new Error('Unauthorized')
     }
-
-    const db = drizzle(env.adu_tutor_d1)
 
     const trimmed = query.trim()
     if (!trimmed) return []

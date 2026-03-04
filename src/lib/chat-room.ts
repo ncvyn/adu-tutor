@@ -1,6 +1,6 @@
 import { DurableObject } from 'cloudflare:workers'
-import { drizzle } from 'drizzle-orm/d1'
 import { and, eq } from 'drizzle-orm'
+import { db } from '@/lib/db'
 import {
   conversation as conversationTable,
   message as messageTable,
@@ -51,10 +51,8 @@ export class ChatRoom extends DurableObject<Env> {
 
       if (!data.content.trim()) return
 
-      // Validate required fields
       if (!data.senderId || !data.recipientId) return
 
-      const db = drizzle(this.env.adu_tutor_d1)
       const now = Date.now()
       const id = crypto.randomUUID()
 

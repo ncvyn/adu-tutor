@@ -1,15 +1,12 @@
 import { createServerFn } from '@tanstack/solid-start'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
-import { drizzle } from 'drizzle-orm/d1'
 import { desc, eq } from 'drizzle-orm'
-import { env } from 'cloudflare:workers'
 import { auth } from '@/lib/auth'
+import { db } from '@/lib/db'
 import { infoCard } from '@/schemas/info'
 
 export const getInfoCards = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const db = drizzle(env.adu_tutor_d1)
-
     return await db.select().from(infoCard).orderBy(desc(infoCard.createdAt))
   },
 )
@@ -30,8 +27,6 @@ export const createInfoCard = createServerFn({ method: 'POST' })
     if (!title || !content) {
       throw new Error('Title and content are required')
     }
-
-    const db = drizzle(env.adu_tutor_d1)
 
     const [newCard] = await db
       .insert(infoCard)
@@ -61,19 +56,17 @@ export const deleteInfoCard = createServerFn({ method: 'POST' })
       throw new Error('Card ID is required')
     }
 
-    const db = drizzle(env.adu_tutor_d1)
-
-    const [existing] = await db
+    const cards = await db
       .select()
       .from(infoCard)
       .where(eq(infoCard.id, data.id))
       .limit(1)
-
-    if (!existing) {
+    if (cards.length === 0) {
       throw new Error('Card not found')
     }
 
-    if (existing.authorId !== session.user.id) {
+    const card = cards[0]
+    if (card.authorId !== session.user.id) {
       throw new Error('You can only delete your own cards')
     }
 

@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
 import { env } from 'cloudflare:workers'
-import { drizzle } from 'drizzle-orm/d1'
 import { inArray } from 'drizzle-orm'
+import { db } from '@/lib/db'
 import { auth } from '@/lib/auth'
 import { middleware } from '@/lib/middleware'
 import { user } from '@/schemas/auth'
@@ -34,7 +34,6 @@ export const Route = createFileRoute('/api/ws')({
         if (session.user.id !== s)
           return new Response('Sender does not match session', { status: 403 })
 
-        const db = drizzle(env.adu_tutor_d1)
         const rows = await db
           .select({ id: user.id })
           .from(user)

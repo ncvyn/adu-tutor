@@ -1,5 +1,6 @@
 import { createSignal, onCleanup } from 'solid-js'
 import { useNotifications } from '@/components'
+import { getMessages } from '@/server/messages.functions'
 
 export interface ChatMessage {
   id: string
@@ -12,17 +13,6 @@ export interface ChatMessage {
 interface ChatOptions {
   senderId: string
   recipientId: string
-}
-
-interface Conversation {
-  id: string
-  minUserId: string
-  maxUserId: string
-}
-
-interface MessagesApiResponse {
-  conversation: Conversation | null
-  messages: Array<ChatMessage>
 }
 
 const MAX_RECONNECT_DELAY = 30000 // 30 seconds
@@ -47,24 +37,15 @@ export function useChat(options: ChatOptions) {
   async function loadHistory() {
     setIsLoading(true)
     try {
-      const res = await fetch(`/api/messages?${params}`)
-      if (res.ok) {
-        const data: MessagesApiResponse = await res.json()
-        setMessages(data.messages)
-
-        if (data.conversation?.id) {
-          setConversationId(data.conversation.id)
-        }
-      } else {
-        notify({
-          type: 'error',
-          message: `Failed to load message history. ${res.statusText}`,
-        })
+      const data = await getMessages({ data: { senderId, recipientId } })
+      setMessages(data.messages)
+      if (data.conversation?.id) {
+        setConversationId(data.conversation.id)
       }
-    } catch {
+    } catch (error) {
       notify({
-        type: 'info',
-        message: 'No history found. Creating a new one...',
+        type: 'error',
+        message: `Failed to load message history: ${error instanceof Error ? error.message : 'Unknown error'}`,
       })
     } finally {
       setIsLoading(false)
