@@ -3,6 +3,7 @@ import { Show, Suspense, createResource } from 'solid-js'
 import { signOut, useAuthGuard } from '@/lib/auth-client'
 import { getUserProfile } from '@/server/get-user-profile.functions'
 import { Dock, LoadingScreen, Navbar, useNotifications } from '@/components'
+import { getInitials } from '@/lib/helper'
 
 export const Route = createFileRoute('/profile')({ component: Profile })
 
@@ -10,14 +11,6 @@ function Profile() {
   const session = useAuthGuard({ requireAuth: true })
   const { notify } = useNotifications()
   const navigate = useNavigate()
-
-  const getInitials = (name: string) =>
-    name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
 
   const [userProfile] = createResource(
     () => session().data?.user.id,
@@ -44,7 +37,6 @@ function Profile() {
                       </div>
                     </div>
                     <h2 class="card-title">{profile().name}</h2>
-                    <p class="text-base-content/70">{profile().email}</p>
                     <div class="mt-2 badge font-semibold tracking-wide uppercase badge-primary">
                       {profile().role}
                     </div>

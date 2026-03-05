@@ -1,6 +1,7 @@
-import { For, Show, createEffect, createMemo, createSignal } from 'solid-js'
+import { For, Show, createEffect, createSignal } from 'solid-js'
 import type { UserResult } from '@/components'
 import { useChat } from '@/lib/use-chat'
+import { getInitials } from '@/lib/helper'
 
 const THRESHOLD_MS = 3 * 60 * 1000 // 3 minutes
 
@@ -22,14 +23,6 @@ export const ChatPanel = (props: {
       messagesEndRef?.scrollIntoView({ behavior: 'instant' })
     })
   })
-
-  const getInitials = (name: string) =>
-    name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
 
   const handleSend = () => {
     const content = input().trim()

@@ -1,6 +1,7 @@
 import { For, Show, createEffect, createSignal, on } from 'solid-js'
 import { Search } from 'lucide-solid'
 import { searchUsers } from '@/server/search-users.functions'
+import { getInitials } from '@/lib/helper'
 
 export type UserResult = {
   id: string
@@ -53,14 +54,6 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
       fetchUsers(q)
     }),
   )
-
-  const getInitials = (name: string) =>
-    name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
 
   return (
     <div class="relative">

@@ -18,7 +18,7 @@ export const getMessages = createServerFn({ method: 'GET' })
     const { senderId: s, recipientId: r } = data
     const { minUserId, maxUserId } = getConversationPair(s, r)
 
-    const [existingConversation] = await db
+    const conversations = await db
       .select()
       .from(conversation)
       .where(
@@ -29,8 +29,9 @@ export const getMessages = createServerFn({ method: 'GET' })
       )
       .limit(1)
 
-    if (!existingConversation.id)
+    if (conversations.length === 0)
       return { conversation: null, messages: [] } as ConversationDetails
+    const existingConversation = conversations[0]
 
     const messages = await db
       .select()
