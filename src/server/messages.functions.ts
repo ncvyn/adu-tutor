@@ -1,12 +1,13 @@
 import { createServerFn } from '@tanstack/solid-start'
 
 import { and, asc, eq } from 'drizzle-orm'
+import type {ConversationDetails} from '@/server/helper.server';
 import { db } from '@/lib/db'
 
 import { conversation, message } from '@/schemas/chat'
 import {
-  getConversationPair,
-  type ConversationDetails,
+  
+  getConversationPair
 } from '@/server/helper.server'
 import { middleware } from '@/lib/middleware'
 

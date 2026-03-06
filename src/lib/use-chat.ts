@@ -85,11 +85,12 @@ export function useChat(options: ChatOptions) {
           if (data.conversationId && !conversationId()) {
             setConversationId(data.conversationId)
           }
-          setMessages((prev) => {
+          setMessages((p) => {
+            const prev = Array.isArray(p) ? p : []
             if (prev.some((m) => m.id === data.id)) {
               return prev
             }
-            const newMessages = [
+            return [
               ...prev,
               {
                 id: data.id,
@@ -99,7 +100,6 @@ export function useChat(options: ChatOptions) {
                 createdAt: data.createdAt,
               },
             ]
-            return newMessages
           })
         }
       } catch (err) {
