@@ -59,14 +59,12 @@ export class ChatRoom extends DurableObject<Env> {
       let conversationId = data.conversationId
 
       if (!conversationId) {
-        // Derive the canonical pair from sender + recipient
         const [minUserId, maxUserId] =
           data.senderId.localeCompare(data.recipientId) <= 0
             ? [data.senderId, data.recipientId]
             : [data.recipientId, data.senderId]
 
-        // Try to find existing conversation
-        const [existing] = await db
+        const rows = await db
           .select()
           .from(conversationTable)
           .where(
@@ -77,10 +75,9 @@ export class ChatRoom extends DurableObject<Env> {
           )
           .limit(1)
 
-        if (existing.id) {
-          conversationId = existing.id
+        if (rows.length > 0) {
+          conversationId = rows[0].id
         } else {
-          // Create a new conversation
           const [created] = await db
             .insert(conversationTable)
             .values({

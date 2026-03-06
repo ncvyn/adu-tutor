@@ -2,7 +2,13 @@ import { createFileRoute, useNavigate } from '@tanstack/solid-router'
 import { Show, Suspense, createResource } from 'solid-js'
 import { signOut, useAuthGuard } from '@/lib/auth-client'
 import { getUserProfile } from '@/server/get-user-profile.functions'
-import { Dock, LoadingScreen, Navbar, useNotifications } from '@/components'
+import {
+  Dock,
+  LoadingScreen,
+  Navbar,
+  UserBadges,
+  useNotifications,
+} from '@/components'
 import { getInitials } from '@/lib/helper'
 
 export const Route = createFileRoute('/profile')({ component: Profile })
@@ -40,6 +46,9 @@ function Profile() {
                     <div class="mt-2 badge font-semibold tracking-wide uppercase badge-primary">
                       {profile().role}
                     </div>
+
+                    <UserBadges userId={profile().id} />
+
                     <button
                       class="btn mt-6 btn-error"
                       onClick={() => signOut(notify, navigate)}
