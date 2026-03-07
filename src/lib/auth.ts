@@ -41,6 +41,24 @@ export const auth = betterAuth({
         defaultValue: 0,
         input: false,
       },
+      bio: {
+        type: 'string',
+        required: true,
+        defaultValue: '',
+        input: false,
+      },
+      preferredSubject: {
+        type: 'string',
+        required: true,
+        defaultValue: '',
+        input: false,
+      },
+      availability: {
+        type: 'string',
+        required: true,
+        defaultValue: '',
+        input: false,
+      },
     },
   },
   session: {

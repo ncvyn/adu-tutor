@@ -13,8 +13,8 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as InfoHubRouteImport } from './routes/info-hub'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiWsRouteImport } from './routes/api/ws'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiWsRouteImport } from './routes/api.ws'
+import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
 
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',

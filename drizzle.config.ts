@@ -6,6 +6,7 @@ export default defineConfig({
     'src/schemas/chat.ts',
     'src/schemas/info.ts',
     'src/schemas/badge.ts',
+    'src/schemas/noti.ts',
   ],
   out: './migrations',
   dialect: 'sqlite',

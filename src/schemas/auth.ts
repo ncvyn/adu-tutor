@@ -22,6 +22,9 @@ export const user = sqliteTable("user", {
     .default("tutee")
     .notNull(),
   xp: integer("xp").default(0).notNull(),
+  bio: text("bio").default("").notNull(),
+  preferredSubject: text("preferred_subject").default("").notNull(),
+  availability: text("availability").default(""),
 });
 
 export const session = sqliteTable(
