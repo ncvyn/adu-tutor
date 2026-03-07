@@ -1,7 +1,9 @@
 import { For, Show, createEffect, createSignal } from 'solid-js'
+import { SolidMarkdown } from 'solid-markdown'
 import type { UserResult } from '@/components'
 import { useChat } from '@/lib/use-chat'
 import { getInitials } from '@/lib/helper'
+import { markdownClass } from '@/lib/markdown'
 
 const THRESHOLD_MS = 3 * 60 * 1000 // 3 minutes
 
@@ -141,13 +143,15 @@ export const ChatPanel = (props: {
                       </div>
                     </Show>
                     <div
-                      class="chat-bubble break-all"
+                      class="chat-bubble wrap-break-word whitespace-normal"
                       classList={{
                         'chat-bubble-primary': isSender,
                         'bg-base-200': !isSender,
                       }}
                     >
-                      {msg.content}
+                      <div class={markdownClass}>
+                        <SolidMarkdown>{msg.content}</SolidMarkdown>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -160,16 +164,16 @@ export const ChatPanel = (props: {
       </div>
 
       <footer class="flex gap-2 border-t border-base-300 px-4 py-3 sm:px-6">
-        <input
-          type="text"
+        <textarea
           placeholder="Write a message..."
-          class="input flex-1"
+          class="textarea flex-1"
+          rows={1}
           value={input()}
           onInput={(e) => setInput(e.currentTarget.value)}
           onKeyDown={handleKeyDown}
         />
         <button
-          class="btn btn-primary"
+          class="btn self-end btn-primary"
           disabled={!input().trim() || !isConnected()}
           onClick={handleSend}
         >
