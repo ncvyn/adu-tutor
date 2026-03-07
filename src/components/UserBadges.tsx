@@ -1,4 +1,4 @@
-import { For, Show, createResource, createSignal, onCleanup } from 'solid-js'
+import { For, Show, createResource, createSignal } from 'solid-js'
 import { getMyBadges, getUserBadges } from '@/server/badge.functions'
 
 export interface UserBadgesProps {
@@ -18,22 +18,6 @@ export function UserBadges(props: UserBadgesProps) {
 
   const [openTip, setOpenTip] = createSignal<string | null>(null)
 
-  function toggleTip(badgeId: string) {
-    setOpenTip((prev) => (prev === badgeId ? null : badgeId))
-  }
-
-  function handleClickOutside(e: MouseEvent) {
-    const target = e.target as HTMLElement
-    if (!target.closest('[data-badge-tip]')) {
-      setOpenTip(null)
-    }
-  }
-
-  if (typeof document !== 'undefined') {
-    document.addEventListener('click', handleClickOutside)
-    onCleanup(() => document.removeEventListener('click', handleClickOutside))
-  }
-
   return (
     <Show
       when={!badges.loading}
@@ -47,13 +31,19 @@ export function UserBadges(props: UserBadgesProps) {
           <div class="flex flex-wrap justify-center gap-2">
             <For each={badges()}>
               {(b) => (
-                <div class="relative inline-block" data-badge-tip>
+                <div
+                  class="tooltip"
+                  classList={{ 'tooltip-open': openTip() === b.badgeId }}
+                  data-tip={`${b.name}: ${b.description}`}
+                >
                   <button
                     type="button"
                     class="cursor-pointer rounded-full p-1 transition hover:bg-base-200"
                     onClick={(e) => {
                       e.stopPropagation()
-                      toggleTip(b.badgeId)
+                      setOpenTip((prev) =>
+                        prev === b.badgeId ? null : b.badgeId,
+                      )
                     }}
                     aria-label={`Show info for ${b.name}`}
                   >
@@ -63,14 +53,6 @@ export function UserBadges(props: UserBadgesProps) {
                       class="h-10 w-10"
                     />
                   </button>
-
-                  <Show when={openTip() === b.badgeId}>
-                    <div class="absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 rounded-lg bg-neutral px-3 py-1.5 text-xs whitespace-nowrap text-neutral-content shadow-lg">
-                      <span class="font-semibold">{b.name}</span>:{' '}
-                      {b.description}
-                      <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral" />
-                    </div>
-                  </Show>
                 </div>
               )}
             </For>
