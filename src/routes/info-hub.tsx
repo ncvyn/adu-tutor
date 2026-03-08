@@ -25,6 +25,15 @@ function InfoHub() {
 
   let shareDialogRef: HTMLDialogElement | undefined
   let confirmDialogRef: HTMLDialogElement | undefined
+  let deleteDialogRef: HTMLDialogElement | undefined
+
+  const [pendingDeleteId, setPendingDeleteId] = createSignal<string | null>(
+    null,
+  )
+  const [pendingDeleteTitle, setPendingDeleteTitle] = createSignal<
+    string | null
+  >(null)
+  const [isDeleting, setIsDeleting] = createSignal(false)
 
   const isFormValid = createMemo(
     () => newTitle().trim().length > 0 && newContent().trim().length > 0,
@@ -111,13 +120,33 @@ function InfoHub() {
     }
   }
 
-  async function handleDeleteCard(id: string) {
-    try {
-      await deleteInfoCard({ data: { id } })
-      setCards((prev) => prev.filter((card) => card.id !== id))
-    } catch (err) {
-      notify({ type: 'error', message: `Error deleting info card: ${err}` })
-    }
+  function requestDeleteCard(id: string, title: string) {
+    setPendingDeleteId(id)
+    setPendingDeleteTitle(title)
+    deleteDialogRef?.showModal()
+  }
+
+  function confirmDeleteCard() {
+    const id = pendingDeleteId()
+    if (!id) return
+    setIsDeleting(true)
+    deleteInfoCard({ data: { id } })
+      .then(() => {
+        setCards((prev) => prev.filter((card) => card.id !== id))
+        setPendingDeleteId(null)
+        setPendingDeleteTitle(null)
+        deleteDialogRef?.close()
+      })
+      .catch((err) => {
+        notify({ type: 'error', message: `Error deleting info card: ${err}` })
+      })
+      .finally(() => setIsDeleting(false))
+  }
+
+  function cancelDeleteCard() {
+    setPendingDeleteId(null)
+    setPendingDeleteTitle(null)
+    deleteDialogRef?.close()
   }
 
   return (
@@ -151,7 +180,9 @@ function InfoHub() {
                         <Show when={card.authorId === session().data!.user.id}>
                           <button
                             class="btn text-error btn-ghost btn-xs"
-                            onClick={() => handleDeleteCard(card.id)}
+                            onClick={() =>
+                              requestDeleteCard(card.id, card.title)
+                            }
                           >
                             Delete
                           </button>
@@ -237,6 +268,37 @@ function InfoHub() {
             </button>
             <button class="btn btn-error" onClick={confirmDiscard}>
               Discard
+            </button>
+          </div>
+        </div>
+      </dialog>
+
+      <dialog ref={deleteDialogRef} class="modal">
+        <div class="modal-box">
+          <h3 class="text-lg font-bold">Delete info card?</h3>
+          <p class="py-2 text-sm opacity-70">
+            Are you sure you want to delete "<b>{pendingDeleteTitle()}</b>"?
+            This action cannot be undone.
+          </p>
+          <div class="modal-action">
+            <button
+              class="btn btn-ghost"
+              onClick={cancelDeleteCard}
+              disabled={isDeleting()}
+            >
+              Cancel
+            </button>
+            <button
+              class="btn btn-error"
+              onClick={confirmDeleteCard}
+              disabled={isDeleting()}
+            >
+              <Show
+                when={!isDeleting()}
+                fallback={<span class="loading loading-sm loading-spinner" />}
+              >
+                Delete
+              </Show>
             </button>
           </div>
         </div>
