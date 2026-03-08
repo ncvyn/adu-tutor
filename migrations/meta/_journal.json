@@ -43,6 +43,13 @@
       "when": 1772875594128,
       "tag": "0005_clumsy_ares",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1772966408358,
+      "tag": "0006_pale_random",
+      "breakpoints": true
     }
   ]
 }

@@ -1,13 +1,19 @@
-import { Show } from 'solid-js'
+import { Show, For } from 'solid-js'
 import { getInitials } from '@/lib/helper'
 import { UserBadges, useNotifications } from '@/components'
 import { signOut } from '@/lib/auth-client'
 import { useNavigate } from '@tanstack/solid-router'
 
-export function UserProfile(props: { profile: any }) {
+export default function UserProfile(props: { profile: any }) {
   const { profile } = props
   const { notify } = useNotifications()
   const navigate = useNavigate()
+
+  const subjects: string[] = Array.isArray(profile.preferredSubjects)
+    ? profile.preferredSubjects
+    : typeof profile.preferredSubjects === 'string'
+      ? JSON.parse(profile.preferredSubjects || '[]')
+      : []
 
   return (
     <div class="flex flex-col items-center text-center">
@@ -20,8 +26,16 @@ export function UserProfile(props: { profile: any }) {
       <div class="mt-2 badge font-semibold tracking-wide uppercase badge-primary">
         {profile.role}
       </div>
-      <Show when={profile.preferredSubject}>
-        <div class="mt-2 badge">{profile.preferredSubject}</div>
+      <Show when={subjects.length > 0}>
+        <div class="mt-2 flex flex-wrap justify-center gap-2">
+          <For each={subjects}>
+            {(subject) => (
+              <div class="badge font-semibold tracking-wide uppercase badge-info">
+                {subject}
+              </div>
+            )}
+          </For>
+        </div>
       </Show>
       <Show when={profile.bio}>
         <p class="mt-4 max-w-lg text-sm opacity-80">{profile.bio}</p>
@@ -36,5 +50,3 @@ export function UserProfile(props: { profile: any }) {
     </div>
   )
 }
-
-export default UserProfile

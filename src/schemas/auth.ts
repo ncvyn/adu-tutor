@@ -21,9 +21,8 @@ export const user = sqliteTable("user", {
   role: text({ enum: ["tutor", "tutee"] })
     .default("tutee")
     .notNull(),
-  xp: integer("xp").default(0).notNull(),
   bio: text("bio").default("").notNull(),
-  preferredSubject: text("preferred_subject").default("").notNull(),
+  preferredSubjects: text("preferred_subjects").default('[]').notNull(),
   availability: text("availability").default(""),
 });
 

@@ -17,14 +17,20 @@ interface SettingsProps {
   refetchProfile: () => Promise<unknown>
 }
 
+const MAXIMUM_SUBJECTS = 5
+
 export default function Settings(props: SettingsProps) {
   const { profile, refetchProfile } = props
   const { notify } = useNotifications()
   const navigate = useNavigate()
 
   const [bio, setBio] = createSignal(profile.bio ?? '')
-  const [preferredSubject, setPreferredSubject] = createSignal<string>(
-    profile.preferredSubject ?? SUBJECTS[0],
+  const [preferredSubjects, setPreferredSubjects] = createSignal<string[]>(
+    Array.isArray(profile.preferredSubjects)
+      ? profile.preferredSubjects
+      : typeof profile.preferredSubjects === 'string'
+        ? JSON.parse(profile.preferredSubjects || '[]')
+        : [],
   )
   const [theme, setTheme] = createSignal<ThemeMode>(
     (localStorage.getItem('adu-theme') as ThemeMode | null) ?? 'system',
@@ -46,7 +52,7 @@ export default function Settings(props: SettingsProps) {
       await updateSettings({
         data: {
           bio: bio().trim(),
-          preferredSubject: preferredSubject(),
+          preferredSubjects: preferredSubjects(),
           availability:
             profile.role === 'tutor' ? JSON.stringify(availability()) : '',
         },
@@ -121,6 +127,16 @@ export default function Settings(props: SettingsProps) {
     localStorage.setItem('adu-theme', value)
   }
 
+  function toggleSubject(subject: string) {
+    setPreferredSubjects((curr) =>
+      curr.includes(subject)
+        ? curr.filter((s) => s !== subject)
+        : curr.length < MAXIMUM_SUBJECTS
+          ? [...curr, subject]
+          : curr,
+    )
+  }
+
   return (
     <div class="space-y-6">
       {/* Account Settings Card */}
@@ -138,21 +154,31 @@ export default function Settings(props: SettingsProps) {
           </fieldset>
           <fieldset class="fieldset w-full">
             <legend class="fieldset-legend">
-              Preferred Subject{' '}
+              Preferred Subjects{' '}
               {profile.role === 'tutor' ? 'to Teach' : 'to Learn'}
             </legend>
-            <select
-              class="select-bordered select"
-              value={preferredSubject()}
-              onChange={(e) => setPreferredSubject(e.currentTarget.value)}
-            >
-              <option disabled selected>
-                Select a subject
-              </option>
+            <div class="flex flex-wrap gap-2">
               <For each={SUBJECTS}>
-                {(subject) => <option value={subject}>{subject}</option>}
+                {(subject) => (
+                  <label class="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary"
+                      checked={preferredSubjects().includes(subject)}
+                      onInput={() => toggleSubject(subject)}
+                      disabled={
+                        !preferredSubjects().includes(subject) &&
+                        preferredSubjects().length >= MAXIMUM_SUBJECTS
+                      }
+                    />
+                    <span>{subject}</span>
+                  </label>
+                )}
               </For>
-            </select>
+            </div>
+            <div class="mt-1 text-xs opacity-70">
+              Choose up to {MAXIMUM_SUBJECTS} subjects.
+            </div>
           </fieldset>
           <fieldset class="fieldset w-full">
             <legend class="fieldset-legend">Program Theme</legend>

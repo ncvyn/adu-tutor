@@ -58,7 +58,6 @@ export async function signIn(
     })
 
     notify({ type: 'success', message: 'Redirecting...' })
-    await authClient.revokeOtherSessions()
   } catch (error) {
     notify({
       type: 'error',

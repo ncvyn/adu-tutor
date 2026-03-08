@@ -35,22 +35,16 @@ export const auth = betterAuth({
         defaultValue: 'tutee',
         input: false,
       },
-      xp: {
-        type: 'number',
-        required: true,
-        defaultValue: 0,
-        input: false,
-      },
       bio: {
         type: 'string',
         required: true,
         defaultValue: '',
         input: false,
       },
-      preferredSubject: {
-        type: 'string',
+      preferredSubjects: {
+        type: 'json',
         required: true,
-        defaultValue: '',
+        defaultValue: [],
         input: false,
       },
       availability: {

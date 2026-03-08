@@ -8,7 +8,7 @@ import { user } from '@/schemas/auth'
 
 type UpdateSettingsInput = {
   bio: string
-  preferredSubject: string
+  preferredSubjects: string[]
   availability?: string
 }
 
@@ -24,7 +24,7 @@ export const updateSettings = createServerFn({ method: 'POST' })
       .update(user)
       .set({
         bio: data.bio.trim(),
-        preferredSubject: data.preferredSubject.trim(),
+        preferredSubjects: JSON.stringify(data.preferredSubjects),
         availability: data.availability?.trim() || null,
       })
       .where(eq(user.id, session.user.id))

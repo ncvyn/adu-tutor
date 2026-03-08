@@ -3,9 +3,9 @@ import { defineConfig } from 'drizzle-kit'
 export default defineConfig({
   schema: [
     'src/schemas/auth.ts',
+    'src/schemas/badge.ts',
     'src/schemas/chat.ts',
     'src/schemas/info.ts',
-    'src/schemas/badge.ts',
     'src/schemas/noti.ts',
   ],
   out: './migrations',
