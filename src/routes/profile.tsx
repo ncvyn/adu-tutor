@@ -3,19 +3,11 @@ import { Show, Suspense, createResource, createSignal } from 'solid-js'
 import { useAuthGuard } from '@/lib/auth-client'
 import { getUserProfile } from '@/server/get-user-profile.functions'
 import { Dock, LoadingScreen, Navbar } from '@/components'
+import { DAYS } from '@/lib/constants'
 import Settings from '@/components/Settings'
 import UserProfile from '@/components/UserProfile'
 
 export const Route = createFileRoute('/profile')({ component: Profile })
-
-export const SUBJECTS = [
-  'Math',
-  'Science',
-  'English',
-  'Programming',
-  'Other',
-] as const
-export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 
 export type ThemeMode = 'light' | 'dark' | 'system'
 export type AvailabilityMap = Partial<Record<(typeof DAYS)[number], string>>

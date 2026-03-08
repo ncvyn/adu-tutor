@@ -1,6 +1,7 @@
 import type { AvailabilityMap, ThemeMode } from '@/routes/profile'
+import { DAYS, SUBJECTS } from '@/lib/constants'
 import { For, Show, createSignal, onMount } from 'solid-js'
-import { DAYS, SUBJECTS, applyTheme } from '@/routes/profile'
+import { applyTheme } from '@/routes/profile'
 import { updateSettings } from '@/server/update-settings.functions'
 import {
   clearNotifications,
