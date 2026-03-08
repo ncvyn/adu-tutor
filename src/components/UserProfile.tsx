@@ -21,10 +21,7 @@ export function UserProfile(props: { profile: any }) {
         {profile.role}
       </div>
       <Show when={profile.preferredSubject}>
-        <div class="mt-2 badge badge-outline">
-          {profile.role === 'tutor' ? 'Teaches' : 'Learns'}:{' '}
-          {profile.preferredSubject}
-        </div>
+        <div class="mt-2 badge">{profile.preferredSubject}</div>
       </Show>
       <Show when={profile.bio}>
         <p class="mt-4 max-w-lg text-sm opacity-80">{profile.bio}</p>
