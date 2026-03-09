@@ -9,7 +9,10 @@ import type { DAYS } from '@/lib/constants'
 import Settings from '@/components/Settings'
 import UserProfile from '@/components/UserProfile'
 
-export const Route = createFileRoute('/profile')({ component: Profile })
+export const Route = createFileRoute('/profile')({
+  ssr: false,
+  component: Profile,
+})
 
 export type ThemeMode = 'light' | 'dark' | 'system'
 export type AvailabilityMap = Partial<Record<(typeof DAYS)[number], string>>

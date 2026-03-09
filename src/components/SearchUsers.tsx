@@ -1,5 +1,4 @@
-import { For, Show, createMemo, createSignal } from 'solid-js'
-import { useQuery } from '@tanstack/solid-query'
+import { For, Show, createSignal, onCleanup, onMount } from 'solid-js'
 import { Search } from 'lucide-solid'
 import { searchUsers } from '@/server/search-users.functions'
 import { getInitials } from '@/lib/helper'
@@ -11,44 +10,100 @@ export type UserResult = {
 
 export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
   const [query, setQuery] = createSignal('')
+  const [results, setResults] = createSignal<Array<UserResult>>([])
+  const [isLoading, setIsLoading] = createSignal(false)
   const [isOpen, setIsOpen] = createSignal(false)
 
-  const trimmedQuery = createMemo(() => query().trim())
+  let rootRef: HTMLDivElement | undefined
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null
+  let requestToken = 0
 
-  const usersQuery = useQuery(() => ({
-    queryKey: ['users', 'search', trimmedQuery()] as const,
-    enabled: trimmedQuery().length > 0,
-    queryFn: async () => searchUsers({ data: trimmedQuery() }),
-    staleTime: 15_000,
-  }))
+  const closeDropdown = () => setIsOpen(false)
 
-  const results = createMemo(() => usersQuery.data ?? [])
+  const runSearch = (raw: string) => {
+    const trimmed = raw.trim()
+
+    if (!trimmed) {
+      setResults([])
+      setIsLoading(false)
+      setIsOpen(false)
+      return
+    }
+
+    setIsLoading(true)
+    setIsOpen(true)
+
+    const token = ++requestToken
+
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(async () => {
+      try {
+        const data = await searchUsers({ data: trimmed })
+        if (token !== requestToken) return
+        setResults(data)
+      } catch {
+        if (token !== requestToken) return
+        setResults([])
+      } finally {
+        if (token !== requestToken) return
+        setIsLoading(false)
+      }
+    }, 200)
+  }
+
+  const handleOutsidePointerDown = (event: PointerEvent) => {
+    const root = rootRef
+    if (!root) return
+    const target = event.target
+    if (!(target instanceof Node)) return
+    if (!root.contains(target)) closeDropdown()
+  }
+
+  onMount(() => {
+    document.addEventListener('pointerdown', handleOutsidePointerDown)
+  })
+
+  onCleanup(() => {
+    document.removeEventListener('pointerdown', handleOutsidePointerDown)
+    if (debounceTimer) clearTimeout(debounceTimer)
+  })
 
   return (
-    <div class="relative">
+    <div ref={rootRef} class="relative">
       <label class="input w-full">
         <Search class="h-4 w-4 opacity-50" />
         <input
           type="text"
           placeholder="Search users..."
           value={query()}
+          onFocus={() => {
+            if (query().trim()) setIsOpen(true)
+          }}
           onInput={(e) => {
             const value = e.currentTarget.value
             setQuery(value)
-            setIsOpen(value.trim().length > 0)
+            runSearch(value)
           }}
-          onFocus={() => {
-            if (results().length > 0) setIsOpen(true)
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') closeDropdown()
           }}
-          onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         />
-        <Show when={usersQuery.isFetching}>
+        <Show when={isLoading()}>
           <span class="loading loading-xs loading-spinner" />
         </Show>
       </label>
 
-      <Show when={isOpen() && results().length > 0}>
+      <Show when={isOpen() && query().trim().length > 0}>
         <ul class="menu absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
+          <Show when={isLoading()}>
+            <li>
+              <div class="flex items-center gap-2 opacity-70">
+                <span class="loading loading-xs loading-spinner" />
+                Searching...
+              </div>
+            </li>
+          </Show>
+
           <For each={results()}>
             {(user) => (
               <li>
@@ -58,7 +113,8 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
                     e.preventDefault()
                     props.onSelect?.(user)
                     setQuery('')
-                    setIsOpen(false)
+                    setResults([])
+                    closeDropdown()
                   }}
                 >
                   <div class="avatar avatar-placeholder">
@@ -68,13 +124,17 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
                       </span>
                     </div>
                   </div>
-                  <div class="flex flex-col items-start">
-                    <span class="text-sm font-medium">{user.name}</span>
-                  </div>
+                  <span class="text-sm font-medium">{user.name}</span>
                 </button>
               </li>
             )}
           </For>
+
+          <Show when={!isLoading() && results().length === 0}>
+            <li>
+              <div class="text-sm opacity-60">No users found.</div>
+            </li>
+          </Show>
         </ul>
       </Show>
     </div>
