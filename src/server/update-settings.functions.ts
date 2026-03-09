@@ -8,7 +8,7 @@ import { user } from '@/schemas/auth'
 
 type UpdateSettingsInput = {
   bio: string
-  preferredSubjects: string[]
+  preferredSubjects: Array<string>
   availability?: string
 }
 

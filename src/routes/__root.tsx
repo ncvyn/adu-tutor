@@ -5,15 +5,18 @@ import {
   createRootRouteWithContext,
 } from '@tanstack/solid-router'
 import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools'
+import { QueryClientProvider } from '@tanstack/solid-query'
 
+import { ErrorBoundary, Suspense } from 'solid-js'
 import { HydrationScript } from 'solid-js/web'
-import { Suspense } from 'solid-js'
 
 import {
   Notifications,
   NotificationsProvider,
+  useNotifications,
 } from '@/components/Notifications'
 import { ChatProvider } from '@/components/ChatContext'
+import { queryClient } from '@/lib/query-client'
 
 import styleCss from '@/styles.css?url'
 
@@ -39,6 +42,25 @@ export const Route = createRootRouteWithContext()({
   shellComponent: RootComponent,
 })
 
+function RootErrorFallback() {
+  const { notify } = useNotifications()
+
+  return (
+    <div class="m-4 rounded-box border border-error/30 bg-error/10 p-4 text-error">
+      <p class="font-semibold">Something went wrong.</p>
+      <button
+        class="btn mt-3 btn-sm btn-error"
+        onClick={() => {
+          notify({ type: 'error', message: 'Unexpected app error occurred.' })
+          window.location.reload()
+        }}
+      >
+        Reload
+      </button>
+    </div>
+  )
+}
+
 function RootComponent() {
   return (
     <html>
@@ -46,19 +68,23 @@ function RootComponent() {
         <HydrationScript />
       </head>
       <body>
-        <NotificationsProvider>
-          <ChatProvider>
-            <HeadContent />
-            <Suspense>
-              <Notifications />
-              <Outlet />
-              {process.env.NODE_ENV === 'development' && (
-                <TanStackRouterDevtools />
-              )}
-            </Suspense>
-            <Scripts />
-          </ChatProvider>
-        </NotificationsProvider>
+        <QueryClientProvider client={queryClient}>
+          <NotificationsProvider>
+            <ChatProvider>
+              <HeadContent />
+              <ErrorBoundary fallback={<RootErrorFallback />}>
+                <Suspense>
+                  <Notifications />
+                  <Outlet />
+                  {process.env.NODE_ENV === 'development' && (
+                    <TanStackRouterDevtools />
+                  )}
+                </Suspense>
+              </ErrorBoundary>
+              <Scripts />
+            </ChatProvider>
+          </NotificationsProvider>
+        </QueryClientProvider>
       </body>
     </html>
   )

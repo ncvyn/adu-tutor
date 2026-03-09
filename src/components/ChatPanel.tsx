@@ -60,6 +60,7 @@ export const ChatPanel = (props: {
   const messages = () => chat.messages()
   const isLoading = () => chat.isLoading()
   const isConnected = () => chat.isConnected()
+  const isSending = () => chat.isSending()
 
   return (
     <section class="flex h-full min-h-0 flex-col rounded-box border border-base-300 bg-base-100">
@@ -174,10 +175,15 @@ export const ChatPanel = (props: {
         />
         <button
           class="btn self-end btn-primary"
-          disabled={!input().trim() || !isConnected()}
+          disabled={!input().trim() || (!isConnected() && isSending())}
           onClick={handleSend}
         >
-          Send
+          <Show
+            when={!isSending()}
+            fallback={<span class="loading loading-xs loading-spinner" />}
+          >
+            Send
+          </Show>
         </button>
       </footer>
     </section>

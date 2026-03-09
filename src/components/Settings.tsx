@@ -25,7 +25,7 @@ export default function Settings(props: SettingsProps) {
   const navigate = useNavigate()
 
   const [bio, setBio] = createSignal(profile.bio ?? '')
-  const [preferredSubjects, setPreferredSubjects] = createSignal<string[]>(
+  const [preferredSubjects, setPreferredSubjects] = createSignal<Array<string>>(
     Array.isArray(profile.preferredSubjects)
       ? profile.preferredSubjects
       : typeof profile.preferredSubjects === 'string'

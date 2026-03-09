@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/solid-start'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
-import { desc, eq, and, sql } from 'drizzle-orm'
+import { and, desc, eq, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { infoCard, infoCardVote } from '@/schemas/info'
@@ -39,7 +39,7 @@ export const getInfoCards = createServerFn({ method: 'GET' }).handler(
 
     return cards.map((card) => ({
       ...card,
-      subjects: JSON.parse(card.subjects) as string[],
+      subjects: JSON.parse(card.subjects) as Array<string>,
       score: scoreMap.get(card.id) ?? 0,
       userVote: userVoteMap.get(card.id) ?? null,
     }))
@@ -48,7 +48,8 @@ export const getInfoCards = createServerFn({ method: 'GET' }).handler(
 
 export const createInfoCard = createServerFn({ method: 'POST' })
   .inputValidator(
-    (input: { title: string; content: string; subjects: string[] }) => input,
+    (input: { title: string; content: string; subjects: Array<string> }) =>
+      input,
   )
   .handler(async ({ data }) => {
     const headers = getRequestHeaders()
@@ -60,7 +61,7 @@ export const createInfoCard = createServerFn({ method: 'POST' })
 
     const title = data.title.trim()
     const content = data.content.trim()
-    const subjects = (data.subjects ?? [])
+    const subjects = data.subjects
       .map((s) => s.trim())
       .filter(Boolean)
       .filter((s) => SUBJECTS.includes(s as (typeof SUBJECTS)[number]))

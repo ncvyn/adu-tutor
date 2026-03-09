@@ -1,5 +1,13 @@
-import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
+import {
+  ErrorBoundary,
+  For,
+  Show,
+  Suspense,
+  createMemo,
+  createSignal,
+} from 'solid-js'
 import { createFileRoute } from '@tanstack/solid-router'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { SolidMarkdown } from 'solid-markdown'
 import type { InfoCardWithVotes } from '@/schemas/info'
 import { useAuthGuard } from '@/lib/auth-client'
@@ -16,16 +24,24 @@ import {
 
 export const Route = createFileRoute('/info-hub')({ component: InfoHub })
 
+function InfoHubErrorFallback() {
+  return (
+    <div class="mx-auto my-8 w-full max-w-4xl px-4">
+      <div class="alert alert-error">
+        <span>Failed to load info cards.</span>
+      </div>
+    </div>
+  )
+}
+
 function InfoHub() {
   const session = useAuthGuard({ requireAuth: true })
   const { notify } = useNotifications()
+  const queryClient = useQueryClient()
 
-  const [cards, setCards] = createSignal<Array<InfoCardWithVotes>>([])
-  const [isLoading, setIsLoading] = createSignal(true)
   const [newTitle, setNewTitle] = createSignal('')
   const [newContent, setNewContent] = createSignal('')
-  const [newSubjects, setNewSubjects] = createSignal<string[]>(['General'])
-  const [isSaving, setIsSaving] = createSignal(false)
+  const [newSubjects, setNewSubjects] = createSignal<Array<string>>(['General'])
   const [filterSubject, setFilterSubject] = createSignal<string>('All')
 
   let shareDialogRef: HTMLDialogElement | undefined
@@ -38,10 +54,68 @@ function InfoHub() {
   const [pendingDeleteTitle, setPendingDeleteTitle] = createSignal<
     string | null
   >(null)
-  const [isDeleting, setIsDeleting] = createSignal(false)
 
-  const isFormValid = createMemo(
-    () => newTitle().trim().length > 0 && newContent().trim().length > 0,
+  const [allowClose, setAllowClose] = createSignal(false)
+
+  const cardsQuery = useQuery(() => ({
+    queryKey: ['info-cards', session().data?.user.id] as const,
+    enabled: !!session().data?.user.id,
+    queryFn: async () => getInfoCards(),
+  }))
+
+  const createCardMutation = useMutation(() => ({
+    mutationKey: ['info-card', 'create', session().data?.user.id] as const,
+    mutationFn: async (payload: {
+      title: string
+      content: string
+      subjects: Array<string>
+    }) => createInfoCard({ data: payload }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['info-cards'] })
+      closeShareDialog()
+    },
+    onError: (err) => {
+      notify({
+        type: 'error',
+        message: `Error creating info card: ${String(err)}`,
+      })
+    },
+  }))
+
+  const deleteCardMutation = useMutation(() => ({
+    mutationKey: ['info-card', 'delete', pendingDeleteId()] as const,
+    mutationFn: async (id: string) => deleteInfoCard({ data: { id } }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['info-cards'] })
+      setPendingDeleteId(null)
+      setPendingDeleteTitle(null)
+      deleteDialogRef?.close()
+    },
+    onError: (err) => {
+      notify({
+        type: 'error',
+        message: `Error deleting info card: ${String(err)}`,
+      })
+    },
+  }))
+
+  const voteMutation = useMutation(() => ({
+    mutationKey: ['info-card', 'vote', session().data?.user.id] as const,
+    mutationFn: async (payload: { cardId: string; value: number }) =>
+      voteInfoCard({ data: payload }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['info-cards'] })
+    },
+    onError: (err) => {
+      notify({
+        type: 'error',
+        message: `Error voting: ${String(err)}`,
+      })
+    },
+  }))
+
+  const cards = createMemo<Array<InfoCardWithVotes>>(
+    () => cardsQuery.data ?? [],
   )
 
   const filteredCards = createMemo(() => {
@@ -55,11 +129,13 @@ function InfoHub() {
     return count === 1 ? '1 card' : `${count} cards`
   })
 
+  const isFormValid = createMemo(
+    () => newTitle().trim().length > 0 && newContent().trim().length > 0,
+  )
+
   const isDirty = createMemo(
     () => newTitle().trim().length > 0 || newContent().trim().length > 0,
   )
-
-  const [allowClose, setAllowClose] = createSignal(false)
 
   function resetForm() {
     setNewTitle('')
@@ -95,42 +171,14 @@ function InfoHub() {
     confirmDialogRef?.close()
   }
 
-  async function fetchCards() {
-    try {
-      const result = await getInfoCards()
-      setCards(result)
-    } catch (err) {
-      notify({ type: 'error', message: `Error fetching info cards: ${err}` })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  onMount(() => {
-    fetchCards()
-  })
-
   async function addCard() {
-    if (!isFormValid() || isSaving()) return
+    if (!isFormValid() || createCardMutation.isPending) return
 
-    setIsSaving(true)
-
-    try {
-      const newCard = await createInfoCard({
-        data: {
-          title: newTitle().trim(),
-          content: newContent().trim(),
-          subjects: newSubjects(),
-        },
-      })
-
-      setCards((prev) => [newCard, ...prev])
-      closeShareDialog()
-    } catch (err) {
-      notify({ type: 'error', message: `Error creating info card: ${err}` })
-    } finally {
-      setIsSaving(false)
-    }
+    await createCardMutation.mutateAsync({
+      title: newTitle().trim(),
+      content: newContent().trim(),
+      subjects: newSubjects(),
+    })
   }
 
   function requestDeleteCard(id: string, title: string) {
@@ -139,21 +187,10 @@ function InfoHub() {
     deleteDialogRef?.showModal()
   }
 
-  function confirmDeleteCard() {
+  async function confirmDeleteCard() {
     const id = pendingDeleteId()
-    if (!id) return
-    setIsDeleting(true)
-    deleteInfoCard({ data: { id } })
-      .then(() => {
-        setCards((prev) => prev.filter((card) => card.id !== id))
-        setPendingDeleteId(null)
-        setPendingDeleteTitle(null)
-        deleteDialogRef?.close()
-      })
-      .catch((err) => {
-        notify({ type: 'error', message: `Error deleting info card: ${err}` })
-      })
-      .finally(() => setIsDeleting(false))
+    if (!id || deleteCardMutation.isPending) return
+    await deleteCardMutation.mutateAsync(id)
   }
 
   function cancelDeleteCard() {
@@ -163,129 +200,128 @@ function InfoHub() {
   }
 
   async function handleVote(cardId: string, value: number) {
-    try {
-      const result = await voteInfoCard({ data: { cardId, value } })
-
-      setCards((prev) =>
-        prev.map((card) => {
-          if (card.id !== cardId) return card
-
-          const oldVote = card.userVote ?? 0
-          const newVote = result.userVote ?? 0
-          const scoreDiff = newVote - oldVote
-
-          return {
-            ...card,
-            score: card.score + scoreDiff,
-            userVote: result.userVote,
-          }
-        }),
-      )
-    } catch (err) {
-      notify({ type: 'error', message: `Error voting: ${err}` })
-    }
+    if (voteMutation.isPending) return
+    await voteMutation.mutateAsync({ cardId, value })
   }
 
   return (
     <AuthenticatedLayout>
       <Show when={session().data} fallback={<LoadingScreen />}>
-        <div class="mx-auto my-8 w-full max-w-4xl px-4 pb-4">
-          <div class="mb-4 flex items-center justify-between">
-            <div>
-              <h1 class="text-2xl font-bold">Info Hub</h1>
-              <p class="text-sm opacity-70">{cardCountLabel()}</p>
-            </div>
+        <ErrorBoundary fallback={<InfoHubErrorFallback />}>
+          <Suspense fallback={<LoadingScreen />}>
+            <div class="mx-auto my-8 w-full max-w-4xl px-4 pb-4">
+              <div class="mb-4 flex items-center justify-between">
+                <div>
+                  <h1 class="text-2xl font-bold">Info Hub</h1>
+                  <p class="text-sm opacity-70">{cardCountLabel()}</p>
+                </div>
 
-            <button class="btn btn-primary" onClick={openShareDialog}>
-              Share Info
-            </button>
-          </div>
+                <button class="btn btn-primary" onClick={openShareDialog}>
+                  Share Info
+                </button>
+              </div>
 
-          <div class="mb-4">
-            <select
-              class="select-bordered select w-full max-w-xs"
-              value={filterSubject()}
-              onChange={(e) => setFilterSubject(e.currentTarget.value)}
-            >
-              <option value="All">All Subjects</option>
-              <For each={SUBJECTS}>
-                {(subject) => <option value={subject}>{subject}</option>}
-              </For>
-            </select>
-          </div>
+              <div class="mb-4">
+                <select
+                  class="select-bordered select w-full max-w-xs"
+                  value={filterSubject()}
+                  onChange={(e) => setFilterSubject(e.currentTarget.value)}
+                >
+                  <option value="All">All Subjects</option>
+                  <For each={SUBJECTS}>
+                    {(subject) => <option value={subject}>{subject}</option>}
+                  </For>
+                </select>
+              </div>
 
-          <Show when={!isLoading()} fallback={<LoadingScreen />}>
-            <div class="space-y-4">
-              <For each={filteredCards()}>
-                {(card) => (
-                  <div class="card bg-base-100 shadow card-border">
-                    <div class="card-body">
-                      <div class="flex items-start gap-4">
-                        {/* Voting column */}
-                        <div class="flex flex-col items-center gap-1">
-                          <button
-                            class={`btn btn-ghost btn-xs ${card.userVote === 1 ? 'btn-active text-success' : ''}`}
-                            disabled={card.authorId === session().data!.user.id}
-                            onClick={() => handleVote(card.id, 1)}
-                            title="Upvote"
-                          >
-                            ▲
-                          </button>
-                          <span class="text-sm font-bold">{card.score}</span>
-                          <button
-                            class={`btn btn-ghost btn-xs ${card.userVote === -1 ? 'btn-active text-error' : ''}`}
-                            disabled={card.authorId === session().data!.user.id}
-                            onClick={() => handleVote(card.id, -1)}
-                            title="Downvote"
-                          >
-                            ▼
-                          </button>
-                        </div>
+              <Show when={filteredCards().length > 0}>
+                <div class="space-y-4">
+                  <For each={filteredCards()}>
+                    {(card) => (
+                      <div class="card bg-base-100 shadow card-border">
+                        <div class="card-body">
+                          <div class="flex items-start gap-4">
+                            <div class="flex flex-col items-center gap-1">
+                              <button
+                                class={`btn btn-ghost btn-xs ${card.userVote === 1 ? 'btn-active text-success' : ''}`}
+                                disabled={
+                                  card.authorId === session().data!.user.id
+                                }
+                                onClick={() => handleVote(card.id, 1)}
+                                title="Upvote"
+                              >
+                                ▲
+                              </button>
+                              <span class="text-sm font-bold">
+                                {card.score}
+                              </span>
+                              <button
+                                class={`btn btn-ghost btn-xs ${card.userVote === -1 ? 'btn-active text-error' : ''}`}
+                                disabled={
+                                  card.authorId === session().data!.user.id
+                                }
+                                onClick={() => handleVote(card.id, -1)}
+                                title="Downvote"
+                              >
+                                ▼
+                              </button>
+                            </div>
 
-                        {/* Card content */}
-                        <div class="min-w-0 flex-1">
-                          <div class="flex items-start justify-between gap-4">
-                            <div>
-                              <h2 class="card-title">{card.title}</h2>
-                              <div class="flex items-center gap-2">
-                                <p class="text-xs opacity-60">
-                                  by {card.authorName}
-                                </p>
-                                <For each={card.subjects}>
-                                  {(s) => (
-                                    <span class="badge badge-outline badge-sm">
-                                      {s}
-                                    </span>
-                                  )}
-                                </For>
+                            <div class="min-w-0 flex-1">
+                              <div class="flex items-start justify-between gap-4">
+                                <div>
+                                  <h2 class="card-title">{card.title}</h2>
+                                  <div class="flex items-center gap-2">
+                                    <p class="text-xs opacity-60">
+                                      by {card.authorName}
+                                    </p>
+                                    <For each={card.subjects}>
+                                      {(s) => (
+                                        <span class="badge badge-outline badge-sm">
+                                          {s}
+                                        </span>
+                                      )}
+                                    </For>
+                                  </div>
+                                </div>
+                                <Show
+                                  when={
+                                    card.authorId === session().data!.user.id
+                                  }
+                                >
+                                  <button
+                                    class="btn text-error btn-ghost btn-xs"
+                                    onClick={() =>
+                                      requestDeleteCard(card.id, card.title)
+                                    }
+                                  >
+                                    Delete
+                                  </button>
+                                </Show>
+                              </div>
+
+                              <div class={markdownClass}>
+                                <SolidMarkdown>{card.content}</SolidMarkdown>
                               </div>
                             </div>
-                            <Show
-                              when={card.authorId === session().data!.user.id}
-                            >
-                              <button
-                                class="btn text-error btn-ghost btn-xs"
-                                onClick={() =>
-                                  requestDeleteCard(card.id, card.title)
-                                }
-                              >
-                                Delete
-                              </button>
-                            </Show>
-                          </div>
-
-                          <div class={markdownClass}>
-                            <SolidMarkdown>{card.content}</SolidMarkdown>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                )}
-              </For>
+                    )}
+                  </For>
+                </div>
+              </Show>
+
+              <Show when={filteredCards().length === 0}>
+                <div class="rounded-box border border-base-300 bg-base-100 p-8 text-center">
+                  <p class="text-sm opacity-60">
+                    No cards found for this filter.
+                  </p>
+                </div>
+              </Show>
             </div>
-          </Show>
-        </div>
+          </Suspense>
+        </ErrorBoundary>
       </Show>
 
       <dialog
@@ -354,11 +390,11 @@ function InfoHub() {
             </button>
             <button
               class="btn btn-primary"
-              disabled={!isFormValid() || isSaving()}
+              disabled={!isFormValid() || createCardMutation.isPending}
               onClick={addCard}
             >
               <Show
-                when={!isSaving()}
+                when={!createCardMutation.isPending}
                 fallback={<span class="loading loading-sm loading-spinner" />}
               >
                 Post
@@ -396,17 +432,17 @@ function InfoHub() {
             <button
               class="btn btn-ghost"
               onClick={cancelDeleteCard}
-              disabled={isDeleting()}
+              disabled={deleteCardMutation.isPending}
             >
               Cancel
             </button>
             <button
               class="btn btn-error"
               onClick={confirmDeleteCard}
-              disabled={isDeleting()}
+              disabled={deleteCardMutation.isPending}
             >
               <Show
-                when={!isDeleting()}
+                when={!deleteCardMutation.isPending}
                 fallback={<span class="loading loading-sm loading-spinner" />}
               >
                 Delete

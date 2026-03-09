@@ -14,11 +14,13 @@ const SUBJECT_OPTIONS = [
 
 export function EditSubjectsModal(props: {
   open: boolean
-  subjects: string[]
+  subjects: Array<string>
   onClose: () => void
-  onSaveSuccess: (subjects: string[]) => void
+  onSaveSuccess: (subjects: Array<string>) => void
 }) {
-  const [selected, setSelected] = createSignal<string[]>([...props.subjects])
+  const [selected, setSelected] = createSignal<Array<string>>([
+    ...props.subjects,
+  ])
   const [saving, setSaving] = createSignal(false)
 
   function toggleSubject(subject: string) {

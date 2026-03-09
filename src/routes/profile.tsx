@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/solid-router'
-import { Show, Suspense, createResource, createSignal } from 'solid-js'
+import { useQuery } from '@tanstack/solid-query'
+import { ErrorBoundary, Show, Suspense, createSignal } from 'solid-js'
 import { useAuthGuard } from '@/lib/auth-client'
 import { getUserProfile } from '@/server/get-user-profile.functions'
 import { LoadingScreen } from '@/components'
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
-import { DAYS } from '@/lib/constants'
+import type { DAYS } from '@/lib/constants'
 import Settings from '@/components/Settings'
 import UserProfile from '@/components/UserProfile'
 
@@ -26,54 +27,63 @@ export function applyTheme(value: ThemeMode): void {
   localStorage.setItem('adu-theme', value)
 }
 
+function ProfileErrorFallback() {
+  return (
+    <div class="alert alert-error">
+      <span>Failed to load profile data.</span>
+    </div>
+  )
+}
+
 function Profile() {
   const session = useAuthGuard({ requireAuth: true })
   const [isSettingsOpen, setIsSettingsOpen] = createSignal(false)
 
-  const [userProfile, { refetch: refetchProfile }] = createResource(
-    () => session().data?.user.id,
-    async () => getUserProfile(),
-  )
+  const userProfileQuery = useQuery(() => ({
+    queryKey: ['user-profile', session().data?.user.id] as const,
+    enabled: !!session().data?.user.id,
+    queryFn: async () => getUserProfile(),
+  }))
 
   return (
     <AuthenticatedLayout>
       <Show when={session().data} fallback={<LoadingScreen />}>
-        <Suspense fallback={<LoadingScreen />}>
-          <Show when={userProfile()}>
-            {(profile) => (
-              <div class="my-10 flex flex-col items-center px-4">
-                <div class="card w-full max-w-3xl bg-base-100 shadow-xl">
-                  <div class="card-body">
-                    <div class="mb-4 flex items-center justify-between">
-                      <h2 class="card-title">
-                        {isSettingsOpen() ? 'Settings' : 'Profile'}
-                      </h2>
-                      <button
-                        class="btn btn-sm btn-primary"
-                        onClick={() => setIsSettingsOpen((v) => !v)}
+        <ErrorBoundary fallback={<ProfileErrorFallback />}>
+          <Suspense fallback={<LoadingScreen />}>
+            <Show when={userProfileQuery.data}>
+              {(profile) => (
+                <div class="my-10 flex flex-col items-center px-4">
+                  <div class="card w-full max-w-3xl bg-base-100 shadow-xl">
+                    <div class="card-body">
+                      <div class="mb-4 flex items-center justify-between">
+                        <h2 class="card-title">
+                          {isSettingsOpen() ? 'Settings' : 'Profile'}
+                        </h2>
+                        <button
+                          class="btn btn-sm btn-primary"
+                          onClick={() => setIsSettingsOpen((v) => !v)}
+                        >
+                          {isSettingsOpen() ? 'Back to Profile' : 'Settings'}
+                        </button>
+                      </div>
+                      <Show
+                        when={!isSettingsOpen()}
+                        fallback={
+                          <Settings
+                            profile={profile()}
+                            refetchProfile={() => userProfileQuery.refetch()}
+                          />
+                        }
                       >
-                        {isSettingsOpen() ? 'Back to Profile' : 'Settings'}
-                      </button>
+                        <UserProfile profile={profile()} />
+                      </Show>
                     </div>
-                    <Show
-                      when={!isSettingsOpen()}
-                      fallback={
-                        <Settings
-                          profile={profile()}
-                          refetchProfile={() =>
-                            Promise.resolve(refetchProfile())
-                          }
-                        />
-                      }
-                    >
-                      <UserProfile profile={profile()} />
-                    </Show>
                   </div>
                 </div>
-              </div>
-            )}
-          </Show>
-        </Suspense>
+              )}
+            </Show>
+          </Suspense>
+        </ErrorBoundary>
       </Show>
     </AuthenticatedLayout>
   )

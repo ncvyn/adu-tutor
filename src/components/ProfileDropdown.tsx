@@ -25,7 +25,7 @@ export function ProfileDropdown() {
           <div
             tabindex="0"
             role="button"
-            class="btn btn-ghost btn-circle avatar avatar-placeholder"
+            class="btn avatar avatar-placeholder btn-circle btn-ghost"
             aria-label="Open profile menu"
           >
             <div class="w-10 rounded-full bg-primary text-primary-content">

@@ -1,6 +1,7 @@
-import { createSignal, onCleanup } from 'solid-js'
+import { createEffect, createSignal, on, onCleanup } from 'solid-js'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { useNotifications } from '@/components'
-import { getMessages } from '@/server/messages.functions'
+import { addMessage, getMessages } from '@/server/messages.functions'
 
 export interface ChatMessage {
   id: string
@@ -19,38 +20,89 @@ const MAX_RECONNECT_DELAY = 30000 // 30 seconds
 const INITIAL_RECONNECT_DELAY = 1000 // 1 second
 
 export function useChat(options: ChatOptions) {
-  const [messages, setMessages] = createSignal<Array<ChatMessage>>([])
   const [isConnected, setIsConnected] = createSignal(false)
-  const [isLoading, setIsLoading] = createSignal(true)
   const [conversationId, setConversationId] = createSignal<string>('')
 
   let ws: WebSocket | null = null
   let reconnectDelay = INITIAL_RECONNECT_DELAY
   let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
   let isIntentionallyClosed = false
+  let hasConnected = false
 
   const { senderId, recipientId } = options
   const params = `s=${senderId}&r=${recipientId}`
 
   const { notify } = useNotifications()
+  const queryClient = useQueryClient()
 
-  async function loadHistory() {
-    setIsLoading(true)
-    try {
-      const data = await getMessages({ data: { senderId, recipientId } })
-      setMessages(data.messages)
-      if (data.conversation?.id) {
-        setConversationId(data.conversation.id)
+  const messagesQueryKey = () => ['messages', senderId, recipientId] as const
+
+  const historyQuery = useQuery(() => ({
+    queryKey: messagesQueryKey(),
+    enabled: Boolean(senderId && recipientId),
+    queryFn: async () =>
+      getMessages({
+        data: { senderId, recipientId },
+      }),
+    staleTime: 10_000,
+  }))
+
+  createEffect(() => {
+    const data = historyQuery.data
+    if (!data?.conversation?.id) return
+    setConversationId((prev) => prev || data.conversation!.id)
+  })
+
+  function appendMessageToCache(newMessage: ChatMessage) {
+    queryClient.setQueryData(messagesQueryKey(), (prev) => {
+      const current = prev as
+        | {
+            conversation: { id: string } | null
+            messages: Array<ChatMessage>
+          }
+        | undefined
+
+      const prevMessages = Array.isArray(current?.messages)
+        ? current.messages
+        : []
+
+      if (prevMessages.some((m) => m.id === newMessage.id)) {
+        return current ?? { conversation: null, messages: prevMessages }
       }
-    } catch (error) {
+
+      return {
+        conversation: current?.conversation ?? {
+          id: newMessage.conversationId,
+        },
+        messages: [...prevMessages, newMessage],
+      }
+    })
+  }
+
+  const sendMutation = useMutation(() => ({
+    mutationKey: ['messages', 'send', senderId, recipientId] as const,
+    mutationFn: async (content: string) =>
+      addMessage({
+        data: { senderId, recipientId, content },
+      }),
+    onSuccess: async (result) => {
+      const incoming = result.messages[0]
+      if (result.messages.length !== 0) {
+        setConversationId((prev) => prev || incoming.conversationId)
+        appendMessageToCache(incoming)
+      } else {
+        await queryClient.invalidateQueries({
+          queryKey: messagesQueryKey(),
+        })
+      }
+    },
+    onError: (error) => {
       notify({
         type: 'error',
-        message: `Failed to load message history: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        message: `Failed to send message: ${error instanceof Error ? error.message : 'Unknown error'}`,
       })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    },
+  }))
 
   function scheduleReconnect() {
     if (isIntentionallyClosed) return
@@ -74,35 +126,26 @@ export function useChat(options: ChatOptions) {
 
     ws.addEventListener('open', () => {
       setIsConnected(true)
-
       reconnectDelay = INITIAL_RECONNECT_DELAY
     })
 
     ws.addEventListener('message', (event) => {
       try {
         const data = JSON.parse(event.data) as ChatMessage & { type: string }
-        if (data.type === 'message') {
-          if (data.conversationId && !conversationId()) {
-            setConversationId(data.conversationId)
-          }
-          setMessages((p) => {
-            const prev = Array.isArray(p) ? p : []
-            if (prev.some((m) => m.id === data.id)) {
-              return prev
-            }
-            return [
-              ...prev,
-              {
-                id: data.id,
-                conversationId: data.conversationId,
-                senderId: data.senderId,
-                content: data.content,
-                createdAt: data.createdAt,
-              },
-            ]
-          })
+        if (data.type !== 'message') return
+
+        if (data.conversationId && !conversationId()) {
+          setConversationId(data.conversationId)
         }
-      } catch (err) {
+
+        appendMessageToCache({
+          id: data.id,
+          conversationId: data.conversationId,
+          senderId: data.senderId,
+          content: data.content,
+          createdAt: data.createdAt,
+        })
+      } catch {
         notify({
           type: 'warning',
           message: 'Malformed message received.',
@@ -122,18 +165,35 @@ export function useChat(options: ChatOptions) {
     })
   }
 
-  function send(content: string) {
-    if (!ws || ws.readyState !== WebSocket.OPEN) return
+  createEffect(
+    on(
+      () => historyQuery.isSuccess,
+      (isSuccess) => {
+        if (!isSuccess || hasConnected) return
+        hasConnected = true
+        connect()
+      },
+    ),
+  )
 
-    ws.send(
-      JSON.stringify({
-        type: 'message',
-        conversationId: conversationId(),
-        senderId,
-        recipientId,
-        content,
-      }),
-    )
+  function send(content: string) {
+    const trimmed = content.trim()
+    if (!trimmed) return
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(
+        JSON.stringify({
+          type: 'message',
+          conversationId: conversationId(),
+          senderId,
+          recipientId,
+          content: trimmed,
+        }),
+      )
+      return
+    }
+
+    void sendMutation.mutateAsync(trimmed)
   }
 
   function disconnect() {
@@ -148,14 +208,13 @@ export function useChat(options: ChatOptions) {
     }
   }
 
-  loadHistory().then(() => connect())
-
   onCleanup(() => disconnect())
 
   return {
-    messages,
+    messages: () => historyQuery.data?.messages ?? [],
     isConnected,
-    isLoading,
+    isLoading: () => historyQuery.isLoading,
+    isSending: () => sendMutation.isPending,
     send,
     disconnect,
   }

@@ -1,4 +1,4 @@
-import { Show, For } from 'solid-js'
+import { For, Show } from 'solid-js'
 import { getInitials } from '@/lib/helper'
 import { UserBadges, useNotifications } from '@/components'
 import { signOut } from '@/lib/auth-client'
@@ -9,7 +9,7 @@ export default function UserProfile(props: { profile: any }) {
   const { notify } = useNotifications()
   const navigate = useNavigate()
 
-  const subjects: string[] = Array.isArray(profile.preferredSubjects)
+  const subjects: Array<string> = Array.isArray(profile.preferredSubjects)
     ? profile.preferredSubjects
     : typeof profile.preferredSubjects === 'string'
       ? JSON.parse(profile.preferredSubjects || '[]')

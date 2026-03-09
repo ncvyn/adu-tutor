@@ -43,7 +43,7 @@ export const getMySubjects = createServerFn({ method: 'GET' })
   })
 
 export const setSubjects = createServerFn({ method: 'POST' })
-  .inputValidator((data: { subjects: string[] }) => data)
+  .inputValidator((data: { subjects: Array<string> }) => data)
   .middleware([middleware])
   .handler(async ({ data }) => {
     const headers = getRequestHeaders()
