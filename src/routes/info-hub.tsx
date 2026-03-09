@@ -1,14 +1,16 @@
 import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
 import { createFileRoute } from '@tanstack/solid-router'
 import { SolidMarkdown } from 'solid-markdown'
-import type { InfoCard } from '@/schemas/info'
+import type { InfoCardWithVotes } from '@/schemas/info'
 import { useAuthGuard } from '@/lib/auth-client'
 import { Dock, LoadingScreen, Navbar, useNotifications } from '@/components'
 import { markdownClass } from '@/lib/markdown'
+import { SUBJECTS } from '@/lib/constants'
 import {
   createInfoCard,
   deleteInfoCard,
   getInfoCards,
+  voteInfoCard,
 } from '@/server/info-cards.functions'
 
 export const Route = createFileRoute('/info-hub')({ component: InfoHub })
@@ -17,11 +19,13 @@ function InfoHub() {
   const session = useAuthGuard({ requireAuth: true })
   const { notify } = useNotifications()
 
-  const [cards, setCards] = createSignal<Array<InfoCard>>([])
+  const [cards, setCards] = createSignal<Array<InfoCardWithVotes>>([])
   const [isLoading, setIsLoading] = createSignal(true)
   const [newTitle, setNewTitle] = createSignal('')
   const [newContent, setNewContent] = createSignal('')
+  const [newSubjects, setNewSubjects] = createSignal<string[]>(['General'])
   const [isSaving, setIsSaving] = createSignal(false)
+  const [filterSubject, setFilterSubject] = createSignal<string>('All')
 
   let shareDialogRef: HTMLDialogElement | undefined
   let confirmDialogRef: HTMLDialogElement | undefined
@@ -39,8 +43,14 @@ function InfoHub() {
     () => newTitle().trim().length > 0 && newContent().trim().length > 0,
   )
 
+  const filteredCards = createMemo(() => {
+    const subject = filterSubject()
+    if (subject === 'All') return cards()
+    return cards().filter((card) => card.subjects.includes(subject))
+  })
+
   const cardCountLabel = createMemo(() => {
-    const count = cards().length
+    const count = filteredCards().length
     return count === 1 ? '1 card' : `${count} cards`
   })
 
@@ -53,6 +63,7 @@ function InfoHub() {
   function resetForm() {
     setNewTitle('')
     setNewContent('')
+    setNewSubjects(['General'])
   }
 
   function openShareDialog() {
@@ -108,6 +119,7 @@ function InfoHub() {
         data: {
           title: newTitle().trim(),
           content: newContent().trim(),
+          subjects: newSubjects(),
         },
       })
 
@@ -149,6 +161,30 @@ function InfoHub() {
     deleteDialogRef?.close()
   }
 
+  async function handleVote(cardId: string, value: number) {
+    try {
+      const result = await voteInfoCard({ data: { cardId, value } })
+
+      setCards((prev) =>
+        prev.map((card) => {
+          if (card.id !== cardId) return card
+
+          const oldVote = card.userVote ?? 0
+          const newVote = result.userVote ?? 0
+          const scoreDiff = newVote - oldVote
+
+          return {
+            ...card,
+            score: card.score + scoreDiff,
+            userVote: result.userVote,
+          }
+        }),
+      )
+    } catch (err) {
+      notify({ type: 'error', message: `Error voting: ${err}` })
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -166,31 +202,83 @@ function InfoHub() {
             </button>
           </div>
 
+          <div class="mb-4">
+            <select
+              class="select-bordered select w-full max-w-xs"
+              value={filterSubject()}
+              onChange={(e) => setFilterSubject(e.currentTarget.value)}
+            >
+              <option value="All">All Subjects</option>
+              <For each={SUBJECTS}>
+                {(subject) => <option value={subject}>{subject}</option>}
+              </For>
+            </select>
+          </div>
+
           <Show when={!isLoading()} fallback={<LoadingScreen />}>
             <div class="space-y-4">
-              <For each={cards()}>
+              <For each={filteredCards()}>
                 {(card) => (
                   <div class="card bg-base-100 shadow card-border">
                     <div class="card-body">
-                      <div class="flex items-start justify-between gap-4">
-                        <div>
-                          <h2 class="card-title">{card.title}</h2>
-                          <p class="text-xs opacity-60">by {card.authorName}</p>
-                        </div>
-                        <Show when={card.authorId === session().data!.user.id}>
+                      <div class="flex items-start gap-4">
+                        {/* Voting column */}
+                        <div class="flex flex-col items-center gap-1">
                           <button
-                            class="btn text-error btn-ghost btn-xs"
-                            onClick={() =>
-                              requestDeleteCard(card.id, card.title)
-                            }
+                            class={`btn btn-ghost btn-xs ${card.userVote === 1 ? 'btn-active text-success' : ''}`}
+                            disabled={card.authorId === session().data!.user.id}
+                            onClick={() => handleVote(card.id, 1)}
+                            title="Upvote"
                           >
-                            Delete
+                            ▲
                           </button>
-                        </Show>
-                      </div>
+                          <span class="text-sm font-bold">{card.score}</span>
+                          <button
+                            class={`btn btn-ghost btn-xs ${card.userVote === -1 ? 'btn-active text-error' : ''}`}
+                            disabled={card.authorId === session().data!.user.id}
+                            onClick={() => handleVote(card.id, -1)}
+                            title="Downvote"
+                          >
+                            ▼
+                          </button>
+                        </div>
 
-                      <div class={markdownClass}>
-                        <SolidMarkdown>{card.content}</SolidMarkdown>
+                        {/* Card content */}
+                        <div class="min-w-0 flex-1">
+                          <div class="flex items-start justify-between gap-4">
+                            <div>
+                              <h2 class="card-title">{card.title}</h2>
+                              <div class="flex items-center gap-2">
+                                <p class="text-xs opacity-60">
+                                  by {card.authorName}
+                                </p>
+                                <For each={card.subjects}>
+                                  {(s) => (
+                                    <span class="badge badge-outline badge-sm">
+                                      {s}
+                                    </span>
+                                  )}
+                                </For>
+                              </div>
+                            </div>
+                            <Show
+                              when={card.authorId === session().data!.user.id}
+                            >
+                              <button
+                                class="btn text-error btn-ghost btn-xs"
+                                onClick={() =>
+                                  requestDeleteCard(card.id, card.title)
+                                }
+                              >
+                                Delete
+                              </button>
+                            </Show>
+                          </div>
+
+                          <div class={markdownClass}>
+                            <SolidMarkdown>{card.content}</SolidMarkdown>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -221,6 +309,31 @@ function InfoHub() {
                 onInput={(e) => setNewTitle(e.currentTarget.value)}
                 placeholder="e.g. Algebra reviewer tips"
               />
+            </fieldset>
+
+            <fieldset class="fieldset w-full">
+              <legend class="fieldset-legend">Subjects</legend>
+              <div class="flex flex-wrap gap-2">
+                <For each={SUBJECTS}>
+                  {(subject) => (
+                    <label class="flex cursor-pointer items-center gap-2">
+                      <input
+                        type="checkbox"
+                        class="checkbox checkbox-sm checkbox-primary"
+                        checked={newSubjects().includes(subject)}
+                        onInput={() =>
+                          setNewSubjects((prev) =>
+                            prev.includes(subject)
+                              ? prev.filter((s) => s !== subject)
+                              : [...prev, subject],
+                          )
+                        }
+                      />
+                      <span class="text-sm">{subject}</span>
+                    </label>
+                  )}
+                </For>
+              </div>
             </fieldset>
 
             <fieldset class="fieldset w-full">
