@@ -10,7 +10,6 @@ const SUBJECT_OPTIONS = [
   'History',
   'Geography',
   'Computer Science',
-  // ...add more as needed
 ]
 
 export function EditSubjectsModal(props: {

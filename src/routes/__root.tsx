@@ -13,6 +13,7 @@ import {
   Notifications,
   NotificationsProvider,
 } from '@/components/Notifications'
+import { ChatProvider } from '@/components/ChatContext'
 
 import styleCss from '@/styles.css?url'
 
@@ -46,15 +47,17 @@ function RootComponent() {
       </head>
       <body>
         <NotificationsProvider>
-          <HeadContent />
-          <Suspense>
-            <Notifications />
-            <Outlet />
-            {process.env.NODE_ENV === 'development' && (
-              <TanStackRouterDevtools />
-            )}
-          </Suspense>
-          <Scripts />
+          <ChatProvider>
+            <HeadContent />
+            <Suspense>
+              <Notifications />
+              <Outlet />
+              {process.env.NODE_ENV === 'development' && (
+                <TanStackRouterDevtools />
+              )}
+            </Suspense>
+            <Scripts />
+          </ChatProvider>
         </NotificationsProvider>
       </body>
     </html>

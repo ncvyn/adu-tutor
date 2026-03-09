@@ -3,7 +3,8 @@ import { createFileRoute } from '@tanstack/solid-router'
 import { SolidMarkdown } from 'solid-markdown'
 import type { InfoCardWithVotes } from '@/schemas/info'
 import { useAuthGuard } from '@/lib/auth-client'
-import { Dock, LoadingScreen, Navbar, useNotifications } from '@/components'
+import { LoadingScreen, useNotifications } from '@/components'
+import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import { markdownClass } from '@/lib/markdown'
 import { SUBJECTS } from '@/lib/constants'
 import {
@@ -186,11 +187,9 @@ function InfoHub() {
   }
 
   return (
-    <>
-      <Navbar />
-
+    <AuthenticatedLayout>
       <Show when={session().data} fallback={<LoadingScreen />}>
-        <div class="mx-auto my-8 w-full max-w-4xl px-4">
+        <div class="mx-auto my-8 w-full max-w-4xl px-4 pb-4">
           <div class="mb-4 flex items-center justify-between">
             <div>
               <h1 class="text-2xl font-bold">Info Hub</h1>
@@ -416,8 +415,6 @@ function InfoHub() {
           </div>
         </div>
       </dialog>
-
-      <Dock />
-    </>
+    </AuthenticatedLayout>
   )
 }

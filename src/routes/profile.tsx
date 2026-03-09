@@ -2,7 +2,8 @@ import { createFileRoute } from '@tanstack/solid-router'
 import { Show, Suspense, createResource, createSignal } from 'solid-js'
 import { useAuthGuard } from '@/lib/auth-client'
 import { getUserProfile } from '@/server/get-user-profile.functions'
-import { Dock, LoadingScreen, Navbar } from '@/components'
+import { LoadingScreen } from '@/components'
+import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import { DAYS } from '@/lib/constants'
 import Settings from '@/components/Settings'
 import UserProfile from '@/components/UserProfile'
@@ -35,8 +36,7 @@ function Profile() {
   )
 
   return (
-    <>
-      <Navbar />
+    <AuthenticatedLayout>
       <Show when={session().data} fallback={<LoadingScreen />}>
         <Suspense fallback={<LoadingScreen />}>
           <Show when={userProfile()}>
@@ -75,7 +75,6 @@ function Profile() {
           </Show>
         </Suspense>
       </Show>
-      <Dock />
-    </>
+    </AuthenticatedLayout>
   )
 }

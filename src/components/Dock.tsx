@@ -4,7 +4,7 @@ import { BookCopy, MessageCircle, UserRound } from 'lucide-solid'
 
 export const Dock = () => {
   return (
-    <div class="dock dock-lg lg:flex xl:hidden">
+    <div class="dock dock-lg md:hidden">
       <Link to="/messages" activeProps={{ class: 'dock-active' }}>
         <MessageCircle />
         <span class="dock-label select-none">Messages</span>
