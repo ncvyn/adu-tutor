@@ -17,9 +17,11 @@ export function Sidebar() {
     <aside class="flex h-full w-full flex-col border-r border-base-300 bg-base-100">
       {/* Brand */}
       <div class="flex items-center gap-2 border-b border-base-300 px-5 py-4">
-        <span class="text-xl font-bold tracking-tight text-primary">
-          AdU-Tutor
-        </span>
+        <img
+          src="/adu-tutor-logo.svg"
+          alt="AdU-Tutor"
+          class="h-8 w-auto select-none"
+        />
       </div>
 
       {/* Navigation */}
