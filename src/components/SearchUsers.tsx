@@ -1,7 +1,9 @@
-import { For, Show, createSignal, onCleanup, onMount } from 'solid-js'
+import { For, Show, createSignal, onCleanup } from 'solid-js'
 import { Search } from 'lucide-solid'
 import { searchUsers } from '@/server/search-users.functions'
+import { getRecipients } from '@/server/recipients.functions'
 import { getInitials } from '@/lib/helper'
+import { useQuery } from '@tanstack/solid-query'
 
 export type UserResult = {
   id: string
@@ -13,6 +15,19 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
   const [results, setResults] = createSignal<Array<UserResult>>([])
   const [isLoading, setIsLoading] = createSignal(false)
   const [isOpen, setIsOpen] = createSignal(false)
+
+  const recipientsQuery = useQuery(() => ({
+    queryKey: ['recipients'],
+    queryFn: async () => {
+      try {
+        const data = await getRecipients()
+        return data
+      } catch {
+        return []
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+  }))
 
   let rootRef: HTMLDivElement | undefined
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -59,10 +74,6 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
     if (!root.contains(target)) closeDropdown()
   }
 
-  onMount(() => {
-    document.addEventListener('pointerdown', handleOutsidePointerDown)
-  })
-
   onCleanup(() => {
     document.removeEventListener('pointerdown', handleOutsidePointerDown)
     if (debounceTimer) clearTimeout(debounceTimer)
@@ -70,6 +81,43 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
 
   return (
     <div ref={rootRef} class="relative">
+      <Show when={recipientsQuery.isLoading}>
+        <div class="mb-2 flex items-center gap-2 opacity-70">
+          <span class="loading loading-xs loading-spinner" />
+          Loading recent chats...
+        </div>
+      </Show>
+      <Show when={recipientsQuery.isSuccess && recipientsQuery.data.length > 0}>
+        <div class="mb-2">
+          <div class="mb-1 text-xs font-semibold opacity-60">Recent Chats</div>
+          <ul class="menu bg-base-100 p-2 shadow">
+            <For each={recipientsQuery.data}>
+              {(user) => (
+                <li>
+                  <button
+                    class="flex items-center gap-3"
+                    onClick={() => {
+                      props.onSelect?.(user)
+                      setQuery('')
+                      setResults([])
+                      closeDropdown()
+                    }}
+                  >
+                    <div class="avatar avatar-placeholder">
+                      <div class="w-8 rounded-full bg-neutral text-neutral-content">
+                        <span class="text-xs font-semibold">
+                          {getInitials(user.name)}
+                        </span>
+                      </div>
+                    </div>
+                    <span class="text-sm font-medium">{user.name}</span>
+                  </button>
+                </li>
+              )}
+            </For>
+          </ul>
+        </div>
+      </Show>
       <label class="input w-full">
         <Search class="h-4 w-4 opacity-50" />
         <input
