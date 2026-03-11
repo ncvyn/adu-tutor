@@ -60,7 +60,6 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
         if (token !== requestToken) return
         setResults([])
       } finally {
-        if (token !== requestToken) return
         setIsLoading(false)
       }
     }, 200)
@@ -81,43 +80,6 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
 
   return (
     <div ref={rootRef} class="relative">
-      <Show when={recipientsQuery.isLoading}>
-        <div class="mb-2 flex items-center gap-2 opacity-70">
-          <span class="loading loading-xs loading-spinner" />
-          Loading recent chats...
-        </div>
-      </Show>
-      <Show when={recipientsQuery.isSuccess && recipientsQuery.data.length > 0}>
-        <div class="mb-2">
-          <div class="mb-1 text-xs font-semibold opacity-60">Recent Chats</div>
-          <ul class="menu bg-base-100 p-2 shadow">
-            <For each={recipientsQuery.data}>
-              {(user) => (
-                <li>
-                  <button
-                    class="flex items-center gap-3"
-                    onClick={() => {
-                      props.onSelect?.(user)
-                      setQuery('')
-                      setResults([])
-                      closeDropdown()
-                    }}
-                  >
-                    <div class="avatar avatar-placeholder">
-                      <div class="w-8 rounded-full bg-neutral text-neutral-content">
-                        <span class="text-xs font-semibold">
-                          {getInitials(user.name)}
-                        </span>
-                      </div>
-                    </div>
-                    <span class="text-sm font-medium">{user.name}</span>
-                  </button>
-                </li>
-              )}
-            </For>
-          </ul>
-        </div>
-      </Show>
       <label class="input w-full">
         <Search class="h-4 w-4 opacity-50" />
         <input
@@ -184,6 +146,44 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
             </li>
           </Show>
         </ul>
+      </Show>
+
+      <Show when={recipientsQuery.isLoading}>
+        <div class="mb-2 flex items-center gap-2 opacity-70">
+          <span class="loading loading-xs loading-spinner" />
+          Loading recent chats...
+        </div>
+      </Show>
+      <Show when={recipientsQuery.isSuccess && recipientsQuery.data.length > 0}>
+        <div class="mb-2">
+          <div class="my-1 text-xs font-semibold opacity-60">Recent Chats</div>
+          <ul class="menu w-full bg-base-100 shadow">
+            <For each={recipientsQuery.data}>
+              {(user) => (
+                <li>
+                  <button
+                    class="flex items-center gap-3"
+                    onClick={() => {
+                      props.onSelect?.(user)
+                      setQuery('')
+                      setResults([])
+                      closeDropdown()
+                    }}
+                  >
+                    <div class="avatar avatar-placeholder">
+                      <div class="w-8 rounded-full bg-neutral text-neutral-content">
+                        <span class="text-xs font-semibold">
+                          {getInitials(user.name)}
+                        </span>
+                      </div>
+                    </div>
+                    <span class="text-sm font-medium">{user.name}</span>
+                  </button>
+                </li>
+              )}
+            </For>
+          </ul>
+        </div>
       </Show>
     </div>
   )

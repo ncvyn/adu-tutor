@@ -1,13 +1,9 @@
 import { For, Show } from 'solid-js'
 import { getInitials } from '@/lib/helper'
-import { UserBadges, useNotifications } from '@/components'
-import { signOut } from '@/lib/auth-client'
-import { useNavigate } from '@tanstack/solid-router'
+import { UserBadges } from '@/components'
 
 export default function UserProfile(props: { profile: any }) {
   const { profile } = props
-  const { notify } = useNotifications()
-  const navigate = useNavigate()
 
   const subjects: Array<string> = Array.isArray(profile.preferredSubjects)
     ? profile.preferredSubjects
@@ -41,12 +37,6 @@ export default function UserProfile(props: { profile: any }) {
         <p class="mt-4 max-w-lg text-sm opacity-80">{profile.bio}</p>
       </Show>
       <UserBadges userId={profile.id} />
-      <button
-        class="btn mt-6 btn-error"
-        onClick={() => signOut(notify, navigate)}
-      >
-        Sign out
-      </button>
     </div>
   )
 }

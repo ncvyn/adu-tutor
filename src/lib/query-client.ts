@@ -12,9 +12,3 @@ export const queryClient = new QueryClient({
     },
   },
 })
-
-export type EntityQueryKey = [
-  entity: string,
-  id?: string | number | null,
-  ...params: Array<string | number | boolean | null | undefined>,
-]
