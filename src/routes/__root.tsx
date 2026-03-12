@@ -13,7 +13,7 @@ import {
   Notifications,
   NotificationsProvider,
 } from '@/components/Notifications'
-import { ChatProvider } from '@/components/ChatContext'
+import { ChatProvider } from '@/components/messages/ChatContext'
 import { queryClient } from '@/lib/query-client'
 
 import styleCss from '@/styles.css?url'

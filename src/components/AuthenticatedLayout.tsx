@@ -1,6 +1,6 @@
 import type { JSX } from 'solid-js'
 import { Sidebar } from '@/components/Sidebar'
-import { ProfileDropdown } from '@/components/ProfileDropdown'
+import { ProfileDropdown } from '@/components/profile/ProfileDropdown'
 import { Dock } from '@/components/Dock'
 
 export function AuthenticatedLayout(props: { children: JSX.Element }) {

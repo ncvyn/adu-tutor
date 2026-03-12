@@ -1,7 +1,7 @@
 import { Link, useNavigate } from '@tanstack/solid-router'
 import { SearchUsers } from '@/components'
 import type { UserResult } from '@/components'
-import { useChatContext } from '@/components/ChatContext'
+import { useChatContext } from '@/components/messages/ChatContext'
 
 export function Sidebar() {
   const navigate = useNavigate()

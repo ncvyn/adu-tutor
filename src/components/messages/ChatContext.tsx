@@ -1,6 +1,6 @@
 import { createContext, createSignal, useContext } from 'solid-js'
 import type { JSX } from 'solid-js'
-import type { UserResult } from '@/components/SearchUsers'
+import type { UserResult } from '@/components/messages/SearchUsers'
 
 interface ChatContextValue {
   selectedRecipient: () => UserResult | null

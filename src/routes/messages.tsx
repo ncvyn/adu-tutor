@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show, createSignal } from 'solid-js'
-import type { UserResult } from '@/components/SearchUsers'
+import type { UserResult } from '@/components/messages/SearchUsers'
 import { useAuthGuard } from '@/lib/auth-client'
 import {
   AuthenticatedLayout,
@@ -8,7 +8,7 @@ import {
   LoadingScreen,
   SearchUsers,
 } from '@/components'
-import { useChatContext } from '@/components/ChatContext'
+import { useChatContext } from '@/components/messages/ChatContext'
 
 export const Route = createFileRoute('/messages')({ component: Messages })
 

@@ -6,8 +6,8 @@ import { getUserProfile } from '@/server/get-user-profile.functions'
 import { LoadingScreen } from '@/components'
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import type { DAYS } from '@/lib/constants'
-import Settings from '@/components/Settings'
-import UserProfile from '@/components/UserProfile'
+import Settings from '@/components/profile/Settings'
+import UserProfile from '@/components/profile/UserProfile'
 
 export const Route = createFileRoute('/profile')({
   ssr: false,
