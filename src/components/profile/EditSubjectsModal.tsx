@@ -1,16 +1,6 @@
 import { createSignal } from 'solid-js'
 import { setSubjects } from '@/server/subject.functions'
-
-const SUBJECT_OPTIONS = [
-  'Math',
-  'Physics',
-  'Biology',
-  'Chemistry',
-  'English',
-  'History',
-  'Geography',
-  'Computer Science',
-]
+import { SUBJECTS } from '@/lib/constants'
 
 export function EditSubjectsModal(props: {
   open: boolean
@@ -50,7 +40,7 @@ export function EditSubjectsModal(props: {
         <h3 class="mb-2 text-lg font-bold">Edit Preferred Subjects</h3>
         <form onSubmit={handleSave} class="flex flex-col gap-2">
           <div class="flex flex-wrap gap-2">
-            {SUBJECT_OPTIONS.map((subject) => (
+            {SUBJECTS.map((subject) => (
               <label class="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
