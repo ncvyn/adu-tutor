@@ -1,10 +1,12 @@
 import { createServerFn } from '@tanstack/solid-start'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
 import { and, desc, eq, sql } from 'drizzle-orm'
+
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { infoCard, infoCardVote } from '@/schemas/info'
 import { SUBJECTS } from '@/lib/constants'
+import { infoCard, infoCardVote } from '@/schemas/info'
+import { awardBadge } from '@/server/badge.server'
 
 export const getInfoCards = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -74,6 +76,14 @@ export const createInfoCard = createServerFn({ method: 'POST' })
       subjects.push('General')
     }
 
+    const userCardCount = await db
+      .select()
+      .from(infoCard)
+      .where(eq(infoCard.authorId, session.user.id))
+      .limit(1)
+
+    const isFirstCard = userCardCount.length === 0
+
     const [newCard] = await db
       .insert(infoCard)
       .values({
@@ -85,6 +95,14 @@ export const createInfoCard = createServerFn({ method: 'POST' })
         authorName: session.user.name,
       })
       .returning()
+
+    if (isFirstCard) {
+      try {
+        await awardBadge(session.user.id, 'first-post')
+      } catch (error) {
+        console.error('Failed to award first post badge:', error)
+      }
+    }
 
     return { ...newCard, subjects, score: 0, userVote: null }
   })

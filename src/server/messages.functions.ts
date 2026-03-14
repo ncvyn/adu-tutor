@@ -7,6 +7,7 @@ import { db } from '@/lib/db'
 import { conversation, message } from '@/schemas/chat'
 import { getConversationPair } from '@/server/helper.server'
 import { middleware } from '@/lib/middleware'
+import { awardBadge } from '@/server/badge.server'
 
 export const getMessages = createServerFn({ method: 'GET' })
   .inputValidator((data: { senderId: string; recipientId: string }) => data)
@@ -56,6 +57,13 @@ export const addMessage = createServerFn({ method: 'POST' })
     if (!content.trim())
       return { conversation: null, messages: [] } as ConversationDetails
 
+    const userMessageCount = await db
+      .select()
+      .from(message)
+      .where(eq(message.senderId, sender))
+      .limit(1)
+    const isFirstMessage = userMessageCount.length === 0
+
     const { minUserId, maxUserId } = getConversationPair(sender, receiver)
 
     const conversations = await db
@@ -92,6 +100,14 @@ export const addMessage = createServerFn({ method: 'POST' })
         content: content.trim(),
       })
       .returning()
+
+    if (isFirstMessage) {
+      try {
+        await awardBadge(sender, 'first-message')
+      } catch (error) {
+        console.error('Failed to award first message badge:', error)
+      }
+    }
 
     return {
       conversation: existingConversation,
