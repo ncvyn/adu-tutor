@@ -5,6 +5,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { badge, userBadge } from '@/schemas/badge'
 import { middleware } from '@/lib/middleware'
+import { awardBadge } from '@/server/badge.server'
 
 export const getAllBadges = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -72,46 +73,7 @@ export const assignBadge = createServerFn({ method: 'POST' })
       throw new Error('Unauthorized')
     }
 
-    if (session.user.role !== 'tutor') {
-      throw new Error('Forbidden: only tutors can assign badges')
-    }
-
-    const badges = await db
-      .select()
-      .from(badge)
-      .where(eq(badge.slug, data.badgeSlug))
-      .limit(1)
-
-    if (badges.length === 0) {
-      throw new Error(`Badge not found: ${data.badgeSlug}`)
-    }
-
-    const [targetBadge] = badges
-    const rows = await db
-      .select()
-      .from(userBadge)
-      .where(
-        and(
-          eq(userBadge.userId, data.userId),
-          eq(userBadge.badgeId, targetBadge.id),
-        ),
-      )
-      .limit(1)
-
-    if (rows.length > 0) {
-      return { alreadyAssigned: true, userBadge: rows[0] }
-    }
-
-    const [newUserBadge] = await db
-      .insert(userBadge)
-      .values({
-        id: crypto.randomUUID(),
-        userId: data.userId,
-        badgeId: targetBadge.id,
-      })
-      .returning()
-
-    return { alreadyAssigned: false, userBadge: newUserBadge }
+    return await awardBadge(data.userId, data.badgeSlug)
   })
 
 export const revokeBadge = createServerFn({ method: 'POST' })

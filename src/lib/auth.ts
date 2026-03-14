@@ -4,6 +4,9 @@ import { env } from 'cloudflare:workers'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { drizzle } from 'drizzle-orm/d1'
 import { account, session, user, verification } from '@/schemas/auth'
+import { createAuthMiddleware } from 'better-auth/api'
+import { awardBadge } from '@/server/badge.server'
+import { eq } from 'drizzle-orm'
 
 const schema = { user, session, account, verification }
 const db = drizzle(env.adu_tutor_d1, { schema })
@@ -63,4 +66,26 @@ export const auth = betterAuth({
     },
   },
   plugins: [tanstackStartCookies()],
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      const newSession = ctx.context.newSession
+      if (newSession) {
+        const userId = newSession.session.userId
+
+        const rows = await db
+          .select()
+          .from(schema.user)
+          .where(eq(schema.user.id, userId))
+        if (rows.length !== 0) {
+          const createdAt = new Date(rows[0].createdAt)
+          const now = new Date()
+          const thresholdMs = 60_000 // 1 minute
+
+          if (now.getTime() - createdAt.getTime() < thresholdMs) {
+            await awardBadge(userId, 'newcomer')
+          }
+        }
+      }
+    }),
+  },
 })
