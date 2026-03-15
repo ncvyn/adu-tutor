@@ -13,6 +13,7 @@ import {
   Filter,
   Header,
   ShareDialog,
+  TutorSearch,
 } from '@/components/info-hub'
 import {
   createInfoCard,
@@ -201,6 +202,7 @@ function InfoHub() {
             fallback={<LoadingScreen />}
           >
             <div class="mx-auto my-8 w-full max-w-4xl px-4 pb-4">
+              <TutorSearch />
               <Header
                 cardCountLabel={cardCountLabel()}
                 isRefreshing={cardsQuery.isFetching && !cardsQuery.isPending}
