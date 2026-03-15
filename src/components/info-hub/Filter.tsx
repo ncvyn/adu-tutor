@@ -1,12 +1,12 @@
 import { For } from 'solid-js'
 import { SUBJECTS } from '@/lib/constants'
 
-interface InfoHubFilterProps {
+interface FilterProps {
   value: string
   onChange: (value: string) => void
 }
 
-export function InfoHubFilter(props: InfoHubFilterProps) {
+export function Filter(props: FilterProps) {
   return (
     <div class="mb-4">
       <select

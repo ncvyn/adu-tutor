@@ -3,14 +3,14 @@ import { SolidMarkdown } from 'solid-markdown'
 import type { InfoCardWithVotes } from '@/schemas/info'
 import { markdownClass } from '@/lib/markdown'
 
-interface InfoHubCardListProps {
+interface CardListProps {
   cards: Array<InfoCardWithVotes>
   currentUserId: string
   onVote: (cardId: string, value: number) => void
   onRequestDelete: (id: string, title: string) => void
 }
 
-export function InfoHubCardList(props: InfoHubCardListProps) {
+export function CardList(props: CardListProps) {
   return (
     <>
       <Show when={props.cards.length > 0}>

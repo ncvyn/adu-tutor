@@ -1,12 +1,12 @@
 import { Show } from 'solid-js'
 
-interface InfoHubHeaderProps {
+interface HeaderProps {
   cardCountLabel: string
   isRefreshing: boolean
   onShare: () => void
 }
 
-export function InfoHubHeader(props: InfoHubHeaderProps) {
+export function Header(props: HeaderProps) {
   return (
     <div class="mb-4 flex items-center justify-between">
       <div>

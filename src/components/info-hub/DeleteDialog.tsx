@@ -1,6 +1,6 @@
 import { Show } from 'solid-js'
 
-interface InfoHubDeleteDialogProps {
+interface DeleteDialogProps {
   ref: (el: HTMLDialogElement) => void
   title: string | null
   isDeleting: boolean
@@ -8,7 +8,7 @@ interface InfoHubDeleteDialogProps {
   onConfirm: () => void
 }
 
-export function InfoHubDeleteDialog(props: InfoHubDeleteDialogProps) {
+export function DeleteDialog(props: DeleteDialogProps) {
   return (
     <dialog ref={props.ref} class="modal">
       <div class="modal-box">

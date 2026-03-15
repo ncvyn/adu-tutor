@@ -1,7 +1,7 @@
 import { For, Show } from 'solid-js'
 import { SUBJECTS } from '@/lib/constants'
 
-interface InfoHubShareDialogProps {
+interface ShareDialogProps {
   ref: (el: HTMLDialogElement) => void
   allowClose: boolean
   onRequestClose: () => void
@@ -17,7 +17,7 @@ interface InfoHubShareDialogProps {
   onSubmit: () => void
 }
 
-export function InfoHubShareDialog(props: InfoHubShareDialogProps) {
+export function ShareDialog(props: ShareDialogProps) {
   return (
     <dialog
       ref={props.ref}

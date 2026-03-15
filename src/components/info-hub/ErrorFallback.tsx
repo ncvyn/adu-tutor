@@ -1,4 +1,4 @@
-export function InfoHubErrorFallback() {
+export function ErrorFallback() {
   return (
     <div class="mx-auto my-8 w-full max-w-4xl px-4">
       <div class="alert alert-error">

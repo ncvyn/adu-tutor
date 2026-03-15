@@ -1,10 +1,10 @@
-interface InfoHubDiscardDialogProps {
+interface DiscardDialogProps {
   ref: (el: HTMLDialogElement) => void
   onKeepEditing: () => void
   onDiscard: () => void
 }
 
-export function InfoHubDiscardDialog(props: InfoHubDiscardDialogProps) {
+export function DiscardDialog(props: DiscardDialogProps) {
   return (
     <dialog ref={props.ref} class="modal">
       <div class="modal-box">

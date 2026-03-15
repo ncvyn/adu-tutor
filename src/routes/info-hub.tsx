@@ -6,13 +6,13 @@ import { useAuthGuard } from '@/lib/auth-client'
 import { LoadingScreen, useNotifications } from '@/components'
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import {
-  InfoHubCardList,
-  InfoHubDeleteDialog,
-  InfoHubDiscardDialog,
-  InfoHubErrorFallback,
-  InfoHubFilter,
-  InfoHubHeader,
-  InfoHubShareDialog,
+  CardList,
+  DeleteDialog,
+  DiscardDialog,
+  ErrorFallback,
+  Filter,
+  Header,
+  ShareDialog,
 } from '@/components/info-hub'
 import {
   createInfoCard,
@@ -195,24 +195,21 @@ function InfoHub() {
   return (
     <Show when={session().data} fallback={<LoadingScreen />}>
       <AuthenticatedLayout>
-        <ErrorBoundary fallback={<InfoHubErrorFallback />}>
+        <ErrorBoundary fallback={<ErrorFallback />}>
           <Show
             when={!cardsQuery.isPending || !!cardsQuery.data}
             fallback={<LoadingScreen />}
           >
             <div class="mx-auto my-8 w-full max-w-4xl px-4 pb-4">
-              <InfoHubHeader
+              <Header
                 cardCountLabel={cardCountLabel()}
                 isRefreshing={cardsQuery.isFetching && !cardsQuery.isPending}
                 onShare={openShareDialog}
               />
 
-              <InfoHubFilter
-                value={filterSubject()}
-                onChange={setFilterSubject}
-              />
+              <Filter value={filterSubject()} onChange={setFilterSubject} />
 
-              <InfoHubCardList
+              <CardList
                 cards={filteredCards()}
                 currentUserId={session().data!.user.id}
                 onVote={handleVote}
@@ -222,7 +219,7 @@ function InfoHub() {
           </Show>
         </ErrorBoundary>
 
-        <InfoHubShareDialog
+        <ShareDialog
           ref={(el) => {
             shareDialogRef = el
           }}
@@ -246,7 +243,7 @@ function InfoHub() {
           onSubmit={addCard}
         />
 
-        <InfoHubDiscardDialog
+        <DiscardDialog
           ref={(el) => {
             confirmDialogRef = el
           }}
@@ -254,7 +251,7 @@ function InfoHub() {
           onDiscard={confirmDiscard}
         />
 
-        <InfoHubDeleteDialog
+        <DeleteDialog
           ref={(el) => {
             deleteDialogRef = el
           }}
