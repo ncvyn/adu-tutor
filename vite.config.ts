@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
-import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 
 import { tanstackStart } from '@tanstack/solid-start/plugin/vite'
@@ -10,14 +9,13 @@ import { cloudflare } from '@cloudflare/vite-plugin'
 import lucidePreprocess from 'vite-plugin-lucide-preprocess'
 
 export default defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+  },
   plugins: [
     lucidePreprocess(),
     devtools(),
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
-    // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
     tailwindcss(),
     tanstackStart(),
     solidPlugin({ ssr: true }),
