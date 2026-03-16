@@ -92,12 +92,18 @@ export class ChatRoom extends DurableObject<Env> {
 
       if (!conversationId) return
 
-      await db.insert(messageTable).values({
-        id,
-        conversationId,
-        senderId: data.senderId,
-        content: data.content.trim(),
-      })
+      await db.batch([
+        db.insert(messageTable).values({
+          id,
+          conversationId,
+          senderId: data.senderId,
+          content: data.content.trim(),
+        }),
+        db
+          .update(conversationTable)
+          .set({ updatedAt: new Date(now) })
+          .where(eq(conversationTable.id, conversationId)),
+      ])
 
       const outgoing: OutgoingMessage = {
         type: 'message',

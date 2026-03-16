@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/solid-start'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
-import { eq, inArray, or } from 'drizzle-orm'
+import { and, desc, eq, ne, or } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { conversation } from '@/schemas/chat'
@@ -13,20 +13,30 @@ export const getRecipients = createServerFn({ method: 'GET' }).handler(
     if (!session) return []
 
     const id = session.user.id
-    const convs = await db
-      .select()
-      .from(conversation)
-      .where(or(eq(conversation.minUserId, id), eq(conversation.maxUserId, id)))
-    if (convs.length === 0) return []
-
-    const recipientIds = convs.map((card) =>
-      card.minUserId !== id ? card.minUserId : card.maxUserId,
-    )
 
     const profiles = await db
-      .select()
+      .select({
+        id: user.id,
+        name: user.name,
+      })
       .from(user)
-      .where(inArray(user.id, recipientIds))
+      .innerJoin(
+        conversation,
+        or(
+          and(
+            eq(conversation.minUserId, id),
+            eq(conversation.maxUserId, user.id),
+          ),
+          and(
+            eq(conversation.maxUserId, id),
+            eq(conversation.minUserId, user.id),
+          ),
+        ),
+      )
+      .where(ne(user.id, id))
+      .orderBy(desc(conversation.updatedAt))
+      .limit(20)
+
     return profiles
   },
 )

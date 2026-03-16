@@ -57,6 +57,13 @@
       "when": 1773062826084,
       "tag": "0007_even_kang",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1773645505541,
+      "tag": "0008_freezing_supernaut",
+      "breakpoints": true
     }
   ]
 }

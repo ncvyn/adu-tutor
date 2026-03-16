@@ -16,9 +16,14 @@ export const conversation = sqliteTable(
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
   (table) => [
     uniqueIndex('conversation_pair_idx').on(table.minUserId, table.maxUserId),
+    index('conversation_updated_idx').on(table.updatedAt),
   ],
 )
 
@@ -44,7 +49,6 @@ export const message = sqliteTable(
 )
 
 // Relations
-
 export const conversationRelations = relations(conversation, ({ one, many }) => ({
   minUser: one(user, {
     fields: [conversation.minUserId],

@@ -1,8 +1,9 @@
 import { createServerFn } from '@tanstack/solid-start'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
-import { and, eq, like, ne } from 'drizzle-orm'
+import { and, desc, eq, like, ne, or } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { user } from '@/schemas/auth'
+import { conversation } from '@/schemas/chat'
 import { auth } from '@/lib/auth'
 
 export const searchUsers = createServerFn({ method: 'GET' })
@@ -24,14 +25,27 @@ export const searchUsers = createServerFn({ method: 'GET' })
         name: user.name,
       })
       .from(user)
+      .innerJoin(
+        conversation,
+        or(
+          and(
+            eq(conversation.minUserId, session.user.id),
+            eq(conversation.maxUserId, user.id),
+          ),
+          and(
+            eq(conversation.maxUserId, session.user.id),
+            eq(conversation.minUserId, user.id),
+          ),
+        ),
+      )
       .where(
         and(
           like(user.name, `%${trimmed}%`),
           ne(user.id, session.user.id),
-          ne(user.role, session.user.role),
           eq(user.banned, false),
         ),
       )
+      .orderBy(desc(conversation.updatedAt))
       .limit(10)
 
     return results
