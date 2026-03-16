@@ -57,7 +57,7 @@ export function ProfileDropdown() {
 
             <div
               tabindex="0"
-              class="dropdown-content z-50 mt-2 w-72 rounded-box border border-base-300 bg-base-100 p-4 shadow-xl"
+              class="dropdown-content z-50 mt-2 w-72 rounded-box border border-base-300 bg-base-100 p-2 shadow-xl"
             >
               <div class="flex flex-col items-center gap-2 border-b border-base-300 pb-4">
                 <div class="avatar avatar-placeholder">

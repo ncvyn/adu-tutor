@@ -19,6 +19,8 @@ interface SettingsProps {
 
 const MAXIMUM_SUBJECTS = 5
 
+type TimeWindow = { start: string; end: string }
+
 export default function Settings(props: SettingsProps) {
   const { profile, refetchProfile } = props
   const { notify } = useNotifications()
@@ -35,11 +37,24 @@ export default function Settings(props: SettingsProps) {
   const [theme, setTheme] = createSignal<ThemeMode>(
     (localStorage.getItem('adu-theme') as ThemeMode | null) ?? 'system',
   )
-  const [availability, setAvailability] = createSignal<AvailabilityMap>(
-    profile.availability
-      ? (JSON.parse(profile.availability) as AvailabilityMap)
-      : {},
-  )
+
+  // Parse existing availability string "09:00-12:00, 14:00-17:00" into structured UI state
+  const initialAvailability = profile.availability
+    ? (JSON.parse(profile.availability) as AvailabilityMap)
+    : {}
+  const initialSchedule: Record<string, TimeWindow[]> = {}
+  DAYS.forEach((day) => {
+    const dayStr = initialAvailability[day] || ''
+    initialSchedule[day] = dayStr
+      ? dayStr.split(',').map((window) => {
+          const [start = '', end = ''] = window.split('-')
+          return { start: start.trim(), end: end.trim() }
+        })
+      : []
+  })
+  const [schedule, setSchedule] =
+    createSignal<Record<string, TimeWindow[]>>(initialSchedule)
+
   const [isSaving, setIsSaving] = createSignal(false)
   const [loadingNotifs, setLoadingNotifs] = createSignal(false)
   const [notifications, setNotifications] = createSignal<Array<any>>([])
@@ -49,12 +64,26 @@ export default function Settings(props: SettingsProps) {
   async function handleSave() {
     setIsSaving(true)
     try {
+      const serializedAvailability: AvailabilityMap = {}
+      DAYS.forEach((day) => {
+        const windows = schedule()[day] || []
+        const validWindows = windows
+          .filter((w) => w.start && w.end)
+          .map((w) => `${w.start}-${w.end}`)
+
+        if (validWindows.length > 0) {
+          serializedAvailability[day] = validWindows.join(', ')
+        }
+      })
+
       await updateSettings({
         data: {
           bio: bio().trim(),
           preferredSubjects: preferredSubjects(),
           availability:
-            profile.role === 'tutor' ? JSON.stringify(availability()) : '',
+            profile.role === 'tutor'
+              ? JSON.stringify(serializedAvailability)
+              : '',
         },
       })
       notify({ type: 'success', message: 'Settings saved.' })
@@ -67,6 +96,35 @@ export default function Settings(props: SettingsProps) {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  // Schedule Manipulation Helpers
+  function addTimeWindow(day: string) {
+    setSchedule((prev) => ({
+      ...prev,
+      [day]: [...(prev[day] || []), { start: '', end: '' }],
+    }))
+  }
+
+  function updateTimeWindow(
+    day: string,
+    index: number,
+    field: 'start' | 'end',
+    value: string,
+  ) {
+    setSchedule((prev) => {
+      const updatedDay = [...(prev[day] || [])]
+      updatedDay[index] = { ...updatedDay[index], [field]: value }
+      return { ...prev, [day]: updatedDay }
+    })
+  }
+
+  function removeTimeWindow(day: string, index: number) {
+    setSchedule((prev) => {
+      const updatedDay = [...(prev[day] || [])]
+      updatedDay.splice(index, 1)
+      return { ...prev, [day]: updatedDay }
+    })
   }
 
   async function handleDismissNotification(id: string) {
@@ -139,10 +197,10 @@ export default function Settings(props: SettingsProps) {
 
   return (
     <div class="space-y-6">
-      {/* Account Settings Card */}
+      {/* Account Card */}
       <div class="card border border-base-300 bg-base-100">
         <div class="card-body gap-4">
-          <h3 class="card-title text-lg">Account Settings</h3>
+          <h3 class="card-title text-lg">Account</h3>
           <fieldset class="fieldset w-full">
             <legend class="fieldset-legend">Your bio</legend>
             <textarea
@@ -154,8 +212,8 @@ export default function Settings(props: SettingsProps) {
           </fieldset>
           <fieldset class="fieldset w-full">
             <legend class="fieldset-legend">
-              Preferred Subjects{' '}
-              {profile.role === 'tutor' ? 'to Teach' : 'to Learn'}
+              Preferred subjects{' '}
+              {profile.role === 'tutor' ? 'to teach' : 'to learn'}
             </legend>
             <div class="flex flex-wrap gap-2">
               <For each={SUBJECTS}>
@@ -181,7 +239,7 @@ export default function Settings(props: SettingsProps) {
             </div>
           </fieldset>
           <fieldset class="fieldset w-full">
-            <legend class="fieldset-legend">Program Theme</legend>
+            <legend class="fieldset-legend">Program theme</legend>
             <select
               class="select-bordered select"
               value={theme()}
@@ -193,32 +251,85 @@ export default function Settings(props: SettingsProps) {
             </select>
           </fieldset>
           <Show when={profile.role === 'tutor'}>
-            <div class="space-y-2">
-              <div class="font-medium">Availability Schedule</div>
-              <p class="text-sm opacity-70">
-                Add general day/time windows (e.g. 09:00-12:00, 14:00-17:00).
+            <fieldset class="fieldset w-full">
+              <legend class="fieldset-legend">Availability schedule</legend>
+              <p class="label">
+                Set the hours you are generally available to tutor.
               </p>
+            </fieldset>
+            <div class="grid gap-4 lg:max-w-2/3">
               <For each={DAYS}>
                 {(day) => (
-                  <fieldset class="fieldset w-full">
-                    <legend class="fieldset-legend">{day}</legend>
-                    <input
-                      class="input-bordered input"
-                      value={availability()[day] ?? ''}
-                      onInput={(e) =>
-                        setAvailability({
-                          ...availability(),
-                          [day]: e.currentTarget.value,
-                        })
+                  <div class="flex flex-col gap-2 rounded-lg border border-base-200 bg-base-100 p-3 shadow-sm">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm font-bold">{day}</span>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-primary"
+                        onClick={() => addTimeWindow(day)}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <Show
+                      when={(schedule()[day] || []).length > 0}
+                      fallback={
+                        <span class="text-sm italic opacity-50">
+                          No schedule.
+                        </span>
                       }
-                      placeholder="Time window"
-                    />
-                  </fieldset>
+                    >
+                      <div class="flex flex-col gap-2">
+                        <For each={schedule()[day]}>
+                          {(window, index) => (
+                            <div class="flex items-center gap-2">
+                              <input
+                                type="time"
+                                class="input-bordered input input-sm flex-1"
+                                value={window.start}
+                                onInput={(e) =>
+                                  updateTimeWindow(
+                                    day,
+                                    index(),
+                                    'start',
+                                    e.currentTarget.value,
+                                  )
+                                }
+                              />
+                              <span class="text-xs opacity-70">to</span>
+                              <input
+                                type="time"
+                                class="input-bordered input input-sm flex-1"
+                                value={window.end}
+                                onInput={(e) =>
+                                  updateTimeWindow(
+                                    day,
+                                    index(),
+                                    'end',
+                                    e.currentTarget.value,
+                                  )
+                                }
+                              />
+                              <button
+                                type="button"
+                                class="btn btn-square text-error btn-ghost btn-sm"
+                                onClick={() => removeTimeWindow(day, index())}
+                                title="Remove time window"
+                              >
+                                &times;
+                              </button>
+                            </div>
+                          )}
+                        </For>
+                      </div>
+                    </Show>
+                  </div>
                 )}
               </For>
             </div>
           </Show>
-          <div class="card-actions justify-end">
+          <div class="mt-4 card-actions justify-end">
             <button
               class="btn btn-primary"
               onClick={handleSave}
