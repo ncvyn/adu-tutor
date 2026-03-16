@@ -18,10 +18,6 @@ export function Header(props: HeaderProps) {
           </Show>
         </div>
       </div>
-
-      <button class="btn btn-primary" onClick={props.onShare}>
-        Share Info
-      </button>
     </div>
   )
 }
