@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/solid-query'
 export type UserResult = {
   id: string
   name: string
+  updatedAt?: number | Date
 }
 
 export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
@@ -78,6 +79,17 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
     if (debounceTimer) clearTimeout(debounceTimer)
   })
 
+  const formatTime = (ts?: number | Date) => {
+    if (!ts) return ''
+
+    const date = ts instanceof Date ? ts : new Date(ts)
+    const now = new Date()
+    if (date.toDateString() === now.toDateString()) {
+      return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+    }
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
+  }
+
   return (
     <div ref={rootRef} class="relative">
       <label class="input w-full">
@@ -134,7 +146,9 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
                       </span>
                     </div>
                   </div>
-                  <span class="text-sm font-medium">{user.name}</span>
+                  <span class="flex-1 text-left text-sm font-medium">
+                    {user.name}
+                  </span>
                 </button>
               </li>
             )}
@@ -154,15 +168,22 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
           Loading recent chats...
         </div>
       </Show>
-      <Show when={recipientsQuery.isSuccess && recipientsQuery.data.length > 0}>
-        <div class="mb-2">
-          <div class="my-1 text-xs font-semibold opacity-60">Recent Chats</div>
-          <ul class="menu w-full bg-base-100 shadow">
+
+      <Show
+        when={
+          recipientsQuery.isSuccess && (recipientsQuery.data?.length ?? 0) > 0
+        }
+      >
+        <div class="mt-4 mb-2">
+          <div class="my-1 px-1 text-xs font-semibold opacity-60">
+            Recent Chats
+          </div>
+          <ul class="menu w-full rounded-box bg-base-100 shadow">
             <For each={recipientsQuery.data}>
               {(user) => (
                 <li>
                   <button
-                    class="flex items-center gap-3"
+                    class="flex w-full items-center gap-3"
                     onClick={() => {
                       props.onSelect?.(user)
                       setQuery('')
@@ -177,7 +198,16 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
                         </span>
                       </div>
                     </div>
-                    <span class="text-sm font-medium">{user.name}</span>
+                    <div class="flex flex-1 items-center justify-between overflow-hidden">
+                      <span class="truncate text-sm font-medium">
+                        {user.name}
+                      </span>
+                      <Show when={user.updatedAt}>
+                        <span class="text-xs whitespace-nowrap opacity-50">
+                          {formatTime(user.updatedAt)}
+                        </span>
+                      </Show>
+                    </div>
                   </button>
                 </li>
               )}

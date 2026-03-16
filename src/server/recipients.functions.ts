@@ -18,6 +18,7 @@ export const getRecipients = createServerFn({ method: 'GET' }).handler(
       .select({
         id: user.id,
         name: user.name,
+        updatedAt: conversation.updatedAt,
       })
       .from(user)
       .innerJoin(

@@ -95,6 +95,8 @@ export function useChat(options: ChatOptions) {
           queryKey: messagesQueryKey(),
         })
       }
+
+      await queryClient.invalidateQueries({ queryKey: ['recipients'] })
     },
     onError: (error) => {
       notify({
@@ -145,6 +147,7 @@ export function useChat(options: ChatOptions) {
           content: data.content,
           createdAt: data.createdAt,
         })
+        queryClient.invalidateQueries({ queryKey: ['recipients'] })
       } catch {
         notify({
           type: 'warning',
