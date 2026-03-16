@@ -1,11 +1,11 @@
 import { ErrorBoundary, For, Show, createMemo, createSignal } from 'solid-js'
-import { createFileRoute } from '@tanstack/solid-router'
+import { createFileRoute, useNavigate } from '@tanstack/solid-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import type { InfoCardWithVotes } from '@/schemas/info'
 import { useAuthGuard } from '@/lib/auth-client'
 import { SUBJECTS } from '@/lib/constants'
 
-import { LoadingScreen, useNotifications } from '@/components'
+import { LoadingScreen, useNotifications, useChatContext } from '@/components'
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import {
   CardList,
@@ -35,6 +35,8 @@ function InfoHub() {
   const session = useAuthGuard({ requireAuth: true })
   const { notify } = useNotifications()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const chatContext = useChatContext()
 
   // Share Dialog State
   const [newTitle, setNewTitle] = createSignal('')
@@ -224,6 +226,12 @@ function InfoHub() {
     setTutorSearchQuery('')
   }
 
+  function handleSelectTutor(tutor: { id: string; name: string }) {
+    chatContext.setSelectedRecipient(tutor)
+    closeTutorSearchModal()
+    navigate({ to: '/messages' })
+  }
+
   // ========================
   // Card Handlers
   // ========================
@@ -355,7 +363,12 @@ function InfoHub() {
                             <For each={tutorsQuery.data}>
                               {(tutor) => (
                                 <li>
-                                  <span>{tutor.name}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSelectTutor(tutor)}
+                                  >
+                                    {tutor.name}
+                                  </button>
                                 </li>
                               )}
                             </For>
