@@ -10,7 +10,10 @@ import {
 } from '@/components'
 import { useChatContext } from '@/components/messages/ChatContext'
 
-export const Route = createFileRoute('/messages')({ component: Messages })
+export const Route = createFileRoute('/messages')({
+  ssr: false,
+  component: Messages,
+})
 
 function Messages() {
   const session = useAuthGuard({ requireAuth: true })
