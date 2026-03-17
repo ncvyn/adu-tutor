@@ -17,7 +17,6 @@
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.28.0",
     "@cloudflare/workers-types": "^4.20260316.1",
-    "@tailwindcss/vite": "^4.2.1",
     "@tanstack/router-plugin": "^1.166.12",
     "@tanstack/solid-query": "^5.90.26",
     "@tanstack/solid-router": "^1.167.3",
@@ -29,8 +28,6 @@
     "lucide-solid": "^0.577.0",
     "solid-js": "^1.9.11",
     "solid-markdown": "^2.1.1",
-    "tailwindcss": "^4.2.1",
-    "vite": "^8.0.0",
     "vite-plugin-lucide-preprocess": "^1.4.8"
   },
   "devDependencies": {
@@ -43,6 +40,8 @@
     "oxlint-tsgolint": "^0.17.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "tailwindcss": "^4.2.1",
+    "@tailwindcss/vite": "^4.2.1",
     "typescript": "^5.9.3",
     "vite": "^8.0.0",
     "vite-plugin-solid": "^2.11.11",

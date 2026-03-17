@@ -66,30 +66,20 @@ export const addMessage = createServerFn({ method: 'POST' })
 
     const { minUserId, maxUserId } = getConversationPair(sender, receiver)
 
-    const conversations = await db
-      .select()
-      .from(conversation)
-      .where(
-        and(
-          eq(conversation.minUserId, minUserId),
-          eq(conversation.maxUserId, maxUserId),
-        ),
-      )
-      .limit(1)
-
-    let existingConversation = conversations[0]
-    if (conversations.length === 0) {
-      const [createdConversation] = await db
-        .insert(conversation)
-        .values({
-          id: crypto.randomUUID(),
-          minUserId,
-          maxUserId,
-        })
-        .returning()
-
-      existingConversation = createdConversation
-    }
+    const [existingConversation] = await db
+      .insert(conversation)
+      .values({
+        id: crypto.randomUUID(),
+        minUserId,
+        maxUserId,
+      })
+      .onConflictDoUpdate({
+        target: [conversation.minUserId, conversation.maxUserId],
+        set: {
+          updatedAt: new Date(),
+        },
+      })
+      .returning()
 
     const [newMessage] = await db
       .insert(message)

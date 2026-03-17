@@ -73,7 +73,7 @@ export const auth = betterAuth({
         const userId = newSession.session.userId
 
         const rows = await db
-          .select()
+          .select({ createdAt: schema.user.createdAt })
           .from(schema.user)
           .where(eq(schema.user.id, userId))
         if (rows.length !== 0) {

@@ -46,85 +46,87 @@ export class ChatRoom extends DurableObject<Env> {
   }
 
   async webSocketMessage(_ws: WebSocket, raw: string | ArrayBuffer) {
+    let data: IncomingMessage
     try {
-      const data = JSON.parse(raw as string) as IncomingMessage
+      data = JSON.parse(raw as string) as IncomingMessage
+    } catch (err) {
+      console.error('Invalud WebSocket payload:', err)
+      return
+    }
 
-      if (!data.content.trim()) return
+    if (!data.content.trim()) return
 
-      if (!data.senderId || !data.recipientId) return
+    if (!data.senderId || !data.recipientId) return
 
-      const now = Date.now()
-      const id = crypto.randomUUID()
+    const now = Date.now()
+    const id = crypto.randomUUID()
 
-      let conversationId = data.conversationId
+    let conversationId = data.conversationId
 
-      if (!conversationId) {
-        const [minUserId, maxUserId] =
-          data.senderId.localeCompare(data.recipientId) <= 0
-            ? [data.senderId, data.recipientId]
-            : [data.recipientId, data.senderId]
+    if (!conversationId) {
+      const [minUserId, maxUserId] =
+        data.senderId.localeCompare(data.recipientId) <= 0
+          ? [data.senderId, data.recipientId]
+          : [data.recipientId, data.senderId]
 
-        const rows = await db
-          .select()
-          .from(conversationTable)
-          .where(
-            and(
-              eq(conversationTable.minUserId, minUserId),
-              eq(conversationTable.maxUserId, maxUserId),
-            ),
-          )
-          .limit(1)
+      const rows = await db
+        .select()
+        .from(conversationTable)
+        .where(
+          and(
+            eq(conversationTable.minUserId, minUserId),
+            eq(conversationTable.maxUserId, maxUserId),
+          ),
+        )
+        .limit(1)
 
-        if (rows.length > 0) {
-          conversationId = rows[0].id
-        } else {
-          const [created] = await db
-            .insert(conversationTable)
-            .values({
-              id: crypto.randomUUID(),
-              minUserId,
-              maxUserId,
-            })
-            .returning()
-          conversationId = created.id
-        }
+      if (rows.length > 0) {
+        conversationId = rows[0].id
+      } else {
+        const [created] = await db
+          .insert(conversationTable)
+          .values({
+            id: crypto.randomUUID(),
+            minUserId,
+            maxUserId,
+          })
+          .returning()
+        conversationId = created.id
       }
+    }
 
-      if (!conversationId) return
+    if (!conversationId) return
 
-      await db.batch([
-        db.insert(messageTable).values({
-          id,
-          conversationId,
-          senderId: data.senderId,
-          content: data.content.trim(),
-        }),
-        db
-          .update(conversationTable)
-          .set({ updatedAt: new Date(now) })
-          .where(eq(conversationTable.id, conversationId)),
-      ])
-
-      const outgoing: OutgoingMessage = {
-        type: 'message',
+    await db.batch([
+      db.insert(messageTable).values({
         id,
         conversationId,
         senderId: data.senderId,
         content: data.content.trim(),
-        createdAt: now,
-      }
+      }),
+      db
+        .update(conversationTable)
+        .set({ updatedAt: new Date(now) })
+        .where(eq(conversationTable.id, conversationId)),
+    ])
 
-      const payload = JSON.stringify(outgoing)
+    const outgoing: OutgoingMessage = {
+      type: 'message',
+      id,
+      conversationId,
+      senderId: data.senderId,
+      content: data.content.trim(),
+      createdAt: now,
+    }
 
-      for (const socket of this.ctx.getWebSockets()) {
-        try {
-          socket.send(payload)
-        } catch {
-          // Socket is likely closed
-        }
+    const payload = JSON.stringify(outgoing)
+
+    for (const socket of this.ctx.getWebSockets()) {
+      try {
+        socket.send(payload)
+      } catch {
+        // Socket is likely closed
       }
-    } catch (err) {
-      console.error('webSocketMessage error:', err)
     }
   }
 }
