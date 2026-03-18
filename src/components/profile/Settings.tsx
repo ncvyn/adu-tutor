@@ -21,6 +21,12 @@ const MAXIMUM_SUBJECTS = 5
 
 type TimeWindow = { start: string; end: string }
 
+const THEME_OPTIONS: Array<{ label: string; value: ThemeMode }> = [
+  { label: 'System', value: 'system' },
+  { label: 'Light', value: 'light' },
+  { label: 'Dark', value: 'dark' },
+]
+
 export default function Settings(props: SettingsProps) {
   const { profile, refetchProfile } = props
   const { notify } = useNotifications()
@@ -178,8 +184,7 @@ export default function Settings(props: SettingsProps) {
     }
   }
 
-  function handleThemeChange(e: Event) {
-    const value = (e.target as HTMLSelectElement).value as ThemeMode
+  function handleThemeChange(value: ThemeMode) {
     setTheme(value)
     applyTheme(value)
     localStorage.setItem('adu-theme', value)
@@ -238,18 +243,28 @@ export default function Settings(props: SettingsProps) {
               Choose up to {MAXIMUM_SUBJECTS} subjects.
             </div>
           </fieldset>
+
           <fieldset class="fieldset w-full">
             <legend class="fieldset-legend">Program theme</legend>
-            <select
-              class="select-bordered select"
-              value={theme()}
-              onChange={handleThemeChange}
-            >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="system">System</option>
-            </select>
+            <fieldset class="fieldset">
+              <For each={THEME_OPTIONS}>
+                {(option) => (
+                  <label class="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="radio"
+                      name="theme-radios"
+                      class="theme-controller radio radio-md radio-primary"
+                      value={option.value}
+                      checked={theme() === option.value}
+                      onInput={() => handleThemeChange(option.value)}
+                    />
+                    {option.label}
+                  </label>
+                )}
+              </For>
+            </fieldset>
           </fieldset>
+
           <Show when={profile.role === 'tutor'}>
             <fieldset class="fieldset w-full">
               <legend class="fieldset-legend">Availability schedule</legend>
@@ -313,7 +328,7 @@ export default function Settings(props: SettingsProps) {
                               />
                               <button
                                 type="button"
-                                class="btn btn-square text-error btn-ghost btn-sm"
+                                class="btn btn-square text-base-content btn-ghost btn-sm"
                                 onClick={() => removeTimeWindow(day, index())}
                                 title="Remove time window"
                               >
@@ -329,6 +344,7 @@ export default function Settings(props: SettingsProps) {
               </For>
             </div>
           </Show>
+
           <div class="mt-4 card-actions justify-end">
             <button
               class="btn btn-primary"

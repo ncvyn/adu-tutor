@@ -198,12 +198,12 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
                         </span>
                       </div>
                     </div>
-                    <div class="flex flex-1 items-center justify-between overflow-hidden">
+                    <div class="flex flex-1 items-center justify-between overflow-hidden md:flex-col md:items-start md:justify-center">
                       <span class="truncate text-sm font-medium">
                         {user.name}
                       </span>
                       <Show when={user.updatedAt}>
-                        <span class="text-xs whitespace-nowrap opacity-50">
+                        <span class="text-xs whitespace-nowrap opacity-50 md:mt-1">
                           {formatTime(user.updatedAt)}
                         </span>
                       </Show>

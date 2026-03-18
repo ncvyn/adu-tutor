@@ -14,13 +14,13 @@ export function Sidebar() {
 
   return (
     <aside class="flex h-full w-full flex-col border-r border-base-300 bg-base-100">
-      {/* Brand */}
+      {/* AdU-Tutor logo */}
+
       <div class="flex items-center gap-2 border-b border-base-300 px-5 py-4">
         <Link to="/info-hub" class="flex items-center gap-2">
-          <img
-            src="/adu-tutor-logo.svg"
-            alt="AdU-Tutor"
-            class="h-8 w-auto select-none"
+          <div
+            aria-label="AdU-Tutor"
+            class="mask h-8 w-32 shrink-0 bg-base-content mask-[url('/adu-tutor-logo.svg')] mask-contain mask-center mask-no-repeat"
           />
         </Link>
       </div>
