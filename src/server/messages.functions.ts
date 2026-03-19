@@ -109,3 +109,25 @@ export const addMessage = createServerFn({ method: 'POST' })
       ],
     } as ConversationDetails
   })
+
+export const deleteMessage = createServerFn({ method: 'POST' })
+  .inputValidator((data: { senderId: string; messageId: string }) => data)
+  .middleware([middleware])
+  .handler(async ({ data }) => {
+    const { senderId, messageId } = data
+
+    const deleted = await db
+      .delete(message)
+      .where(and(eq(message.senderId, senderId), eq(message.id, messageId)))
+      .returning()
+
+    if (deleted.length === 0) {
+      throw new Error('Message not found or unauthorized')
+    }
+
+    return {
+      success: true,
+      messageId: deleted[0].id,
+      conversationId: deleted[0].conversationId,
+    }
+  })

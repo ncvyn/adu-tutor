@@ -1,7 +1,11 @@
 import { createEffect, createSignal, on, onCleanup } from 'solid-js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { useNotifications } from '@/components'
-import { addMessage, getMessages } from '@/server/messages.functions'
+import {
+  addMessage,
+  deleteMessage,
+  getMessages,
+} from '@/server/messages.functions'
 
 export interface ChatMessage {
   id: string
@@ -79,6 +83,24 @@ export function useChat(options: ChatOptions) {
     })
   }
 
+  function removeMessageFromCache(messageId: string) {
+    queryClient.setQueryData(messagesQueryKey(), (prev) => {
+      const current = prev as
+        | {
+            conversation: { id: string } | null
+            messages: Array<ChatMessage>
+          }
+        | undefined
+
+      if (!current) return current
+
+      return {
+        conversation: current.conversation,
+        messages: current.messages.filter((m) => m.id !== messageId),
+      }
+    })
+  }
+
   const sendMutation = useMutation(() => ({
     mutationKey: ['messages', 'send', senderId, recipientId] as const,
     mutationFn: async (content: string) =>
@@ -102,6 +124,23 @@ export function useChat(options: ChatOptions) {
       notify({
         type: 'error',
         message: `Failed to send message: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      })
+    },
+  }))
+
+  const deleteMutation = useMutation(() => ({
+    mutationKey: ['messages', 'delete', senderId, recipientId] as const,
+    mutationFn: async (messageId: string) =>
+      deleteMessage({
+        data: { senderId, messageId },
+      }),
+    onSuccess: (_, deletedMessageId) => {
+      removeMessageFromCache(deletedMessageId)
+    },
+    onError: (error) => {
+      notify({
+        type: 'error',
+        message: `Failed to delete message: ${error instanceof Error ? error.message : 'Unknown error'}`,
       })
     },
   }))
@@ -133,7 +172,16 @@ export function useChat(options: ChatOptions) {
 
     ws.addEventListener('message', (event) => {
       try {
-        const data = JSON.parse(event.data) as ChatMessage & { type: string }
+        const data = JSON.parse(event.data) as ChatMessage & {
+          type: string
+          messageId?: string
+        }
+
+        if (data.type === 'delete' && data.messageId) {
+          removeMessageFromCache(data.messageId)
+          return
+        }
+
         if (data.type !== 'message') return
 
         if (data.conversationId && !conversationId()) {
@@ -163,7 +211,7 @@ export function useChat(options: ChatOptions) {
     })
 
     ws.addEventListener('error', () => {
-      notify({ type: 'error', message: 'WebSocket error occurred.' })
+      console.error('WebSocket error occured.')
       setIsConnected(false)
     })
   }
@@ -199,6 +247,22 @@ export function useChat(options: ChatOptions) {
     void sendMutation.mutateAsync(trimmed)
   }
 
+  function remove(messageId: string) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(
+        JSON.stringify({
+          type: 'delete',
+          messageId,
+          conversationId: conversationId(),
+          senderId,
+          recipientId,
+        }),
+      )
+    }
+
+    void deleteMutation.mutateAsync(messageId)
+  }
+
   function disconnect() {
     isIntentionallyClosed = true
     if (reconnectTimeout) {
@@ -219,6 +283,7 @@ export function useChat(options: ChatOptions) {
     isLoading: () => historyQuery.isLoading,
     isSending: () => sendMutation.isPending,
     send,
+    remove,
     disconnect,
   }
 }

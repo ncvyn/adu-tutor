@@ -4,6 +4,7 @@ import type { UserResult } from '@/components'
 import { useChat } from '@/lib/use-chat'
 import { getInitials } from '@/lib/helper'
 import { markdownClass } from '@/lib/markdown'
+import { unixToLocale } from '@/lib/format-date'
 
 const THRESHOLD_MS = 3 * 60 * 1000 // 3 minutes
 
@@ -17,7 +18,15 @@ export const ChatPanel = (props: {
   })
 
   const [input, setInput] = createSignal('')
+  const [messageToDelete, setMessageToDelete] = createSignal<string | null>(
+    null,
+  )
+  const [selectedDeleteMessageId, setSelectedDeleteMessageId] = createSignal<
+    string | null
+  >(null)
+
   let messagesEndRef: HTMLDivElement | undefined
+  let deleteDialogRef: HTMLDialogElement | undefined
 
   createEffect(() => {
     chat.messages()
@@ -27,34 +36,35 @@ export const ChatPanel = (props: {
   })
 
   const handleSend = () => {
-    const content = input().trim()
+    const content = (input() ?? '').trim()
     if (!content) return
     chat.send(content)
     setInput('')
+  }
+
+  const requestDelete = (messageId: string) => {
+    setMessageToDelete(messageId)
+    deleteDialogRef?.showModal()
+  }
+
+  const confirmDelete = () => {
+    const id = messageToDelete()
+    if (id) {
+      chat.remove(id)
+    }
+    setMessageToDelete(null)
+    deleteDialogRef?.close()
+  }
+
+  const cancelDelete = () => {
+    setMessageToDelete(null)
+    deleteDialogRef?.close()
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key !== 'Enter' || e.shiftKey) return
     e.preventDefault()
     handleSend()
-  }
-
-  const unixToLocale = (timestamp: number) => {
-    const ts = new Date(timestamp)
-
-    const date =
-      ts.toDateString() === new Date().toDateString()
-        ? 'Today'
-        : ts.toLocaleDateString([], {
-            month: 'short',
-            day: '2-digit',
-          })
-    const time = new Date(timestamp).toLocaleTimeString([], {
-      hour: 'numeric',
-      minute: '2-digit',
-    })
-
-    return `${date}, ${time}`
   }
 
   const messages = () => chat.messages()
@@ -137,23 +147,51 @@ export const ChatPanel = (props: {
                     </div>
                   </Show>
 
-                  <div class={isSender ? 'chat-end chat' : 'chat-start chat'}>
+                  <div
+                    class={isSender ? 'group chat-end chat' : 'chat-start chat'}
+                  >
                     <Show when={showSeparator}>
                       <div class="chat-header pb-1 text-sm font-semibold opacity-80">
                         {isSender ? 'You' : props.recipient.name}
                       </div>
                     </Show>
+
                     <div
-                      class="chat-bubble wrap-break-word whitespace-normal"
+                      class="chat-bubble cursor-pointer wrap-break-word whitespace-normal"
                       classList={{
                         'chat-bubble-primary': isSender,
                         'bg-base-200': !isSender,
                       }}
+                      onClick={() =>
+                        isSender &&
+                        setSelectedDeleteMessageId(
+                          selectedDeleteMessageId() === msg.id ? null : msg.id,
+                        )
+                      }
+                      tabIndex={isSender ? 0 : undefined}
+                      aria-label={isSender ? 'Show delete' : undefined}
                     >
                       <div class={markdownClass}>
                         <SolidMarkdown>{msg.content}</SolidMarkdown>
                       </div>
                     </div>
+
+                    <Show
+                      when={isSender && selectedDeleteMessageId() === msg.id}
+                    >
+                      <div class="chat-footer flex items-center gap-2 pt-1">
+                        <button
+                          onClick={() => {
+                            setSelectedDeleteMessageId(null)
+                            requestDelete(msg.id)
+                          }}
+                          class="cursor-pointer text-xs text-error hover:underline"
+                          title="Delete message"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </Show>
                   </div>
                 </>
               )
@@ -175,7 +213,7 @@ export const ChatPanel = (props: {
         />
         <button
           class="btn self-end btn-primary"
-          disabled={!input().trim() || (!isConnected() && isSending())}
+          disabled={!(input() ?? '').trim() || (!isConnected() && isSending())}
           onClick={handleSend}
         >
           <Show
@@ -186,6 +224,28 @@ export const ChatPanel = (props: {
           </Show>
         </button>
       </footer>
+
+      {/* Delete Confirmation Dialog */}
+      <dialog ref={deleteDialogRef} class="modal">
+        <div class="modal-box">
+          <h3 class="text-lg font-bold">Delete message?</h3>
+          <p class="py-2 text-sm opacity-70">
+            Are you sure you want to delete this message? This action cannot be
+            undone.
+          </p>
+          <div class="modal-action">
+            <button class="btn btn-ghost" onClick={cancelDelete}>
+              Cancel
+            </button>
+            <button class="btn btn-error" onClick={confirmDelete}>
+              Delete
+            </button>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button onClick={cancelDelete}>close</button>
+        </form>
+      </dialog>
     </section>
   )
 }
