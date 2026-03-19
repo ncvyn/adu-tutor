@@ -1,7 +1,11 @@
-import { For, Show } from 'solid-js'
+import { For, Show, createSignal } from 'solid-js'
 import { getInitials } from '@/lib/helper'
 import { UserBadges } from '@/components'
 import { APP_VERSION } from '@/lib/version.ts'
+import { LogOut } from 'lucide-solid'
+import { signOut } from '@/lib/auth-client'
+import { useNotifications } from '@/components/Notifications'
+import { useNavigate } from '@tanstack/solid-router'
 
 export default function UserProfile(props: { profile: any }) {
   const { profile } = props
@@ -11,6 +15,35 @@ export default function UserProfile(props: { profile: any }) {
     : typeof profile.preferredSubjects === 'string'
       ? JSON.parse(profile.preferredSubjects || '[]')
       : []
+
+  const { notify } = useNotifications()
+  const navigate = useNavigate()
+  const [isSignOutOpen, setIsSignOutOpen] = createSignal(false)
+  const [isSigningOut, setIsSigningOut] = createSignal(false)
+
+  const openSignOutModal = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
+    setIsSignOutOpen(true)
+  }
+
+  const closeSignOutModal = () => {
+    if (!isSigningOut()) {
+      setIsSignOutOpen(false)
+    }
+  }
+
+  const confirmSignOut = async () => {
+    if (isSigningOut()) return
+    setIsSigningOut(true)
+    try {
+      await signOut(notify, navigate)
+    } finally {
+      setIsSigningOut(false)
+      setIsSignOutOpen(false)
+    }
+  }
 
   return (
     <div class="flex flex-col items-center text-center">
@@ -39,6 +72,56 @@ export default function UserProfile(props: { profile: any }) {
       </Show>
       <UserBadges userId={profile.id} />
       <p class="mt-6 text-xs opacity-60">AdU-Tutor v{APP_VERSION}</p>
+
+      {/* Sign out button (mobile only) */}
+      <div class="mt-6 md:hidden">
+        <button
+          type="button"
+          class="btn flex items-center gap-2 btn-error"
+          onClick={openSignOutModal}
+        >
+          <LogOut class="h-4 w-4" />
+          Sign out
+        </button>
+      </div>
+
+      {/* Sign out modal */}
+      <dialog class={`modal ${isSignOutOpen() ? 'modal-open' : ''}`}>
+        <div class="modal-box">
+          <h3 class="text-lg font-bold">Sign out?</h3>
+          <p class="mt-2 text-sm opacity-80">
+            You’ll be signed out of your current session.
+          </p>
+          <div class="modal-action">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              onClick={closeSignOutModal}
+              disabled={isSigningOut()}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-error"
+              onClick={confirmSignOut}
+              disabled={isSigningOut()}
+            >
+              <Show
+                when={!isSigningOut()}
+                fallback={<span class="loading loading-xs loading-spinner" />}
+              >
+                Sign out
+              </Show>
+            </button>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button type="button" onClick={closeSignOutModal}>
+            close
+          </button>
+        </form>
+      </dialog>
     </div>
   )
 }
