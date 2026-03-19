@@ -1,6 +1,7 @@
 import { For, Show } from 'solid-js'
 import { getInitials } from '@/lib/helper'
 import { UserBadges } from '@/components'
+import { APP_VERSION } from '@/lib/version.ts'
 
 export default function UserProfile(props: { profile: any }) {
   const { profile } = props
@@ -37,6 +38,7 @@ export default function UserProfile(props: { profile: any }) {
         <p class="mt-4 max-w-lg text-sm opacity-80">{profile.bio}</p>
       </Show>
       <UserBadges userId={profile.id} />
+      <p class="mt-6 text-xs opacity-60">AdU-Tutor v{APP_VERSION}</p>
     </div>
   )
 }
