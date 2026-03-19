@@ -169,11 +169,7 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
         </div>
       </Show>
 
-      <Show
-        when={
-          recipientsQuery.isSuccess && (recipientsQuery.data?.length ?? 0) > 0
-        }
-      >
+      <Show when={recipientsQuery.isSuccess && recipientsQuery.data.length > 0}>
         <div class="mt-4 mb-2">
           <div class="my-1 px-1 text-xs font-semibold opacity-60">
             Recent Chats

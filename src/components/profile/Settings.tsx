@@ -48,7 +48,7 @@ export default function Settings(props: SettingsProps) {
   const initialAvailability = profile.availability
     ? (JSON.parse(profile.availability) as AvailabilityMap)
     : {}
-  const initialSchedule: Record<string, TimeWindow[]> = {}
+  const initialSchedule: Record<string, Array<TimeWindow>> = {}
   DAYS.forEach((day) => {
     const dayStr = initialAvailability[day] || ''
     initialSchedule[day] = dayStr
@@ -59,7 +59,7 @@ export default function Settings(props: SettingsProps) {
       : []
   })
   const [schedule, setSchedule] =
-    createSignal<Record<string, TimeWindow[]>>(initialSchedule)
+    createSignal<Record<string, Array<TimeWindow>>>(initialSchedule)
 
   const [isSaving, setIsSaving] = createSignal(false)
   const [loadingNotifs, setLoadingNotifs] = createSignal(false)
@@ -72,7 +72,7 @@ export default function Settings(props: SettingsProps) {
     try {
       const serializedAvailability: AvailabilityMap = {}
       DAYS.forEach((day) => {
-        const windows = schedule()[day] || []
+        const windows = schedule()[day]
         const validWindows = windows
           .filter((w) => w.start && w.end)
           .map((w) => `${w.start}-${w.end}`)
@@ -108,7 +108,7 @@ export default function Settings(props: SettingsProps) {
   function addTimeWindow(day: string) {
     setSchedule((prev) => ({
       ...prev,
-      [day]: [...(prev[day] || []), { start: '', end: '' }],
+      [day]: [...prev[day], { start: '', end: '' }],
     }))
   }
 
@@ -119,7 +119,7 @@ export default function Settings(props: SettingsProps) {
     value: string,
   ) {
     setSchedule((prev) => {
-      const updatedDay = [...(prev[day] || [])]
+      const updatedDay = [...prev[day]]
       updatedDay[index] = { ...updatedDay[index], [field]: value }
       return { ...prev, [day]: updatedDay }
     })
@@ -127,7 +127,7 @@ export default function Settings(props: SettingsProps) {
 
   function removeTimeWindow(day: string, index: number) {
     setSchedule((prev) => {
-      const updatedDay = [...(prev[day] || [])]
+      const updatedDay = [...prev[day]]
       updatedDay.splice(index, 1)
       return { ...prev, [day]: updatedDay }
     })
@@ -288,7 +288,7 @@ export default function Settings(props: SettingsProps) {
                     </div>
 
                     <Show
-                      when={(schedule()[day] || []).length > 0}
+                      when={schedule()[day].length > 0}
                       fallback={
                         <span class="text-sm italic opacity-50">
                           No schedule.

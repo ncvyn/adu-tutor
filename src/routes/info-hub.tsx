@@ -4,15 +4,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import type { InfoCardWithVotes } from '@/schemas/info'
 import { useAuthGuard } from '@/lib/auth-client'
 
-import { LoadingScreen, useNotifications, useChatContext } from '@/components'
+import { LoadingScreen, useChatContext, useNotifications } from '@/components'
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import {
   CardList,
   DeleteDialog,
   ErrorFallback,
+  Fab,
   Filter,
   Header,
-  Fab,
   ShareDialog,
   TutorSearchModal,
 } from '@/components/info-hub'
@@ -135,8 +135,8 @@ function InfoHub() {
   }
 
   return (
-    <Show when={session().data} fallback={<LoadingScreen />}>
-      <AuthenticatedLayout>
+    <AuthenticatedLayout>
+      <Show when={session().data} fallback={<LoadingScreen />}>
         <ErrorBoundary fallback={<ErrorFallback />}>
           <Show
             when={!cardsQuery.isPending || !!cardsQuery.data}
@@ -188,7 +188,7 @@ function InfoHub() {
           onCancel={cancelDeleteCard}
           onConfirm={confirmDeleteCard}
         />
-      </AuthenticatedLayout>
-    </Show>
+      </Show>
+    </AuthenticatedLayout>
   )
 }
