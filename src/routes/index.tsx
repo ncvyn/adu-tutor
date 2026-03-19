@@ -27,17 +27,30 @@ function Index() {
       fallback={<LoadingScreen />}
     >
       <div class="hero min-h-screen bg-base-200">
-        <div class="hero-content text-center">
-          <div class="max-w-md">
-            <h1 class="text-5xl font-bold">Welcome to AdU-Tutor</h1>
-            <p class="py-6">
-              AdU-Tutor is a platform that connects students with tutors for
-              online tutoring services.
-            </p>
+        <div class="hero-content px-0">
+          <div class="flex max-w-lg flex-col">
+            <div
+              aria-label="AdU-Tutor"
+              class="mask h-32 w-screen shrink-0 self-center bg-base-content mask-[url('/adu-tutor-logo.svg')] mask-contain mask-center mask-no-repeat md:w-lg"
+            />
+            <span class="-mt-3 w-full px-2.5 text-center text-3xl sm:text-left">
+              {'A platform'}
+              <br class="block sm:hidden" />
+              {' for '}
+              <span class="text-rotate duration-20000">
+                <span class="text-left text-primary-content">
+                  <span class="bg-primary px-2">Tutors.</span>
+                  <span class="bg-primary px-2">Tutees.</span>
+                  <span class="bg-primary px-2">Students.</span>
+                  <span class="bg-primary px-2">Teachers.</span>
+                  <span class="bg-primary px-2">Learners.</span>
+                </span>
+              </span>
+            </span>
             <button
               onClick={handleSignIn}
               classList={{ loading: isLoading() }}
-              class="btn btn-primary"
+              class="btn mt-8 self-center text-center btn-primary"
             >
               <img class="w-6" src={AdULogo} alt="Adamson University logo" />
               Login with AdU Mail
