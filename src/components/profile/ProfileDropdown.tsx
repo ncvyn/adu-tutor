@@ -4,6 +4,7 @@ import { authClient, signOut } from '@/lib/auth-client'
 import { getInitials } from '@/lib/helper'
 import { useNotifications } from '@/components/Notifications'
 import { LogOut, User } from 'lucide-solid'
+import { SignOutModal } from './SignOutModal'
 
 export function ProfileDropdown() {
   const session = authClient.useSession()
@@ -100,44 +101,12 @@ export function ProfileDropdown() {
             </div>
           </div>
 
-          <dialog class={`modal ${isSignOutOpen() ? 'modal-open' : ''}`}>
-            <div class="modal-box">
-              <h3 class="text-lg font-bold">Sign out?</h3>
-              <p class="mt-2 text-sm opacity-80">
-                You’ll be signed out of your current session.
-              </p>
-              <div class="modal-action">
-                <button
-                  type="button"
-                  class="btn btn-ghost"
-                  onClick={closeSignOutModal}
-                  disabled={isSigningOut()}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-error"
-                  onClick={confirmSignOut}
-                  disabled={isSigningOut()}
-                >
-                  <Show
-                    when={!isSigningOut()}
-                    fallback={
-                      <span class="loading loading-xs loading-spinner" />
-                    }
-                  >
-                    Sign out
-                  </Show>
-                </button>
-              </div>
-            </div>
-            <form method="dialog" class="modal-backdrop">
-              <button type="button" onClick={closeSignOutModal}>
-                close
-              </button>
-            </form>
-          </dialog>
+          <SignOutModal
+            open={isSignOutOpen()}
+            isSigningOut={isSigningOut()}
+            onCancel={closeSignOutModal}
+            onConfirm={confirmSignOut}
+          />
         </>
       )}
     </Show>
