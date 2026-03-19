@@ -36,7 +36,7 @@ export const ChatPanel = (props: {
   })
 
   const handleSend = () => {
-    const content = (input() ?? '').trim()
+    const content = input().trim()
     if (!content) return
     chat.send(content)
     setInput('')
@@ -213,7 +213,7 @@ export const ChatPanel = (props: {
         />
         <button
           class="btn self-end btn-primary"
-          disabled={!(input() ?? '').trim() || (!isConnected() && isSending())}
+          disabled={!input().trim() || (!isConnected() && isSending())}
           onClick={handleSend}
         >
           <Show

@@ -126,8 +126,10 @@ export const deleteMessage = createServerFn({ method: 'POST' })
     }
 
     return {
+      type: 'delete',
       success: true,
       messageId: deleted[0].id,
       conversationId: deleted[0].conversationId,
+      senderId,
     }
   })

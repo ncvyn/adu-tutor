@@ -6,13 +6,20 @@ import {
   message as messageTable,
 } from '@/schemas/chat'
 
-interface IncomingMessage {
-  type: 'message'
-  conversationId: string
-  senderId: string
-  recipientId: string
-  content: string
-}
+type IncomingMessage =
+  | {
+      type: 'message'
+      conversationId?: string
+      senderId: string
+      recipientId: string
+      content: string
+    }
+  | {
+      type: 'delete'
+      messageId: string
+      senderId: string
+      conversationId?: string
+    }
 
 interface OutgoingMessage {
   type: 'message'
@@ -21,6 +28,13 @@ interface OutgoingMessage {
   senderId: string
   content: string
   createdAt: number
+}
+
+interface OutgoingDeleteMessage {
+  type: 'delete'
+  messageId: string
+  conversationId: string
+  senderId: string
 }
 
 export class ChatRoom extends DurableObject<Env> {
@@ -50,12 +64,34 @@ export class ChatRoom extends DurableObject<Env> {
     try {
       data = JSON.parse(raw as string) as IncomingMessage
     } catch (err) {
-      console.error('Invalud WebSocket payload:', err)
+      console.error('Invalid WebSocket payload:', err)
+      return
+    }
+
+    if (data.type === 'delete') {
+      if (!data.senderId || !data.messageId || !data.conversationId) return
+
+      const outgoing: OutgoingDeleteMessage = {
+        type: 'delete',
+        messageId: data.messageId,
+        conversationId: data.conversationId,
+        senderId: data.senderId,
+      }
+
+      const payload = JSON.stringify(outgoing)
+
+      for (const socket of this.ctx.getWebSockets()) {
+        try {
+          socket.send(payload)
+        } catch {
+          // Socket is likely closed
+        }
+      }
+
       return
     }
 
     if (!data.content.trim()) return
-
     if (!data.senderId || !data.recipientId) return
 
     const now = Date.now()
@@ -97,12 +133,14 @@ export class ChatRoom extends DurableObject<Env> {
 
     if (!conversationId) return
 
+    const trimmedContent = data.content.trim()
+
     await db.batch([
       db.insert(messageTable).values({
         id,
         conversationId,
         senderId: data.senderId,
-        content: data.content.trim(),
+        content: trimmedContent,
       }),
       db
         .update(conversationTable)
@@ -115,7 +153,7 @@ export class ChatRoom extends DurableObject<Env> {
       id,
       conversationId,
       senderId: data.senderId,
-      content: data.content.trim(),
+      content: trimmedContent,
       createdAt: now,
     }
 
