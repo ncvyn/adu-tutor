@@ -29,9 +29,10 @@ export const ChatPanel = (props: {
   let deleteDialogRef: HTMLDialogElement | undefined
 
   createEffect(() => {
-    chat.messages()
-    queueMicrotask(() => {
-      messagesEndRef?.scrollIntoView({ behavior: 'instant' })
+    if (isLoading() || messages().length == 0) return
+
+    requestAnimationFrame(() => {
+      messagesEndRef?.scrollIntoView({ behavior: 'auto' })
     })
   })
 
