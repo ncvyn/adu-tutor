@@ -96,7 +96,7 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
         <Search class="h-4 w-4 opacity-50" />
         <input
           type="text"
-          placeholder="Search users..."
+          placeholder="Search..."
           value={query()}
           onFocus={() => {
             if (query().trim()) setIsOpen(true)
@@ -170,10 +170,7 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
       </Show>
 
       <Show when={recipientsQuery.isSuccess && recipientsQuery.data.length > 0}>
-        <div class="mt-4 mb-2">
-          <div class="my-1 px-1 text-xs font-semibold opacity-60">
-            Recent Chats
-          </div>
+        <div class="my-0">
           <ul class="menu w-full rounded-box bg-base-100 shadow">
             <For each={recipientsQuery.data}>
               {(user) => (

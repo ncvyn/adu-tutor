@@ -40,7 +40,7 @@ function Messages() {
             {/* Mobile-only search */}
             <div class="mb-3 md:hidden">
               <div class="flex items-center justify-between">
-                <span class="text-sm font-semibold tracking-wide uppercase opacity-60">
+                <span class="text-sm font-semibold tracking-wide uppercase">
                   Messages
                 </span>
               </div>
