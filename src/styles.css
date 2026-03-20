@@ -2,7 +2,7 @@
 @plugin 'daisyui';
 
 @plugin 'daisyui/theme' {
-  name: 'light';
+  name: 'shiro';
   default: true;
   prefersdark: false;
   color-scheme: 'light';
@@ -37,7 +37,7 @@
 }
 
 @plugin 'daisyui/theme' {
-  name: 'dark';
+  name: 'kuro';
   default: false;
   prefersdark: true;
   color-scheme: 'dark';

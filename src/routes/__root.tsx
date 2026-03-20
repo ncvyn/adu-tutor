@@ -6,7 +6,7 @@ import {
 } from '@tanstack/solid-router'
 import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools'
 import { QueryClientProvider } from '@tanstack/solid-query'
-import { ErrorBoundary } from 'solid-js'
+import { ErrorBoundary, onMount } from 'solid-js'
 import { HydrationScript } from 'solid-js/web'
 
 import {
@@ -15,6 +15,7 @@ import {
 } from '@/components/Notifications'
 import { ChatProvider } from '@/components/messages/ChatContext'
 import { queryClient } from '@/lib/query-client'
+import { initTheme } from '@/lib/theme'
 
 import styleCss from '@/styles.css?url'
 
@@ -52,6 +53,8 @@ function RootErrorFallback() {
 }
 
 function RootComponent() {
+  onMount(initTheme)
+
   return (
     <html>
       <head>

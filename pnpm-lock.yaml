@@ -47,6 +47,9 @@ importers:
       solid-markdown:
         specifier: ^2.1.1
         version: 2.1.1(solid-js@1.9.11)
+      theme-change:
+        specifier: ^2.5.0
+        version: 2.5.0
       vite-plugin-lucide-preprocess:
         specifier: ^1.4.8
         version: 1.4.8(rollup@4.59.0)(vite@8.0.0(@types/node@25.5.0)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))
@@ -3538,6 +3541,9 @@ packages:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
 
+  theme-change@2.5.0:
+    resolution: {integrity: sha512-B/UdsgdHAGhSKHTAQnxg/etN0RaMDpehuJmZIjLMDVJ6DGIliRHGD6pODi1CXLQAN9GV0GSyB3G6yCuK05PkPQ==}
+
   tiny-invariant@1.3.3:
     resolution: {integrity: sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==}
 
@@ -6841,6 +6847,8 @@ snapshots:
   tailwindcss@4.2.1: {}
 
   tapable@2.3.0: {}
+
+  theme-change@2.5.0: {}
 
   tiny-invariant@1.3.3: {}
 

@@ -14,21 +14,7 @@ export const Route = createFileRoute('/profile')({
   component: Profile,
 })
 
-export type ThemeMode = 'light' | 'dark' | 'system'
 export type AvailabilityMap = Partial<Record<(typeof DAYS)[number], string>>
-
-export function applyTheme(value: ThemeMode): void {
-  const html = document.documentElement
-  if (value === 'system') {
-    const prefersDark = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    ).matches
-    html.setAttribute('data-theme', prefersDark ? 'dark' : 'light')
-  } else {
-    html.setAttribute('data-theme', value)
-  }
-  localStorage.setItem('adu-theme', value)
-}
 
 function ProfileErrorFallback() {
   return (

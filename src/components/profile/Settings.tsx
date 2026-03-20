@@ -1,7 +1,7 @@
-import type { AvailabilityMap, ThemeMode } from '@/routes/profile'
+import type { AvailabilityMap } from '@/routes/profile'
 import { DAYS, SUBJECTS } from '@/lib/constants'
 import { For, Show, createSignal, onMount } from 'solid-js'
-import { applyTheme } from '@/routes/profile'
+import { applyTheme } from '@/lib/theme'
 import { updateSettings } from '@/server/update-settings.functions'
 import {
   clearNotifications,
@@ -21,10 +21,10 @@ const MAXIMUM_SUBJECTS = 5
 
 type TimeWindow = { start: string; end: string }
 
-const THEME_OPTIONS: Array<{ label: string; value: ThemeMode }> = [
+const THEME_OPTIONS: Array<{ label: string; value: string }> = [
   { label: 'System', value: 'system' },
-  { label: 'Light', value: 'light' },
-  { label: 'Dark', value: 'dark' },
+  { label: 'Light', value: 'shiro' },
+  { label: 'Dark', value: 'kuro' },
 ]
 
 export default function Settings(props: SettingsProps) {
@@ -40,8 +40,8 @@ export default function Settings(props: SettingsProps) {
         ? JSON.parse(profile.preferredSubjects || '[]')
         : [],
   )
-  const [theme, setTheme] = createSignal<ThemeMode>(
-    (localStorage.getItem('adu-theme') as ThemeMode | null) ?? 'system',
+  const [theme, setTheme] = createSignal<string>(
+    (localStorage.getItem('adu-theme') as string | null) ?? 'system',
   )
 
   // Parse existing availability string "09:00-12:00, 14:00-17:00" into structured UI state
@@ -184,10 +184,9 @@ export default function Settings(props: SettingsProps) {
     }
   }
 
-  function handleThemeChange(value: ThemeMode) {
+  function handleThemeChange(value: string) {
     setTheme(value)
     applyTheme(value)
-    localStorage.setItem('adu-theme', value)
   }
 
   function toggleSubject(subject: string) {
