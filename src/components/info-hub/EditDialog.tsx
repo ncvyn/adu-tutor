@@ -1,4 +1,4 @@
-import { For, Show, createMemo, createSignal, createEffect } from 'solid-js'
+import { For, Show, createEffect, createMemo, createSignal, on } from 'solid-js'
 import { useMutation, useQueryClient } from '@tanstack/solid-query'
 import { SUBJECTS } from '@/lib/constants'
 import { useNotifications } from '@/components'
@@ -8,6 +8,7 @@ import type { InfoCardWithVotes } from '@/schemas/info'
 interface EditDialogProps {
   ref: (el: HTMLDialogElement) => void
   card: () => InfoCardWithVotes | null
+  openCount?: () => number
 }
 
 export function EditDialog(props: EditDialogProps) {
@@ -22,13 +23,21 @@ export function EditDialog(props: EditDialogProps) {
   let editDialogRef: HTMLDialogElement | undefined
   let confirmDialogRef: HTMLDialogElement | undefined
 
-  createEffect(() => {
-    const card = props.card()
-    if (!card) return
+  function syncFromCard(card: InfoCardWithVotes) {
     setNewTitle(card.title)
     setNewContent(card.content)
     setNewSubjects(card.subjects.length > 0 ? [...card.subjects] : ['General'])
-  })
+  }
+
+  createEffect(
+    on(
+      () => props.openCount?.() ?? 0,
+      () => {
+        const card = props.card()
+        if (card) syncFromCard(card)
+      },
+    ),
+  )
 
   const updateCardMutation = useMutation(() => ({
     mutationKey: ['info-card', 'update', props.card()?.id] as const,
@@ -61,7 +70,7 @@ export function EditDialog(props: EditDialogProps) {
       newTitle().trim() !== card.title.trim() ||
       newContent().trim() !== card.content.trim() ||
       JSON.stringify([...newSubjects()].sort()) !==
-        JSON.stringify([...(card.subjects ?? [])].sort())
+        JSON.stringify([...card.subjects].sort())
     )
   })
 

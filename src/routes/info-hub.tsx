@@ -42,6 +42,7 @@ function InfoHub() {
   const [editingCard, setEditingCard] = createSignal<InfoCardWithVotes | null>(
     null,
   )
+  const [editOpenCount, setEditOpenCount] = createSignal(0)
 
   let shareDialogRef: HTMLDialogElement | undefined
   let deleteDialogRef: HTMLDialogElement | undefined
@@ -118,6 +119,7 @@ function InfoHub() {
 
   function requestEditCard(card: InfoCardWithVotes) {
     setEditingCard(card)
+    setEditOpenCount((n) => n + 1)
     editDialogRef?.showModal()
   }
 
@@ -192,6 +194,7 @@ function InfoHub() {
                   editDialogRef = el
                 }}
                 card={() => editingCard()}
+                openCount={() => editOpenCount()}
               />
             </div>
           </Show>
