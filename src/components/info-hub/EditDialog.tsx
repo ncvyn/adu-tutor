@@ -1,4 +1,4 @@
-import { For, Show, createMemo, createSignal, onMount } from 'solid-js'
+import { For, Show, createMemo, createSignal, createEffect } from 'solid-js'
 import { useMutation, useQueryClient } from '@tanstack/solid-query'
 import { SUBJECTS } from '@/lib/constants'
 import { useNotifications } from '@/components'
@@ -21,6 +21,14 @@ export function EditDialog(props: EditDialogProps) {
 
   let editDialogRef: HTMLDialogElement | undefined
   let confirmDialogRef: HTMLDialogElement | undefined
+
+  createEffect(() => {
+    const card = props.card()
+    if (!card) return
+    setNewTitle(card.title)
+    setNewContent(card.content)
+    setNewSubjects(card.subjects.length > 0 ? [...card.subjects] : ['General'])
+  })
 
   const updateCardMutation = useMutation(() => ({
     mutationKey: ['info-card', 'update', props.card()?.id] as const,
@@ -56,12 +64,6 @@ export function EditDialog(props: EditDialogProps) {
         JSON.stringify([...(card.subjects ?? [])].sort())
     )
   })
-
-  function syncFromCard(card: InfoCardWithVotes) {
-    setNewTitle(card.title)
-    setNewContent(card.content)
-    setNewSubjects(card.subjects.length > 0 ? [...card.subjects] : ['General'])
-  }
 
   function resetForm() {
     setNewTitle('')
@@ -108,11 +110,6 @@ export function EditDialog(props: EditDialogProps) {
     editDialogRef = el
     props.ref(el)
   }
-
-  onMount(() => {
-    const card = props.card()
-    if (card) syncFromCard(card)
-  })
 
   return (
     <>
