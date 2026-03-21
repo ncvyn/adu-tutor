@@ -51,6 +51,40 @@ export const searchUsers = createServerFn({ method: 'GET' })
     return results
   })
 
+function parseJsonArray(value: unknown): Array<string> {
+  if (Array.isArray(value))
+    return value.filter((item) => typeof item === 'string')
+  if (typeof value !== 'string' || !value.trim()) return []
+  try {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed)
+      ? parsed.filter((item) => typeof item === 'string')
+      : []
+  } catch {
+    return []
+  }
+}
+
+function parseAvailability(value: unknown): Record<string, string> {
+  if (!value) return {}
+  if (typeof value !== 'string') return {}
+  try {
+    const parsed = JSON.parse(value)
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
+      return {}
+    return Object.fromEntries(
+      Object.entries(parsed)
+        .filter(
+          ([day, schedule]) =>
+            typeof day === 'string' && typeof schedule === 'string',
+        )
+        .map(([day, schedule]) => [day, String(schedule)]),
+    ) as Record<string, string>
+  } catch {
+    return {}
+  }
+}
+
 export const searchTutors = createServerFn({ method: 'GET' })
   .inputValidator((query: string) => query)
   .handler(async ({ data: query }) => {
@@ -68,6 +102,8 @@ export const searchTutors = createServerFn({ method: 'GET' })
       .select({
         id: user.id,
         name: user.name,
+        preferredSubjects: user.preferredSubjects,
+        availability: user.availability,
       })
       .from(user)
       .where(
@@ -80,5 +116,10 @@ export const searchTutors = createServerFn({ method: 'GET' })
       )
       .limit(10)
 
-    return results
+    return results.map((tutor) => ({
+      id: tutor.id,
+      name: tutor.name,
+      preferredSubjects: parseJsonArray(tutor.preferredSubjects),
+      availability: parseAvailability(tutor.availability),
+    }))
   })

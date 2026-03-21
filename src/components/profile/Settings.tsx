@@ -41,7 +41,7 @@ export default function Settings(props: SettingsProps) {
         : [],
   )
   const [theme, setTheme] = createSignal<string>(
-    (localStorage.getItem('adu-theme') as string | null) ?? 'system',
+    localStorage.getItem('adu-theme') ?? 'system',
   )
 
   // Parse existing availability string "09:00-12:00, 14:00-17:00" into structured UI state
