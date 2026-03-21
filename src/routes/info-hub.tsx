@@ -9,6 +9,7 @@ import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import {
   CardList,
   DeleteDialog,
+  EditDialog,
   ErrorFallback,
   Fab,
   Filter,
@@ -38,9 +39,13 @@ function InfoHub() {
   const [filterSubject, setFilterSubject] = createSignal<string>('All')
   const [isTutorSearchModalOpen, setIsTutorSearchModalOpen] =
     createSignal(false)
+  const [editingCard, setEditingCard] = createSignal<InfoCardWithVotes | null>(
+    null,
+  )
 
   let shareDialogRef: HTMLDialogElement | undefined
   let deleteDialogRef: HTMLDialogElement | undefined
+  let editDialogRef: HTMLDialogElement | undefined
 
   const [pendingDeleteId, setPendingDeleteId] = createSignal<string | null>(
     null,
@@ -111,6 +116,11 @@ function InfoHub() {
     deleteDialogRef?.showModal()
   }
 
+  function requestEditCard(card: InfoCardWithVotes) {
+    setEditingCard(card)
+    editDialogRef?.showModal()
+  }
+
   async function confirmDeleteCard() {
     const id = pendingDeleteId()
     if (!id || deleteCardMutation.isPending) return
@@ -156,6 +166,7 @@ function InfoHub() {
                 currentUserId={session().data!.user.id}
                 onVote={handleVote}
                 onRequestDelete={requestDeleteCard}
+                onRequestEdit={requestEditCard}
               />
 
               <Fab
@@ -174,6 +185,13 @@ function InfoHub() {
                   shareDialogRef = el
                 }}
                 userId={session().data!.user.id}
+              />
+
+              <EditDialog
+                ref={(el) => {
+                  editDialogRef = el
+                }}
+                card={() => editingCard()}
               />
             </div>
           </Show>

@@ -14,7 +14,7 @@ export function DiscardDialog(props: DiscardDialogProps) {
         </p>
         <div class="modal-action">
           <button class="btn btn-ghost" onClick={props.onKeepEditing}>
-            Keep editing
+            Cancel
           </button>
           <button class="btn btn-error" onClick={props.onDiscard}>
             Discard

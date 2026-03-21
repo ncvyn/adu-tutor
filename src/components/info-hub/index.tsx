@@ -1,6 +1,7 @@
 export * from './CardList'
 export * from './DeleteDialog'
 export * from './DiscardDialog'
+export * from './EditDialog'
 export * from './ErrorFallback'
 export * from './Fab'
 export * from './Filter'

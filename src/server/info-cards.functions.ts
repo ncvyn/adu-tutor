@@ -8,6 +8,17 @@ import { SUBJECTS } from '@/lib/constants'
 import { infoCard, infoCardVote } from '@/schemas/info'
 import { awardBadge } from '@/server/badge.server'
 
+function parseSubjects(value: string): Array<string> {
+  try {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed)
+      ? parsed.filter((item) => typeof item === 'string')
+      : []
+  } catch {
+    return []
+  }
+}
+
 export const getInfoCards = createServerFn({ method: 'GET' }).handler(
   async () => {
     const headers = getRequestHeaders()
@@ -41,7 +52,7 @@ export const getInfoCards = createServerFn({ method: 'GET' }).handler(
 
     return cards.map((card) => ({
       ...card,
-      subjects: JSON.parse(card.subjects) as Array<string>,
+      subjects: parseSubjects(card.subjects),
       score: scoreMap.get(card.id) ?? 0,
       userVote: userVoteMap.get(card.id) ?? null,
     }))
@@ -105,6 +116,74 @@ export const createInfoCard = createServerFn({ method: 'POST' })
     }
 
     return { ...newCard, subjects, score: 0, userVote: null }
+  })
+
+export const updateInfoCard = createServerFn({ method: 'POST' })
+  .inputValidator(
+    (input: {
+      id: string
+      title: string
+      content: string
+      subjects: Array<string>
+    }) => input,
+  )
+  .handler(async ({ data }) => {
+    const headers = getRequestHeaders()
+    const session = await auth.api.getSession({ headers })
+
+    if (!session) {
+      throw new Error('Unauthorized')
+    }
+
+    const id = data.id.trim()
+    const title = data.title.trim()
+    const content = data.content.trim()
+    const subjects = data.subjects
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .filter((s) => SUBJECTS.includes(s as (typeof SUBJECTS)[number]))
+
+    if (!id) {
+      throw new Error('Card ID is required')
+    }
+
+    if (!title || !content) {
+      throw new Error('Title and content are required')
+    }
+
+    if (subjects.length === 0) {
+      subjects.push('General')
+    }
+
+    const cards = await db
+      .select()
+      .from(infoCard)
+      .where(eq(infoCard.id, id))
+      .limit(1)
+
+    if (cards.length === 0) {
+      throw new Error('Card not found')
+    }
+
+    const card = cards[0]
+    if (card.authorId !== session.user.id) {
+      throw new Error('You can only edit your own cards')
+    }
+
+    const [updatedCard] = await db
+      .update(infoCard)
+      .set({
+        title,
+        content,
+        subjects: JSON.stringify(subjects),
+      })
+      .where(eq(infoCard.id, id))
+      .returning()
+
+    return {
+      ...updatedCard,
+      subjects,
+    }
   })
 
 export const deleteInfoCard = createServerFn({ method: 'POST' })

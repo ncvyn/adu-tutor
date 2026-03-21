@@ -8,6 +8,7 @@ interface CardListProps {
   currentUserId: string
   onVote: (cardId: string, value: number) => void
   onRequestDelete: (id: string, title: string) => void
+  onRequestEdit: (card: InfoCardWithVotes) => void
 }
 
 export function CardList(props: CardListProps) {
@@ -103,9 +104,7 @@ export function CardList(props: CardListProps) {
                             <li>
                               <button
                                 type="button"
-                                class="opacity-60"
-                                disabled
-                                title="Edit is not implemented yet"
+                                onClick={() => props.onRequestEdit(card)}
                               >
                                 Edit
                               </button>
