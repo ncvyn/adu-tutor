@@ -1,4 +1,4 @@
-import { Plus, Search, Share } from 'lucide-solid'
+import { Ellipsis, EllipsisVertical, Search, Share } from 'lucide-solid'
 
 interface FabProps {
   onShare: () => void
@@ -15,7 +15,13 @@ export function Fab(props: FabProps) {
           class="btn mb-16 btn-circle shadow-lg btn-xl btn-primary md:mb-0"
           aria-label="Open quick actions"
         >
-          <Plus />
+          <Ellipsis />
+        </div>
+
+        <div class="fab-close">
+          <span class="btn mb-16 btn-circle shadow-lg btn-xl btn-primary md:mb-0">
+            <EllipsisVertical />
+          </span>
         </div>
 
         <button

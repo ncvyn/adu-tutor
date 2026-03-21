@@ -44,15 +44,20 @@ export function ProfileDropdown() {
         <>
           <div class="dropdown dropdown-end">
             <div
-              tabindex="0"
-              role="button"
-              class="btn avatar avatar-placeholder btn-circle btn-ghost"
-              aria-label="Open profile menu"
+              class="tooltip tooltip-left tooltip-primary"
+              data-tip="Profile"
             >
-              <div class="w-10 rounded-full bg-primary text-primary-content">
-                <span class="text-sm font-semibold">
-                  {getInitials(data().user.name)}
-                </span>
+              <div
+                tabindex="0"
+                role="button"
+                class="btn avatar avatar-placeholder btn-circle btn-ghost"
+                aria-label="Open profile menu"
+              >
+                <div class="w-10 rounded-full bg-primary text-primary-content">
+                  <span class="text-sm font-semibold">
+                    {getInitials(data().user.name)}
+                  </span>
+                </div>
               </div>
             </div>
 
