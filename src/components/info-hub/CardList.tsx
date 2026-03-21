@@ -65,15 +65,17 @@ export function CardList(props: CardListProps) {
                     </div>
 
                     <div class="min-w-0 flex-1">
-                      <div class="flex items-start justify-between gap-4">
+                      <div class="flex w-full items-start justify-between gap-4">
                         <div class="min-w-0 flex-1">
                           <button
                             type="button"
-                            class="text-left"
+                            class="w-full text-left"
                             onClick={() => openDetails(card)}
                           >
-                            <h2 class="card-title">{card.title}</h2>
-                            <div class="flex items-center gap-2">
+                            <h2 class="card-title wrap-break-word">
+                              {card.title}
+                            </h2>
+                            <div class="flex flex-wrap items-center gap-2">
                               <p class="text-xs opacity-60">
                                 by {card.authorName}
                               </p>
@@ -87,8 +89,8 @@ export function CardList(props: CardListProps) {
                             </div>
                           </button>
 
-                          <div class="mt-3 prose max-w-none">
-                            <div class={markdownClass}>
+                          <div class="mt-3 prose w-full max-w-none overflow-hidden wrap-break-word">
+                            <div class={`overflow-x-auto ${markdownClass}`}>
                               <SolidMarkdown>
                                 {getPreviewContent(card.content)}
                               </SolidMarkdown>
@@ -98,10 +100,10 @@ export function CardList(props: CardListProps) {
                           <Show when={card.content.length > PREVIEW_LENGTH}>
                             <button
                               type="button"
-                              class="btn mt-1 px-0 btn-link btn-xs"
+                              class="btn mt-1 px-0 btn-ghost btn-sm"
                               onClick={() => openDetails(card)}
                             >
-                              Read more
+                              Read more...
                             </button>
                           </Show>
                         </div>
@@ -164,7 +166,7 @@ export function CardList(props: CardListProps) {
 
               <h3 class="mb-2 text-lg font-bold">{card().title}</h3>
 
-              <div class="mb-4 flex items-center gap-2">
+              <div class="mb-4 flex flex-wrap items-center gap-2">
                 <p class="text-sm opacity-70">by {card().authorName}</p>
                 <span class="badge badge-outline">
                   Score: {card().score} • Vote: {card().userVote ?? 0}
@@ -176,8 +178,8 @@ export function CardList(props: CardListProps) {
                 </For>
               </div>
 
-              <div class="prose max-w-none">
-                <div class={markdownClass}>
+              <div class="prose w-full max-w-none overflow-hidden wrap-break-word">
+                <div class={`overflow-x-auto ${markdownClass}`}>
                   <SolidMarkdown>{card().content}</SolidMarkdown>
                 </div>
               </div>
