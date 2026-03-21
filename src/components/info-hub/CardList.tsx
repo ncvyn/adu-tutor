@@ -1,5 +1,6 @@
 import { For, Show, createSignal } from 'solid-js'
 import { SolidMarkdown } from 'solid-markdown'
+import { Pen, Trash2 } from 'lucide-solid'
 import type { InfoCardWithVotes } from '@/schemas/info'
 import { markdownClass } from '@/lib/markdown'
 
@@ -9,6 +10,13 @@ interface CardListProps {
   onVote: (cardId: string, value: number) => void
   onRequestDelete: (id: string, title: string) => void
   onRequestEdit: (card: InfoCardWithVotes) => void
+}
+
+const PREVIEW_LENGTH = 220
+function getPreviewContent(content: string) {
+  const trimmed = content.trim()
+  if (trimmed.length <= PREVIEW_LENGTH) return trimmed
+  return `${trimmed.slice(0, PREVIEW_LENGTH).trimEnd()}...`
 }
 
 export function CardList(props: CardListProps) {
@@ -58,7 +66,7 @@ export function CardList(props: CardListProps) {
 
                     <div class="min-w-0 flex-1">
                       <div class="flex items-start justify-between gap-4">
-                        <div>
+                        <div class="min-w-0 flex-1">
                           <button
                             type="button"
                             class="text-left"
@@ -78,56 +86,53 @@ export function CardList(props: CardListProps) {
                               </For>
                             </div>
                           </button>
-                        </div>
 
-                        <div class="dropdown dropdown-end">
-                          <div
-                            tabindex={0}
-                            role="button"
-                            class="btn btn-ghost btn-sm"
-                            aria-label="Card actions"
-                          >
-                            ⋮
+                          <div class="mt-3 prose max-w-none">
+                            <div class={markdownClass}>
+                              <SolidMarkdown>
+                                {getPreviewContent(card.content)}
+                              </SolidMarkdown>
+                            </div>
                           </div>
-                          <ul
-                            tabindex={0}
-                            class="dropdown-content menu z-1 mt-2 w-40 rounded-box bg-base-100 p-2 shadow"
-                          >
-                            <li>
-                              <button
-                                type="button"
-                                onClick={() => openDetails(card)}
-                              >
-                                View details
-                              </button>
-                            </li>
-                            <li>
-                              <button
-                                type="button"
-                                onClick={() => props.onRequestEdit(card)}
-                              >
-                                Edit
-                              </button>
-                            </li>
-                            <Show when={card.authorId === props.currentUserId}>
-                              <li>
-                                <button
-                                  type="button"
-                                  class="text-error"
-                                  onClick={() =>
-                                    props.onRequestDelete(card.id, card.title)
-                                  }
-                                >
-                                  Delete
-                                </button>
-                              </li>
-                            </Show>
-                          </ul>
-                        </div>
-                      </div>
 
-                      <div class={markdownClass}>
-                        <SolidMarkdown>{card.content}</SolidMarkdown>
+                          <Show when={card.content.length > PREVIEW_LENGTH}>
+                            <button
+                              type="button"
+                              class="btn mt-1 px-0 btn-link btn-xs"
+                              onClick={() => openDetails(card)}
+                            >
+                              Read more
+                            </button>
+                          </Show>
+                        </div>
+
+                        <div class="flex shrink-0 flex-col gap-2">
+                          <Show when={card.authorId === props.currentUserId}>
+                            <>
+                              <button
+                                type="button"
+                                class="btn gap-1 btn-ghost btn-xs"
+                                onClick={() => props.onRequestEdit(card)}
+                                title="Edit"
+                              >
+                                <Pen class="h-4 w-4" />
+                                <span class="hidden sm:inline">Edit</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                class="btn gap-1 text-error btn-ghost btn-xs"
+                                onClick={() =>
+                                  props.onRequestDelete(card.id, card.title)
+                                }
+                                title="Delete"
+                              >
+                                <Trash2 class="h-4 w-4" />
+                                <span class="hidden sm:inline">Delete</span>
+                              </button>
+                            </>
+                          </Show>
+                        </div>
                       </div>
                     </div>
                   </div>
