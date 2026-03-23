@@ -1,13 +1,8 @@
 import type { AvailabilityMap } from '@/routes/profile'
 import { DAYS, SUBJECTS } from '@/lib/constants'
-import { For, Show, createSignal, onMount } from 'solid-js'
+import { For, Show, createSignal } from 'solid-js'
 import { applyTheme } from '@/lib/theme'
 import { updateSettings } from '@/server/update-settings.functions'
-import {
-  clearNotifications,
-  dismissNotification,
-  getMyNotifications,
-} from '@/server/notifications.functions'
 import { deleteMyAccount } from '@/server/delete-account.functions'
 import { useNavigate } from '@tanstack/solid-router'
 import { useNotifications } from '@/components'
@@ -62,10 +57,6 @@ export default function Settings(props: SettingsProps) {
     createSignal<Record<string, Array<TimeWindow>>>(initialSchedule)
 
   const [isSaving, setIsSaving] = createSignal(false)
-  const [loadingNotifs, setLoadingNotifs] = createSignal(false)
-  const [notifications, setNotifications] = createSignal<Array<any>>([])
-
-  onMount(fetchNotifications)
 
   async function handleSave() {
     setIsSaving(true)
@@ -133,30 +124,6 @@ export default function Settings(props: SettingsProps) {
     })
   }
 
-  async function handleDismissNotification(id: string) {
-    try {
-      await dismissNotification({ data: { id } })
-      await fetchNotifications()
-    } catch (error) {
-      notify({
-        type: 'error',
-        message: `Error dismissing notification: ${error instanceof Error ? error.message : String(error)}`,
-      })
-    }
-  }
-
-  async function handleClearNotifications() {
-    try {
-      await clearNotifications()
-      await fetchNotifications()
-    } catch (error) {
-      notify({
-        type: 'error',
-        message: `Error clearing notifications: ${error instanceof Error ? error.message : String(error)}`,
-      })
-    }
-  }
-
   async function handleDeleteAccount() {
     const confirmed = window.confirm(
       'Delete your account permanently? This cannot be undone.',
@@ -171,16 +138,6 @@ export default function Settings(props: SettingsProps) {
         type: 'error',
         message: `Error deleting account: ${error instanceof Error ? error.message : String(error)}`,
       })
-    }
-  }
-
-  async function fetchNotifications() {
-    setLoadingNotifs(true)
-    try {
-      const notifs = await getMyNotifications()
-      setNotifications(Array.isArray(notifs) ? notifs : [])
-    } finally {
-      setLoadingNotifs(false)
     }
   }
 
@@ -358,45 +315,6 @@ export default function Settings(props: SettingsProps) {
               </Show>
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Program Notifications Card */}
-      <div class="card border border-base-300 bg-base-100">
-        <div class="card-body gap-4">
-          <div class="flex items-center justify-between">
-            <h3 class="card-title text-lg">Program Notifications</h3>
-            <button class="btn btn-sm" onClick={handleClearNotifications}>
-              Clear All
-            </button>
-          </div>
-          <Show
-            when={!loadingNotifs()}
-            fallback={<span class="loading loading-spinner" />}
-          >
-            <Show
-              when={notifications().length > 0}
-              fallback={<p class="text-sm opacity-70">No notifications yet.</p>}
-            >
-              <ul class="menu rounded-box bg-base-200">
-                <For each={notifications()}>
-                  {(n) => (
-                    <li>
-                      <div class="flex items-center justify-between gap-3">
-                        <span class="text-sm">{n.message}</span>
-                        <button
-                          class="btn btn-ghost btn-xs"
-                          onClick={() => handleDismissNotification(n.id)}
-                        >
-                          Dismiss
-                        </button>
-                      </div>
-                    </li>
-                  )}
-                </For>
-              </ul>
-            </Show>
-          </Show>
         </div>
       </div>
 
