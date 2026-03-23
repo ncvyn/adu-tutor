@@ -8,3 +8,9 @@ export const cohort = sqliteTable(
     role: text('role').notNull(),
   },
 )
+
+export type CohortMember = {
+  id: string
+  name: string
+  role: string
+}
