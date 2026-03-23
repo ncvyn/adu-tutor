@@ -3,8 +3,9 @@ import { Link, useNavigate } from '@tanstack/solid-router'
 import { authClient, signOut } from '@/lib/auth-client'
 import { getInitials } from '@/lib/helper'
 import { useNotifications } from '@/components/Notifications'
-import { LogOut, UserRound } from 'lucide-solid'
+import { Info, LogOut, UserRound } from 'lucide-solid'
 import { SignOutModal } from './SignOutModal'
+import { AboutUsModal } from './AboutUsModal'
 
 export function ProfileDropdown() {
   const session = authClient.useSession()
@@ -13,6 +14,7 @@ export function ProfileDropdown() {
 
   const [isSignOutOpen, setIsSignOutOpen] = createSignal(false)
   const [isSigningOut, setIsSigningOut] = createSignal(false)
+  const [isAboutOpen, setIsAboutOpen] = createSignal(false)
 
   const openSignOutModal = () => {
     if (document.activeElement instanceof HTMLElement) {
@@ -94,6 +96,16 @@ export function ProfileDropdown() {
                 </li>
                 <li role="none">
                   <button
+                    class="flex items-center gap-3"
+                    role="menuitem"
+                    onClick={() => setIsAboutOpen(true)}
+                  >
+                    <Info class="h-4 w-4" />
+                    About Us
+                  </button>
+                </li>
+                <li role="none">
+                  <button
                     class="flex items-center gap-3 text-error"
                     role="menuitem"
                     onClick={openSignOutModal}
@@ -105,6 +117,11 @@ export function ProfileDropdown() {
               </ul>
             </div>
           </div>
+
+          <AboutUsModal
+            open={isAboutOpen()}
+            onClose={() => setIsAboutOpen(false)}
+          />
 
           <SignOutModal
             open={isSignOutOpen()}
