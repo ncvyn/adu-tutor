@@ -64,6 +64,13 @@
       "when": 1773645505541,
       "tag": "0008_freezing_supernaut",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1774273520660,
+      "tag": "0009_jittery_diamondback",
+      "breakpoints": true
     }
   ]
 }
