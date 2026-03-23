@@ -36,7 +36,9 @@ function InfoHub() {
   const navigate = useNavigate()
   const chatContext = useChatContext()
 
-  const [filterSubject, setFilterSubject] = createSignal<string>('All')
+  const [filterSubjects, setFilterSubjects] = createSignal<string[]>([])
+  const [searchQuery, setSearchQuery] = createSignal('')
+
   const [isTutorSearchModalOpen, setIsTutorSearchModalOpen] =
     createSignal(false)
   const [editingCard, setEditingCard] = createSignal<InfoCardWithVotes | null>(
@@ -97,9 +99,25 @@ function InfoHub() {
   )
 
   const filteredCards = createMemo(() => {
-    const subject = filterSubject()
-    if (subject === 'All') return cards()
-    return cards().filter((card) => card.subjects.includes(subject))
+    let result = cards()
+
+    const subjects = filterSubjects()
+    if (subjects.length > 0) {
+      result = result.filter((card) =>
+        card.subjects.some((sub) => subjects.includes(sub)),
+      )
+    }
+
+    const query = searchQuery().toLowerCase().trim()
+    if (query) {
+      result = result.filter(
+        (card) =>
+          card.title.toLowerCase().includes(query) ||
+          card.authorName.toLowerCase().includes(query),
+      )
+    }
+
+    return result
   })
 
   const cardCountLabel = createMemo(() => {
@@ -161,7 +179,19 @@ function InfoHub() {
                 onShare={openShareDialog}
               />
 
-              <Filter value={filterSubject()} onChange={setFilterSubject} />
+              <Filter
+                searchQuery={searchQuery()}
+                onSearchChange={setSearchQuery}
+                selectedSubjects={filterSubjects()}
+                onSubjectToggle={(subject) => {
+                  setFilterSubjects((prev) =>
+                    prev.includes(subject)
+                      ? prev.filter((s) => s !== subject)
+                      : [...prev, subject],
+                  )
+                }}
+                onClearSubjects={() => setFilterSubjects([])}
+              />
 
               <CardList
                 cards={filteredCards()}
