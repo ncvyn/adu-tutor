@@ -5,6 +5,7 @@ import { useChat } from '@/lib/use-chat'
 import { getInitials } from '@/lib/helper'
 import { markdownClass } from '@/lib/markdown'
 import { unixToLocale } from '@/lib/format-date'
+import { ReportMessageModal } from './ReportMessageModal'
 
 const THRESHOLD_MS = 3 * 60 * 1000 // 3 minutes
 
@@ -21,9 +22,9 @@ export const ChatPanel = (props: {
   const [messageToDelete, setMessageToDelete] = createSignal<string | null>(
     null,
   )
-  const [selectedDeleteMessageId, setSelectedDeleteMessageId] = createSignal<
-    string | null
-  >(null)
+  const [selectedMessageId, setSelectedMessageId] = createSignal<string | null>(
+    null,
+  )
 
   let messagesEndRef: HTMLDivElement | undefined
   let deleteDialogRef: HTMLDialogElement | undefined
@@ -164,33 +165,35 @@ export const ChatPanel = (props: {
                         'bg-base-200': !isSender,
                       }}
                       onClick={() =>
-                        isSender &&
-                        setSelectedDeleteMessageId(
-                          selectedDeleteMessageId() === msg.id ? null : msg.id,
+                        setSelectedMessageId(
+                          selectedMessageId() === msg.id ? null : msg.id,
                         )
                       }
-                      tabIndex={isSender ? 0 : undefined}
-                      aria-label={isSender ? 'Show delete' : undefined}
+                      tabIndex={0}
+                      aria-label={isSender ? 'Show delete' : 'Show report'}
                     >
                       <div class={markdownClass}>
                         <SolidMarkdown>{msg.content}</SolidMarkdown>
                       </div>
                     </div>
 
-                    <Show
-                      when={isSender && selectedDeleteMessageId() === msg.id}
-                    >
+                    <Show when={selectedMessageId() === msg.id}>
                       <div class="chat-footer flex items-center gap-2 pt-1">
-                        <button
-                          onClick={() => {
-                            setSelectedDeleteMessageId(null)
-                            requestDelete(msg.id)
-                          }}
-                          class="cursor-pointer text-xs text-error hover:underline"
-                          title="Delete message"
+                        <Show
+                          when={isSender}
+                          fallback={<ReportMessageModal messageId={msg.id} />}
                         >
-                          Delete
-                        </button>
+                          <button
+                            onClick={() => {
+                              setSelectedMessageId(null)
+                              requestDelete(msg.id)
+                            }}
+                            class="cursor-pointer text-xs text-error hover:underline"
+                            title="Delete message"
+                          >
+                            Delete
+                          </button>
+                        </Show>
                       </div>
                     </Show>
                   </div>
