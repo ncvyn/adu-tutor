@@ -3,7 +3,7 @@ import { Link, useNavigate } from '@tanstack/solid-router'
 import { authClient, signOut } from '@/lib/auth-client'
 import { getInitials } from '@/lib/helper'
 import { useNotifications } from '@/components/Notifications'
-import { Info, LogOut, UserRound } from 'lucide-solid'
+import { Info, LogOut, Menu, UserRound } from 'lucide-solid'
 import { SignOutModal } from './SignOutModal'
 import { AboutUsModal } from './AboutUsModal'
 
@@ -45,22 +45,15 @@ export function ProfileDropdown() {
       {(data) => (
         <>
           <div class="dropdown dropdown-end">
-            <div
-              class="tooltip-neutral tooltip tooltip-left"
-              data-tip="Profile"
-            >
-              <div
+            <div class="tooltip-neutral tooltip tooltip-left" data-tip="Menu">
+              <button
                 tabindex="0"
                 role="button"
                 class="btn avatar avatar-placeholder btn-circle btn-ghost"
                 aria-label="Open profile menu"
               >
-                <div class="w-10 rounded-full bg-neutral text-neutral-content">
-                  <span class="text-sm font-semibold">
-                    {getInitials(data().user.name)}
-                  </span>
-                </div>
-              </div>
+                <Menu />
+              </button>
             </div>
 
             <div
@@ -69,8 +62,8 @@ export function ProfileDropdown() {
             >
               <div class="flex flex-col items-center gap-2 border-b border-base-300 pb-4">
                 <div class="avatar avatar-placeholder">
-                  <div class="w-16 rounded-full bg-neutral text-neutral-content">
-                    <span class="text-lg font-semibold">
+                  <div class="w-12 rounded-full bg-neutral text-neutral-content">
+                    <span class="text-md font-semibold">
                       {getInitials(data().user.name)}
                     </span>
                   </div>

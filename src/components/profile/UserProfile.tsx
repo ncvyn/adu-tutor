@@ -49,7 +49,7 @@ export default function UserProfile(props: { profile: any }) {
     <div class="flex flex-col items-center text-center">
       <div class="avatar mb-4 avatar-placeholder">
         <div class="w-12 rounded-full bg-neutral text-neutral-content">
-          <span class="text-sm font-semibold">{getInitials(profile.name)}</span>
+          <span class="text-md font-semibold">{getInitials(profile.name)}</span>
         </div>
       </div>
       <h3 class="text-xl font-semibold">{profile.name}</h3>

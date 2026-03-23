@@ -79,7 +79,7 @@ export const ChatPanel = (props: {
         <div class="flex items-center gap-3">
           <div class="avatar avatar-placeholder">
             <div class="w-12 rounded-full bg-neutral text-neutral-content">
-              <span class="text-sm font-semibold">
+              <span class="text-md font-semibold">
                 {getInitials(props.recipient.name)}
               </span>
             </div>
