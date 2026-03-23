@@ -4,9 +4,10 @@ export default defineConfig({
   schema: [
     'src/schemas/auth.ts',
     'src/schemas/badge.ts',
-    'src/schemas/cohort.ts',
     'src/schemas/chat.ts',
+    'src/schemas/cohort.ts',
     'src/schemas/info.ts',
+    'src/schemas/mod.ts',
   ],
   out: './migrations',
   dialect: 'sqlite',
