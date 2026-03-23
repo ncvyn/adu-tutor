@@ -3,6 +3,7 @@
 **Tech Stack:** SolidJS + TanStack Start/Router + Cloudflare Workers
 
 ## Core Principles
+
 - Prefer functional components with TypeScript.
 - Use strict TypeScript mode with proper type safety.
 - Follow functional programming patterns where appropriate.
@@ -12,6 +13,7 @@
 - Prioritize simplicity over complexity.
 
 ## SolidJS Best Practices
+
 - Use `createSignal()` for local reactive state.
 - Use `createMemo()` for derived/computed values.
 - Use `createEffect()` sparingly - prefer reactive primitives.
@@ -24,6 +26,7 @@
 - Leverage fine-grained reactivity - avoid unnecessary wrappers.
 
 ## TanStack Start & Router
+
 - Use file-based routing in `src/routes/`.
 - Define route loaders for data fetching.
 - Use `route.lazy()` for code splitting.
@@ -35,6 +38,7 @@
 - Use route meta for SEO optimization.
 
 ## TanStack Query (Solid Query)
+
 - Use `useQuery()` for GET requests with caching.
 - Use `useMutation()` for POST/PUT/DELETE operations.
 - Implement proper query keys following `['entity', id, ...params]` pattern.
@@ -45,6 +49,7 @@
 - Implement proper error and loading states.
 
 ## Drizzle ORM
+
 - Define schemas as separate schema files in `src/schemas`.
 - Use Drizzle's type-safe query builder.
 - Leverage Drizzle's relations for joins.
@@ -55,6 +60,7 @@
 - Type database queries properly with `InferModel`.
 
 ## Better Auth
+
 - Use Better Auth hooks for authentication state.
 - Implement proper session management.
 - Use middleware for protected routes.
@@ -65,6 +71,7 @@
 - Implement role-based access control (RBAC) if needed.
 
 ## Tailwind CSS v4 + DaisyUI
+
 - Ensure UI components use DaisyUI as much as possible to reduce overhead and maintain design consistency.
 - Avoid creating custom components or styles when DaisyUI alternatives exist.
 - Use Tailwind v4's new `@import` and `@theme` syntax.
@@ -78,6 +85,7 @@
 - Use CSS variables for theme customization.
 
 ## Cloudflare Workers
+
 - Keep bundle size small - Workers have size limits.
 - Use env bindings for environment variables.
 - Leverage Cloudflare D1 for database (if applicable).
@@ -89,6 +97,7 @@
 - Test locally with `wrangler dev`.
 
 ## File Structure
+
 ```text
 src/
 ├── routes/              # File-based routing (TanStack Router)
@@ -104,6 +113,7 @@ src/
 ```
 
 ## TypeScript Conventions
+
 - Use `.tsx` extension for components with JSX.
 - Enable strict mode in `tsconfig.json`.
 - Use explicit return types for functions.
@@ -116,6 +126,7 @@ src/
 - Leverage `satisfies` operator for type validation.
 
 ## Code Quality
+
 - Run `pnpm check` before committing (Prettier + ESLint).
 - Write descriptive variable and function names.
 - Keep functions small and focused (single responsibility).
@@ -129,6 +140,7 @@ src/
 - Prioritize simplicity over complexity.
 
 ## Performance
+
 - Use code splitting with `route.lazy()`.
 - Lazy load heavy components with `lazy()`.
 - Optimize images - use modern formats (WebP, AVIF).
@@ -140,6 +152,7 @@ src/
 - Implement proper caching strategies.
 
 ## Accessibility
+
 - Use semantic HTML elements.
 - Add `aria-label`s for icon-only buttons.
 - Ensure keyboard navigation works.
@@ -150,6 +163,7 @@ src/
 - Provide alt text for images.
 
 ## Testing
+
 - Run tests with `pnpm test` (Vitest).
 - Write unit tests for utility functions.
 - Test components with Solid Testing Library.
@@ -158,6 +172,7 @@ src/
 - Aim for meaningful test coverage, not 100%.
 
 ## Deployment
+
 - Build with `pnpm build` before deploying.
 - Deploy to Cloudflare with `pnpm deploy`.
 - Use environment variables for secrets.

@@ -1,5 +1,11 @@
 import { sql } from 'drizzle-orm'
-import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core'
+import {
+  sqliteTable,
+  text,
+  integer,
+  index,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core'
 import { relations } from 'drizzle-orm'
 import { user } from '@/schemas/auth'
 
@@ -49,19 +55,22 @@ export const message = sqliteTable(
 )
 
 // Relations
-export const conversationRelations = relations(conversation, ({ one, many }) => ({
-  minUser: one(user, {
-    fields: [conversation.minUserId],
-    references: [user.id],
-    relationName: 'minUser',
+export const conversationRelations = relations(
+  conversation,
+  ({ one, many }) => ({
+    minUser: one(user, {
+      fields: [conversation.minUserId],
+      references: [user.id],
+      relationName: 'minUser',
+    }),
+    maxUser: one(user, {
+      fields: [conversation.maxUserId],
+      references: [user.id],
+      relationName: 'maxUser',
+    }),
+    messages: many(message),
   }),
-  maxUser: one(user, {
-    fields: [conversation.maxUserId],
-    references: [user.id],
-    relationName: 'maxUser',
-  }),
-  messages: many(message),
-}))
+)
 
 export const messageRelations = relations(message, ({ one }) => ({
   conversation: one(conversation, {
