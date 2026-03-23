@@ -8,6 +8,7 @@ import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import type { DAYS } from '@/lib/constants'
 import Settings from '@/components/profile/Settings'
 import UserProfile from '@/components/profile/UserProfile'
+import { UserRoundCog, Undo2 } from 'lucide-solid'
 
 export const Route = createFileRoute('/profile')({
   ssr: false,
@@ -48,12 +49,21 @@ function Profile() {
                         <h2 class="card-title">
                           {isSettingsOpen() ? 'Settings' : 'Profile'}
                         </h2>
-                        <button
-                          class="btn btn-sm btn-primary"
-                          onClick={() => setIsSettingsOpen((v) => !v)}
+                        <div
+                          class="tooltip-neutral tooltip"
+                          data-tip={
+                            isSettingsOpen()
+                              ? 'Back to profile'
+                              : 'Open settings'
+                          }
                         >
-                          {isSettingsOpen() ? 'Back to Profile' : 'Settings'}
-                        </button>
+                          <button
+                            class="btn btn-sm btn-primary"
+                            onClick={() => setIsSettingsOpen((v) => !v)}
+                          >
+                            {isSettingsOpen() ? <Undo2 /> : <UserRoundCog />}
+                          </button>
+                        </div>
                       </div>
                       <Show
                         when={!isSettingsOpen()}

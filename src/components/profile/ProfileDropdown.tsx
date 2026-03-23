@@ -3,7 +3,7 @@ import { Link, useNavigate } from '@tanstack/solid-router'
 import { authClient, signOut } from '@/lib/auth-client'
 import { getInitials } from '@/lib/helper'
 import { useNotifications } from '@/components/Notifications'
-import { LogOut, User } from 'lucide-solid'
+import { LogOut, UserRound } from 'lucide-solid'
 import { SignOutModal } from './SignOutModal'
 
 export function ProfileDropdown() {
@@ -44,7 +44,7 @@ export function ProfileDropdown() {
         <>
           <div class="dropdown dropdown-end">
             <div
-              class="tooltip tooltip-left tooltip-primary"
+              class="tooltip-neutral tooltip tooltip-left"
               data-tip="Profile"
             >
               <div
@@ -88,7 +88,7 @@ export function ProfileDropdown() {
                     class="flex items-center gap-3"
                     role="menuitem"
                   >
-                    <User class="h-4 w-4" />
+                    <UserRound class="h-4 w-4" />
                     Profile & Settings
                   </Link>
                 </li>

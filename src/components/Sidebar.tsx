@@ -17,7 +17,7 @@ export function Sidebar() {
       {/* AdU-Tutor logo */}
       <div class="flex items-center gap-2 border-b border-base-300 px-15 py-2">
         <div
-          class="tooltip tooltip-right tooltip-primary"
+          class="tooltip-neutral tooltip tooltip-right"
           data-tip="Go to Info Hub"
         >
           <Link to="/info-hub" class="flex items-center gap-2">
