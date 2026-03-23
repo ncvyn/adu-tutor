@@ -8,7 +8,7 @@ import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import type { DAYS } from '@/lib/constants'
 import Settings from '@/components/profile/Settings'
 import UserProfile from '@/components/profile/UserProfile'
-import { UserRoundCog, Undo2 } from 'lucide-solid'
+import { Undo2, UserRoundCog } from 'lucide-solid'
 
 export const Route = createFileRoute('/profile')({
   ssr: false,

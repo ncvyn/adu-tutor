@@ -53,7 +53,7 @@ export function ProfileDropdown() {
                 class="btn avatar avatar-placeholder btn-circle btn-ghost"
                 aria-label="Open profile menu"
               >
-                <div class="w-10 rounded-full bg-primary text-primary-content">
+                <div class="w-10 rounded-full bg-neutral text-neutral-content">
                   <span class="text-sm font-semibold">
                     {getInitials(data().user.name)}
                   </span>
@@ -67,7 +67,7 @@ export function ProfileDropdown() {
             >
               <div class="flex flex-col items-center gap-2 border-b border-base-300 pb-4">
                 <div class="avatar avatar-placeholder">
-                  <div class="w-16 rounded-full bg-primary text-primary-content">
+                  <div class="w-16 rounded-full bg-neutral text-neutral-content">
                     <span class="text-lg font-semibold">
                       {getInitials(data().user.name)}
                     </span>
