@@ -15,6 +15,7 @@ import {
   Filter,
   Header,
   ShareDialog,
+  TutorApplicationModal,
   TutorSearchModal,
 } from '@/components/info-hub'
 
@@ -160,6 +161,8 @@ function InfoHub() {
                 isRefreshing={cardsQuery.isFetching && !cardsQuery.isPending}
                 onShare={openShareDialog}
               />
+
+              <TutorApplicationModal />
 
               <Filter value={filterSubject()} onChange={setFilterSubject} />
 
