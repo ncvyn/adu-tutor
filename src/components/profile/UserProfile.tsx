@@ -2,10 +2,11 @@ import { For, Show, createSignal } from 'solid-js'
 import { getInitials } from '@/lib/helper'
 import { UserBadges } from '@/components'
 import { APP_VERSION } from '@/lib/version.ts'
-import { LogOut } from 'lucide-solid'
+import { LogOut, Info } from 'lucide-solid'
 import { signOut } from '@/lib/auth-client'
 import { useNotifications } from '@/components/Notifications'
 import { useNavigate } from '@tanstack/solid-router'
+import { AboutUsModal } from './AboutUsModal'
 
 export default function UserProfile(props: { profile: any }) {
   const { profile } = props
@@ -20,6 +21,7 @@ export default function UserProfile(props: { profile: any }) {
   const navigate = useNavigate()
   const [isSignOutOpen, setIsSignOutOpen] = createSignal(false)
   const [isSigningOut, setIsSigningOut] = createSignal(false)
+  const [isAboutOpen, setIsAboutOpen] = createSignal(false)
 
   const openSignOutModal = () => {
     if (document.activeElement instanceof HTMLElement) {
@@ -44,6 +46,15 @@ export default function UserProfile(props: { profile: any }) {
       setIsSignOutOpen(false)
     }
   }
+
+  const openAboutModal = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
+    setIsAboutOpen(true)
+  }
+
+  const closeAboutModal = () => setIsAboutOpen(false)
 
   return (
     <div class="flex flex-col items-center text-center">
@@ -73,11 +84,19 @@ export default function UserProfile(props: { profile: any }) {
       <UserBadges userId={profile.id} />
       <p class="mt-6 text-xs opacity-60">AdU-Tutor v{APP_VERSION}</p>
 
-      {/* Sign out button (mobile only) */}
-      <div class="mt-6 md:hidden">
+      <div class="mt-6 flex flex-col gap-2 md:hidden">
         <button
           type="button"
-          class="btn flex items-center gap-2 btn-error"
+          class="btn flex-1 flex-nowrap items-center justify-center gap-2 whitespace-nowrap btn-info"
+          onClick={openAboutModal}
+        >
+          <Info class="h-4 w-4" />
+          About us
+        </button>
+
+        <button
+          type="button"
+          class="btn flex-1 flex-nowrap items-center justify-center gap-2 whitespace-nowrap btn-error"
           onClick={openSignOutModal}
         >
           <LogOut class="h-4 w-4" />
@@ -85,7 +104,10 @@ export default function UserProfile(props: { profile: any }) {
         </button>
       </div>
 
-      {/* Sign out modal */}
+      <Show when={isAboutOpen()}>
+        <AboutUsModal open={isAboutOpen()} onClose={closeAboutModal} />
+      </Show>
+
       <dialog class={`modal ${isSignOutOpen() ? 'modal-open' : ''}`}>
         <div class="modal-box">
           <h3 class="text-lg font-bold">Sign out?</h3>
