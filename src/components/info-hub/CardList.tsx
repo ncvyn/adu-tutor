@@ -93,13 +93,6 @@ export function CardList(props: CardListProps) {
                               <p class="text-xs opacity-60">
                                 by {card.authorName}
                               </p>
-                              <For each={card.subjects}>
-                                {(s) => (
-                                  <span class="badge badge-soft badge-sm">
-                                    {s}
-                                  </span>
-                                )}
-                              </For>
                             </div>
                           </button>
 
@@ -122,7 +115,12 @@ export function CardList(props: CardListProps) {
                           </Show>
                         </div>
 
-                        <div class="flex shrink-0 flex-col gap-2">
+                        <div class="flex shrink-0 flex-col items-center justify-center gap-2">
+                          <For each={card.subjects}>
+                            {(s) => (
+                              <span class="badge badge-soft badge-sm">{s}</span>
+                            )}
+                          </For>
                           <Show when={card.authorId === props.currentUserId}>
                             <>
                               <button
@@ -182,9 +180,7 @@ export function CardList(props: CardListProps) {
 
               <div class="mb-4 flex flex-wrap items-center gap-2">
                 <p class="text-sm opacity-70">by {card().authorName}</p>
-                <span class="badge badge-outline">
-                  Score: {card().score} • Vote: {card().userVote ?? 0}
-                </span>
+                <span class="badge badge-outline">Score: {card().score}</span>
                 <For each={card().subjects}>
                   {(subject) => (
                     <span class="badge badge-soft badge-sm">{subject}</span>
