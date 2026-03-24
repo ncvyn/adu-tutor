@@ -6,6 +6,7 @@ import { useAuthGuard } from '@/lib/auth-client'
 
 import { LoadingScreen, useChatContext, useNotifications } from '@/components'
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
+import { BadgeWatcher } from '@/components/BadgeWatcher'
 import {
   CardList,
   DeleteDialog,
@@ -166,6 +167,7 @@ function InfoHub() {
 
   return (
     <AuthenticatedLayout>
+      <BadgeWatcher />
       <Show when={session().data} fallback={<LoadingScreen />}>
         <ErrorBoundary fallback={<ErrorFallback />}>
           <Show

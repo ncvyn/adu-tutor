@@ -3,7 +3,6 @@ import {
   createContext,
   createSignal,
   createUniqueId,
-  onCleanup,
   useContext,
 } from 'solid-js'
 import type { JSX } from 'solid-js'
@@ -42,9 +41,7 @@ export function NotificationsProvider(props: { children: JSX.Element }) {
     const id = createUniqueId()
     setNotifications((current) => [...current, { id, type, message, timeout }])
 
-    // auto-dismiss after the timeout
-    const timer = setTimeout(() => dismiss(id), timeout)
-    onCleanup(() => clearTimeout(timer))
+    setTimeout(() => dismiss(id), timeout)
 
     return id
   }

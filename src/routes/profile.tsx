@@ -8,6 +8,7 @@ import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import type { DAYS } from '@/lib/constants'
 import Settings from '@/components/profile/Settings'
 import UserProfile from '@/components/profile/UserProfile'
+import { BadgeWatcher } from '@/components/BadgeWatcher'
 import { Undo2, UserRoundCog } from 'lucide-solid'
 
 export const Route = createFileRoute('/profile')({
@@ -37,6 +38,7 @@ function Profile() {
 
   return (
     <AuthenticatedLayout>
+      <BadgeWatcher />
       <Show when={session().data} fallback={<LoadingScreen />}>
         <ErrorBoundary fallback={<ProfileErrorFallback />}>
           <Suspense fallback={<LoadingScreen />}>

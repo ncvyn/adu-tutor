@@ -9,6 +9,7 @@ import {
   SearchUsers,
 } from '@/components'
 import { useChatContext } from '@/components/messages/ChatContext'
+import { BadgeWatcher } from '@/components/BadgeWatcher'
 
 export const Route = createFileRoute('/messages')({
   ssr: false,
@@ -34,6 +35,7 @@ function Messages() {
 
   return (
     <AuthenticatedLayout>
+      <BadgeWatcher />
       <Show when={session().data} fallback={<LoadingScreen />}>
         {(data) => (
           <section class="flex h-full min-h-0 flex-col px-4 py-5">
