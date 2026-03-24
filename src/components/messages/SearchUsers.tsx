@@ -1,4 +1,4 @@
-import { For, Show, createSignal, onCleanup } from 'solid-js'
+import { For, Show, createSignal } from 'solid-js'
 import { Search } from 'lucide-solid'
 import { searchUsers } from '@/server/search-users.functions'
 import { getRecipients } from '@/server/recipients.functions'
@@ -30,7 +30,6 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
     staleTime: 1000 * 60 * 5,
   }))
 
-  let rootRef: HTMLDivElement | undefined
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
   let requestToken = 0
 
@@ -66,19 +65,6 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
     }, 200)
   }
 
-  const handleOutsidePointerDown = (event: PointerEvent) => {
-    const root = rootRef
-    if (!root) return
-    const target = event.target
-    if (!(target instanceof Node)) return
-    if (!root.contains(target)) closeDropdown()
-  }
-
-  onCleanup(() => {
-    document.removeEventListener('pointerdown', handleOutsidePointerDown)
-    if (debounceTimer) clearTimeout(debounceTimer)
-  })
-
   const formatTime = (ts?: number | Date) => {
     if (!ts) return ''
 
@@ -91,7 +77,7 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
   }
 
   return (
-    <div ref={rootRef} class="relative">
+    <div class="relative">
       <label class="input w-full">
         <Search class="h-4 w-4 opacity-50" />
         <input

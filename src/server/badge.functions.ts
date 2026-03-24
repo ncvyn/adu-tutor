@@ -1,11 +1,10 @@
 import { createServerFn } from '@tanstack/solid-start'
 import { getRequestHeaders } from '@tanstack/solid-start/server'
-import { and, eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { badge, userBadge } from '@/schemas/badge'
 import { middleware } from '@/lib/middleware'
-import { awardBadge } from '@/server/badge.server'
 
 export const getAllBadges = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -60,56 +59,4 @@ export const getMyBadges = createServerFn({ method: 'GET' })
       .where(eq(userBadge.userId, session.user.id))
 
     return rows
-  })
-
-export const assignBadge = createServerFn({ method: 'POST' })
-  .inputValidator((input: { userId: string; badgeSlug: string }) => input)
-  .middleware([middleware])
-  .handler(async ({ data }) => {
-    const headers = getRequestHeaders()
-    const session = await auth.api.getSession({ headers })
-
-    if (!session) {
-      throw new Error('Unauthorized')
-    }
-
-    return await awardBadge(data.userId, data.badgeSlug)
-  })
-
-export const revokeBadge = createServerFn({ method: 'POST' })
-  .inputValidator((input: { userId: string; badgeSlug: string }) => input)
-  .middleware([middleware])
-  .handler(async ({ data }) => {
-    const headers = getRequestHeaders()
-    const session = await auth.api.getSession({ headers })
-
-    if (!session) {
-      throw new Error('Unauthorized')
-    }
-
-    if (session.user.role !== 'tutor') {
-      throw new Error('Forbidden: only tutors can revoke badges')
-    }
-
-    const badges = await db
-      .select()
-      .from(badge)
-      .where(eq(badge.slug, data.badgeSlug))
-      .limit(1)
-
-    if (badges.length === 0) {
-      throw new Error(`Badge not found: ${data.badgeSlug}`)
-    }
-
-    const [targetBadge] = badges
-    await db
-      .delete(userBadge)
-      .where(
-        and(
-          eq(userBadge.userId, data.userId),
-          eq(userBadge.badgeId, targetBadge.id),
-        ),
-      )
-
-    return { success: true }
   })

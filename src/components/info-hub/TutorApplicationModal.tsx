@@ -1,4 +1,4 @@
-export interface TutorApplicationModalProps {
+interface TutorApplicationModalProps {
   reason: string
   setReason: (reason: string) => void
   onSubmit: () => void

@@ -5,7 +5,7 @@ import type { AppNotification } from '@/components'
 
 export const authClient = createAuthClient()
 
-export type AuthGuardOptions = {
+type AuthGuardOptions = {
   /** Require authentication (redirect if NOT logged in) */
   requireAuth?: boolean
   /** Require guest (redirect if IS logged in) */
@@ -61,7 +61,7 @@ export async function signIn(
   } catch (error) {
     notify({
       type: 'error',
-      message: `Error! Signing in failed.`,
+      message: `Error! Signing in failed with error ${error instanceof Error ? error.message : String(error)}`,
     })
   }
 }
@@ -80,7 +80,7 @@ export async function signOut(
   } catch (error) {
     notify({
       type: 'error',
-      message: `Error! Signing out failed.`,
+      message: `Error! Signing out failed with error ${error instanceof Error ? error.message : String(error)}`,
     })
   }
 }

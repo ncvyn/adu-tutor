@@ -3,7 +3,7 @@ import { themeChange } from 'theme-change'
 const THEME_STORAGE_KEY = 'adu-theme'
 const SYSTEM_THEME = 'system'
 
-export function getStoredTheme(): string {
+function getStoredTheme(): string {
   if (typeof window === 'undefined') return SYSTEM_THEME
 
   return localStorage.getItem(THEME_STORAGE_KEY) ?? SYSTEM_THEME

@@ -6,7 +6,7 @@ import {
   getUserBadges,
 } from '@/server/badge.functions'
 
-export interface UserBadgesProps {
+interface UserBadgesProps {
   userId?: string
 }
 

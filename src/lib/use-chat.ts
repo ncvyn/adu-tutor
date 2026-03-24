@@ -7,7 +7,7 @@ import {
   getMessages,
 } from '@/server/messages.functions'
 
-export interface ChatMessage {
+interface ChatMessage {
   id: string
   conversationId: string
   senderId: string

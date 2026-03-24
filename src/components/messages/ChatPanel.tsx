@@ -26,8 +26,8 @@ export const ChatPanel = (props: {
     null,
   )
 
-  let messagesEndRef: HTMLDivElement | undefined
-  let deleteDialogRef: HTMLDialogElement | undefined
+  let messagesEndRef: HTMLDivElement | undefined = undefined
+  let deleteDialogRef: HTMLDialogElement | undefined = undefined
 
   createEffect(() => {
     if (isLoading() || messages().length == 0) return
@@ -202,7 +202,7 @@ export const ChatPanel = (props: {
             }}
           </For>
 
-          <div ref={messagesEndRef} />
+          <div ref={(el) => (messagesEndRef = el)} />
         </Show>
       </div>
 
@@ -230,7 +230,7 @@ export const ChatPanel = (props: {
       </footer>
 
       {/* Delete Confirmation Dialog */}
-      <dialog ref={deleteDialogRef} class="modal">
+      <dialog ref={(el) => (deleteDialogRef = el)} class="modal">
         <div class="modal-box">
           <h3 class="text-lg font-bold">Delete message?</h3>
           <p class="py-2 text-sm opacity-70">

@@ -4,7 +4,6 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/solid-router'
-import { TanStackRouterDevtools } from '@tanstack/solid-router-devtools'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { ErrorBoundary, onMount } from 'solid-js'
 import { HydrationScript } from 'solid-js/web'
@@ -70,9 +69,6 @@ function RootComponent() {
                 <Notifications />
                 <BadgeWatcher />
                 <Outlet />
-                {process.env.NODE_ENV === 'development' && (
-                  <TanStackRouterDevtools />
-                )}
               </ErrorBoundary>
               <Scripts />
             </ChatProvider>

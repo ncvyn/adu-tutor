@@ -20,8 +20,8 @@ export function EditDialog(props: EditDialogProps) {
   const [newSubjects, setNewSubjects] = createSignal<Array<string>>(['General'])
   const [allowClose, setAllowClose] = createSignal(false)
 
-  let editDialogRef: HTMLDialogElement | undefined
-  let confirmDialogRef: HTMLDialogElement | undefined
+  let editDialogRef: HTMLDialogElement | null
+  let confirmDialogRef: HTMLDialogElement | null
 
   function syncFromCard(card: InfoCardWithVotes) {
     setNewTitle(card.title)
@@ -199,7 +199,7 @@ export function EditDialog(props: EditDialogProps) {
         </div>
       </dialog>
 
-      <dialog ref={confirmDialogRef} class="modal">
+      <dialog ref={(el) => (confirmDialogRef = el)} class="modal">
         <div class="modal-box">
           <h3 class="text-lg font-bold">Discard changes?</h3>
           <p class="py-2 text-sm opacity-70">

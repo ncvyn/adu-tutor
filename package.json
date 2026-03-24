@@ -12,16 +12,14 @@
     "check": "prettier --write . && oxlint --fix",
     "deploy": "pnpm build && pnpm wrangler deploy",
     "wrangler:types": "pnpm wrangler types",
-    "wrangler:dev": "pnpm build && pnpm wrangler dev"
+    "wrangler:dev": "pnpm build && pnpm wrangler dev",
+    "knip": "knip"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.28.0",
     "@cloudflare/workers-types": "^4.20260316.1",
-    "@tanstack/router-plugin": "^1.166.12",
     "@tanstack/solid-query": "^5.90.26",
     "@tanstack/solid-router": "^1.167.3",
-    "@tanstack/solid-router-devtools": "^1.166.9",
-    "@tanstack/solid-router-ssr-query": "^1.166.9",
     "@tanstack/solid-start": "^1.166.14",
     "better-auth": "^1.5.5",
     "drizzle-orm": "^0.45.1",
@@ -34,10 +32,10 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/devtools-vite": "^0.6.0",
-    "@tanstack/eslint-config": "^0.4.0",
     "@types/node": "^25.5.0",
     "daisyui": "^5.5.19",
     "drizzle-kit": "^0.31.9",
+    "knip": "^6.0.4",
     "oxlint": "^1.55.0",
     "oxlint-tsgolint": "^0.17.0",
     "prettier": "^3.8.1",
