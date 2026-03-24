@@ -3,6 +3,7 @@ import { SolidMarkdown } from 'solid-markdown'
 import { Pen, Trash2 } from 'lucide-solid'
 import type { InfoCardWithVotes } from '@/schemas/info'
 import { markdownClass } from '@/lib/markdown'
+import type { JSX } from 'solid-js'
 
 interface CardListProps {
   cards: Array<InfoCardWithVotes>
@@ -12,7 +13,7 @@ interface CardListProps {
   onRequestEdit: (card: InfoCardWithVotes) => void
 }
 
-const PREVIEW_LENGTH = 220
+const PREVIEW_LENGTH = 128
 function getPreviewContent(content: string) {
   const trimmed = content.trim()
   if (trimmed.length <= PREVIEW_LENGTH) return trimmed
@@ -29,6 +30,19 @@ export function CardList(props: CardListProps) {
 
   function closeDetails() {
     setSelectedCard(null)
+  }
+
+  function Link(props: JSX.HTMLAttributes<HTMLAnchorElement>) {
+    return (
+      <a
+        {...props}
+        class={'text-secondary underline'}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {props.children}
+      </a>
+    )
   }
 
   return (
@@ -91,7 +105,7 @@ export function CardList(props: CardListProps) {
 
                           <div class="mt-3 prose w-full max-w-none overflow-hidden wrap-break-word">
                             <div class={`overflow-x-auto ${markdownClass}`}>
-                              <SolidMarkdown>
+                              <SolidMarkdown components={{ a: Link }}>
                                 {getPreviewContent(card.content)}
                               </SolidMarkdown>
                             </div>
@@ -180,7 +194,9 @@ export function CardList(props: CardListProps) {
 
               <div class="prose w-full max-w-none overflow-hidden wrap-break-word">
                 <div class={`overflow-x-auto ${markdownClass}`}>
-                  <SolidMarkdown>{card().content}</SolidMarkdown>
+                  <SolidMarkdown components={{ a: Link }}>
+                    {card().content}
+                  </SolidMarkdown>
                 </div>
               </div>
             </div>
