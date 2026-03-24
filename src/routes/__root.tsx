@@ -14,6 +14,7 @@ import {
   NotificationsProvider,
 } from '@/components/Notifications'
 import { ChatProvider } from '@/components/messages/ChatContext'
+import { BadgeWatcher } from '@/components/BadgeWatcher'
 import { queryClient } from '@/lib/query-client'
 import { initTheme } from '@/lib/theme'
 
@@ -67,6 +68,7 @@ function RootComponent() {
               <HeadContent />
               <ErrorBoundary fallback={<RootErrorFallback />}>
                 <Notifications />
+                <BadgeWatcher />
                 <Outlet />
                 {process.env.NODE_ENV === 'development' && (
                   <TanStackRouterDevtools />
