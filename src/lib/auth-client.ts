@@ -1,6 +1,6 @@
 import { createAuthClient } from 'better-auth/solid'
 import { useNavigate } from '@tanstack/solid-router'
-import { createEffect, createSignal } from 'solid-js'
+import { createEffect, createMemo, createSignal } from 'solid-js'
 import type { AppNotification } from '@/components'
 
 export const authClient = createAuthClient()
@@ -24,22 +24,33 @@ export function useAuthGuard(options: AuthGuardOptions = {}) {
   const navigate = useNavigate()
   const [hasRedirected, setHasRedirected] = createSignal(false)
 
+  const sessionState = createMemo(() => {
+    const currentSession = session()
+    return {
+      isPending: currentSession.isPending,
+      userId: currentSession.data?.user.id ?? null,
+      isAuthenticated: !!currentSession.data,
+    }
+  })
+
   createEffect(() => {
-    const { isPending, data } = session()
+    const { isPending, isAuthenticated } = sessionState()
 
     if (isPending || hasRedirected()) return
 
-    // Redirect if user should be authenticated but isn't
-    if (requireAuth && !data) {
-      setHasRedirected(true)
-      navigate({ to: redirectTo || '/', replace: true })
-    }
+    const target =
+      requireAuth && !isAuthenticated
+        ? redirectTo || '/'
+        : requireGuest && isAuthenticated
+          ? redirectTo || '/info-hub'
+          : null
 
-    // Redirect if user should be guest but is authenticated
-    if (requireGuest && data) {
-      setHasRedirected(true)
-      navigate({ to: redirectTo || '/info-hub', replace: true })
-    }
+    if (!target) return
+
+    setHasRedirected(true)
+    queueMicrotask(() => {
+      void navigate({ to: target, replace: true })
+    })
   })
 
   return session
