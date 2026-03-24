@@ -36,7 +36,7 @@ function InfoHub() {
   const navigate = useNavigate()
   const chatContext = useChatContext()
 
-  const [filterSubjects, setFilterSubjects] = createSignal<string[]>([])
+  const [filterSubjects, setFilterSubjects] = createSignal<Array<string>>([])
   const [searchQuery, setSearchQuery] = createSignal('')
 
   const [isTutorSearchModalOpen, setIsTutorSearchModalOpen] =

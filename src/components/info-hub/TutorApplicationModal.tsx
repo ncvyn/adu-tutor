@@ -14,7 +14,7 @@ export function TutorApplicationModal(props: TutorApplicationModalProps) {
         <textarea
           class="textarea-bordered textarea w-full"
           placeholder="Your reason..."
-          value={props.reason ?? ''}
+          value={props.reason}
           onInput={(e) => props.setReason(e.currentTarget.value)}
         />
         <div class="modal-action">

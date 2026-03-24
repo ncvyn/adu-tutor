@@ -29,7 +29,7 @@ export function Fab(props: FabProps) {
 
   const openModal = () => {
     const modal = document.getElementById('tutor_modal') as HTMLDialogElement
-    if (modal) modal.showModal()
+    modal.showModal()
   }
 
   return (

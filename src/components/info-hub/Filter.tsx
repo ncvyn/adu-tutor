@@ -4,7 +4,7 @@ import { SUBJECTS } from '@/lib/constants'
 interface FilterProps {
   searchQuery: string
   onSearchChange: (value: string) => void
-  selectedSubjects: string[]
+  selectedSubjects: Array<string>
   onSubjectToggle: (subject: string) => void
   onClearSubjects: () => void
 }
