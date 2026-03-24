@@ -10,6 +10,8 @@ import { createMutation } from '@tanstack/solid-query'
 import { submitTutorApplication } from '@/server/mod.functions'
 import { TutorApplicationModal } from './TutorApplicationModal'
 
+const tooltipClass = 'tooltip tooltip-neutral tooltip-left'
+
 interface FabProps {
   onShare: () => void
   onSearchTutors: () => void
@@ -36,50 +38,57 @@ export function Fab(props: FabProps) {
     <>
       <div class="fixed right-8 bottom-8 z-50">
         <div class="fab">
-          <div
-            tabindex={0}
-            role="button"
-            class="btn mb-16 btn-circle shadow-lg btn-xl btn-primary md:mb-0"
-            aria-label="Open quick actions"
-          >
-            <Ellipsis />
+          <div class={tooltipClass} data-tip="Open quick actions">
+            <div
+              tabindex={0}
+              role="button"
+              class="btn mb-16 btn-circle shadow-lg btn-xl btn-primary md:mb-0"
+              aria-label="Open quick actions"
+            >
+              <Ellipsis />
+            </div>
           </div>
 
           <div class="fab-close">
-            <span class="btn mb-16 btn-circle shadow-lg btn-xl btn-primary md:mb-0">
-              <EllipsisVertical />
-            </span>
+            <div class={tooltipClass} data-tip="Close quick actions">
+              <span class="btn mb-16 btn-circle shadow-lg btn-xl btn-primary md:mb-0">
+                <EllipsisVertical />
+              </span>
+            </div>
           </div>
 
-          <button
-            class="btn btn-circle btn-lg"
-            type="button"
-            onClick={props.onShare}
-            aria-label="Share info"
-            title="Share Info"
-          >
-            <Share />
-          </button>
+          <div class={tooltipClass} data-tip="Share info">
+            <button
+              class="btn btn-circle btn-lg"
+              type="button"
+              onClick={props.onShare}
+              aria-label="Share info"
+            >
+              <Share />
+            </button>
+          </div>
 
-          <button
-            class="btn btn-circle btn-lg"
-            type="button"
-            onClick={props.onSearchTutors}
-            aria-label="Search tutors"
-            title="Search Tutors"
-          >
-            <Search />
-          </button>
+          <div class={tooltipClass} data-tip="Search tutors">
+            <button
+              class="btn btn-circle btn-lg"
+              type="button"
+              onClick={props.onSearchTutors}
+              aria-label="Search tutors"
+            >
+              <Search />
+            </button>
+          </div>
 
-          <button
-            class="btn btn-circle btn-lg"
-            type="button"
-            onClick={openModal}
-            aria-label="Apply for Tutor Role"
-            title="Apply for Tutor Role"
-          >
-            <ClipboardPen />
-          </button>
+          <div class={tooltipClass} data-tip="Apply for tutor">
+            <button
+              class="btn btn-circle btn-lg"
+              type="button"
+              onClick={openModal}
+              aria-label="Apply for tutor"
+            >
+              <ClipboardPen />
+            </button>
+          </div>
         </div>
       </div>
 
