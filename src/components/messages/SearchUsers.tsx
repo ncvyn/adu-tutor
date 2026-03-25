@@ -27,7 +27,7 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
         return []
       }
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 5 * 60_000,
   }))
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null

@@ -15,7 +15,7 @@ import { markdownClass } from '@/lib/markdown'
 import { unixToLocale } from '@/lib/format-date'
 import { ReportMessageModal } from './ReportMessageModal'
 
-const THRESHOLD_MS = 3 * 60 * 1000 // 3 minutes
+const THRESHOLD_MS = 3 * 60_000
 
 export const ChatPanel = (props: {
   senderId: string

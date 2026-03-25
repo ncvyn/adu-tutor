@@ -22,8 +22,8 @@ interface ChatOptions {
   recipientId: string
 }
 
-const MAX_RECONNECT_DELAY = 30000 // 30 seconds
-const INITIAL_RECONNECT_DELAY = 1000 // 1 second
+const MAX_RECONNECT_DELAY = 30_000 // 30 seconds
+const INITIAL_RECONNECT_DELAY = 1_000 // 1 second
 
 export function useChat(options: ChatOptions) {
   const [isConnected, setIsConnected] = createSignal(false)
