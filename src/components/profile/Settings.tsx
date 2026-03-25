@@ -175,7 +175,7 @@ export default function Settings(props: SettingsProps) {
           <fieldset class="fieldset w-full">
             <legend class="fieldset-legend">
               Preferred subjects{' '}
-              {user.role === 'tutor' ? 'to teach' : 'to learn'}
+              {user.role === 'tutee' ? 'to learn' : 'to teach'}
             </legend>
             <div class="flex flex-wrap gap-2">
               <For each={SUBJECTS}>
@@ -222,7 +222,7 @@ export default function Settings(props: SettingsProps) {
             </fieldset>
           </fieldset>
 
-          <Show when={user.role === 'tutor'}>
+          <Show when={user.role === 'tutor' || user.role === 'mod'}>
             <fieldset class="fieldset w-full">
               <legend class="fieldset-legend">Availability schedule</legend>
               <p class="label">
