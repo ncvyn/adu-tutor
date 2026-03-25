@@ -75,7 +75,7 @@ export const ChatPanel = (props: {
   const isSending = () => chat.isSending()
 
   return (
-    <section class="flex h-full min-h-0 flex-col rounded-box border border-base-300 bg-base-100">
+    <section class="pt-safe fixed inset-0 z-50 flex h-full max-h-[100dvh] min-h-0 flex-col rounded-box border border-base-300 bg-base-100 pb-[5rem] md:relative md:static md:z-0 md:h-full md:max-h-none md:rounded-box md:pt-0 md:pb-0">
       <header class="flex items-center justify-between border-b border-base-300 px-6 py-4">
         <div class="flex items-center gap-3">
           <div class="avatar avatar-placeholder">
@@ -105,7 +105,7 @@ export const ChatPanel = (props: {
         </div>
       </header>
 
-      <div class="min-h-0 flex-1 overflow-y-auto px-6 py-6">
+      <div class="max-h-[calc(100dvh)-5rem] min-h-0 flex-1 overflow-y-auto px-6 py-6 md:max-h-none">
         <Show
           when={!isLoading()}
           fallback={
