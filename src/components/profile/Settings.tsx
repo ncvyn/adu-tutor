@@ -1,6 +1,6 @@
 import type { AvailabilityMap } from '@/routes/profile'
 import { DAYS, SUBJECTS } from '@/lib/constants'
-import { For, Show, createSignal } from 'solid-js'
+import { For, Show, createSignal, onMount } from 'solid-js'
 import { applyTheme } from '@/lib/theme'
 import { updateSettings } from '@/server/update-settings.functions'
 import { deleteMyAccount } from '@/server/delete-account.functions'
@@ -35,9 +35,11 @@ export default function Settings(props: SettingsProps) {
         ? JSON.parse(profile.preferredSubjects || '[]')
         : [],
   )
-  const [theme, setTheme] = createSignal<string>(
-    localStorage.getItem('adu-theme') ?? 'system',
-  )
+  const [theme, setTheme] = createSignal('system')
+
+  onMount(() => {
+    setTheme(localStorage.getItem('adu-theme') ?? 'system')
+  })
 
   // Parse existing availability string "09:00-12:00, 14:00-17:00" into structured UI state
   const initialAvailability = profile.availability

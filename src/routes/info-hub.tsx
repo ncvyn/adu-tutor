@@ -1,4 +1,10 @@
-import { ErrorBoundary, Show, createMemo, createSignal } from 'solid-js'
+import {
+  ErrorBoundary,
+  Show,
+  createMemo,
+  createSignal,
+  onMount,
+} from 'solid-js'
 import { createFileRoute, useNavigate } from '@tanstack/solid-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 
@@ -34,6 +40,12 @@ export const Route = createFileRoute('/info-hub')({
 })
 
 function InfoHub() {
+  const [isClient, setIsClient] = createSignal(false)
+
+  onMount(() => {
+    setIsClient(true)
+  })
+
   const session = useAuthGuard({ requireAuth: true })
   const { notify } = useNotifications()
   const queryClient = useQueryClient()
@@ -63,7 +75,7 @@ function InfoHub() {
 
   const cardsQuery = useQuery(() => ({
     queryKey: ['info-cards', session().data?.user.id] as const,
-    enabled: !!session().data?.user.id,
+    enabled: isClient() && !!session().data?.user.id,
     queryFn: async () => getInfoCards(),
     placeholderData: (previousData) => previousData,
     refetchOnWindowFocus: false,
@@ -169,82 +181,84 @@ function InfoHub() {
   }
 
   return (
-    <AuthenticatedLayout>
-      <BadgeWatcher />
-      <Show when={session().data} fallback={<LoadingScreen />}>
-        <ErrorBoundary fallback={<ErrorFallback />}>
-          <Show
-            when={!cardsQuery.isPending || !!cardsQuery.data}
-            fallback={<LoadingScreen />}
-          >
-            <div class="mx-auto my-8 w-full max-w-4xl px-4 pb-4">
-              <Header
-                cardCountLabel={cardCountLabel()}
-                isRefreshing={cardsQuery.isFetching && !cardsQuery.isPending}
-                onShare={openShareDialog}
-              />
+    <Show when={isClient()} fallback={<LoadingScreen />}>
+      <AuthenticatedLayout>
+        <BadgeWatcher />
+        <Show when={session().data} fallback={<LoadingScreen />}>
+          <ErrorBoundary fallback={<ErrorFallback />}>
+            <Show
+              when={!cardsQuery.isPending || !!cardsQuery.data}
+              fallback={<LoadingScreen />}
+            >
+              <div class="mx-auto my-8 w-full max-w-4xl px-4 pb-4">
+                <Header
+                  cardCountLabel={cardCountLabel()}
+                  isRefreshing={cardsQuery.isFetching && !cardsQuery.isPending}
+                  onShare={openShareDialog}
+                />
 
-              <Filter
-                searchQuery={searchQuery()}
-                onSearchChange={setSearchQuery}
-                selectedSubjects={filterSubjects()}
-                onSubjectToggle={(subject) => {
-                  setFilterSubjects((prev) =>
-                    prev.includes(subject)
-                      ? prev.filter((s) => s !== subject)
-                      : [...prev, subject],
-                  )
-                }}
-                onClearSubjects={() => setFilterSubjects([])}
-              />
+                <Filter
+                  searchQuery={searchQuery()}
+                  onSearchChange={setSearchQuery}
+                  selectedSubjects={filterSubjects()}
+                  onSubjectToggle={(subject) => {
+                    setFilterSubjects((prev) =>
+                      prev.includes(subject)
+                        ? prev.filter((s) => s !== subject)
+                        : [...prev, subject],
+                    )
+                  }}
+                  onClearSubjects={() => setFilterSubjects([])}
+                />
 
-              <CardList
-                cards={filteredCards()}
-                currentUserId={session().data!.user.id}
-                onVote={handleVote}
-                onRequestDelete={requestDeleteCard}
-                onRequestEdit={requestEditCard}
-              />
+                <CardList
+                  cards={filteredCards()}
+                  currentUserId={session().data!.user.id}
+                  onVote={handleVote}
+                  onRequestDelete={requestDeleteCard}
+                  onRequestEdit={requestEditCard}
+                />
 
-              <Fab
-                onShare={openShareDialog}
-                onSearchTutors={() => setIsTutorSearchModalOpen(true)}
-              />
+                <Fab
+                  onShare={openShareDialog}
+                  onSearchTutors={() => setIsTutorSearchModalOpen(true)}
+                />
 
-              <TutorSearchModal
-                isOpen={isTutorSearchModalOpen()}
-                onClose={() => setIsTutorSearchModalOpen(false)}
-                onSelectTutor={handleSelectTutor}
-              />
+                <TutorSearchModal
+                  isOpen={isTutorSearchModalOpen()}
+                  onClose={() => setIsTutorSearchModalOpen(false)}
+                  onSelectTutor={handleSelectTutor}
+                />
 
-              <ShareDialog
-                ref={(el) => {
-                  shareDialogRef = el
-                }}
-                userId={session().data!.user.id}
-              />
+                <ShareDialog
+                  ref={(el) => {
+                    shareDialogRef = el
+                  }}
+                  userId={session().data!.user.id}
+                />
 
-              <EditDialog
-                ref={(el) => {
-                  editDialogRef = el
-                }}
-                card={() => editingCard()}
-                openCount={() => editOpenCount()}
-              />
-            </div>
-          </Show>
-        </ErrorBoundary>
+                <EditDialog
+                  ref={(el) => {
+                    editDialogRef = el
+                  }}
+                  card={() => editingCard()}
+                  openCount={() => editOpenCount()}
+                />
+              </div>
+            </Show>
+          </ErrorBoundary>
 
-        <DeleteDialog
-          ref={(el) => {
-            deleteDialogRef = el
-          }}
-          title={pendingDeleteTitle()}
-          isDeleting={deleteCardMutation.isPending}
-          onCancel={cancelDeleteCard}
-          onConfirm={confirmDeleteCard}
-        />
-      </Show>
-    </AuthenticatedLayout>
+          <DeleteDialog
+            ref={(el) => {
+              deleteDialogRef = el
+            }}
+            title={pendingDeleteTitle()}
+            isDeleting={deleteCardMutation.isPending}
+            onCancel={cancelDeleteCard}
+            onConfirm={confirmDeleteCard}
+          />
+        </Show>
+      </AuthenticatedLayout>
+    </Show>
   )
 }
