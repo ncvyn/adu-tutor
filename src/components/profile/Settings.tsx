@@ -5,7 +5,7 @@ import { applyTheme } from '@/lib/theme'
 import { updateSettings } from '@/server/update-settings.functions'
 import { deleteMyAccount } from '@/server/delete-account.functions'
 import { useNavigate } from '@tanstack/solid-router'
-import { useNotifications } from '@/components'
+import { useNotifications } from '@/components/Notifications'
 
 interface SettingsProps {
   profile: any

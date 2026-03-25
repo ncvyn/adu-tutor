@@ -1,6 +1,5 @@
 import { Link, useNavigate } from '@tanstack/solid-router'
-import { SearchUsers } from '@/components'
-import type { UserResult } from '@/components'
+import { type UserResult, SearchUsers } from '@/components/messages/SearchUsers'
 import { useChatContext } from '@/components/messages/ChatContext'
 
 export function Sidebar() {

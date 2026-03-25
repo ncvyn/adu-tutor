@@ -1,7 +1,7 @@
 import { For, Show, createEffect, createMemo, createSignal, on } from 'solid-js'
 import { useMutation, useQueryClient } from '@tanstack/solid-query'
 import { SUBJECTS } from '@/lib/constants'
-import { useNotifications } from '@/components'
+import { useNotifications } from '@/components/Notifications'
 import { updateInfoCard } from '@/server/info-cards.functions'
 import type { InfoCardWithVotes } from '@/schemas/info'
 

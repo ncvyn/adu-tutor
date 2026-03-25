@@ -2,7 +2,7 @@ import { For, Show, createMemo, createSignal } from 'solid-js'
 import { useMutation, useQueryClient } from '@tanstack/solid-query'
 import { SUBJECTS } from '@/lib/constants'
 import { createInfoCard } from '@/server/info-cards.functions'
-import { useNotifications } from '@/components'
+import { useNotifications } from '@/components/Notifications'
 import { DiscardDialog } from './DiscardDialog'
 
 interface ShareDialogProps {

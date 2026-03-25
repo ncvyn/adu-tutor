@@ -1,15 +1,18 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { useQuery } from '@tanstack/solid-query'
 import { ErrorBoundary, Show, Suspense, createSignal } from 'solid-js'
+import { Undo2, UserRoundCog } from 'lucide-solid'
+
 import { useAuthGuard } from '@/lib/auth-client'
+import { type DAYS } from '@/lib/constants'
 import { getUserProfile } from '@/server/get-user-profile.functions'
-import { LoadingScreen } from '@/components'
+
+import { LoadingScreen } from '@/components/LoadingScreen'
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
-import type { DAYS } from '@/lib/constants'
+import { BadgeWatcher } from '@/components/BadgeWatcher'
+
 import Settings from '@/components/profile/Settings'
 import UserProfile from '@/components/profile/UserProfile'
-import { BadgeWatcher } from '@/components/BadgeWatcher'
-import { Undo2, UserRoundCog } from 'lucide-solid'
 
 export const Route = createFileRoute('/profile')({
   ssr: false,

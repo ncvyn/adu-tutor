@@ -1,11 +1,13 @@
 import { createEffect, createSignal, on, onCleanup } from 'solid-js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
-import { useNotifications } from '@/components'
+
 import {
   addMessage,
   deleteMessage,
   getMessages,
 } from '@/server/messages.functions'
+
+import { useNotifications } from '@/components/Notifications'
 
 interface ChatMessage {
   id: string

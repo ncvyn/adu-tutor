@@ -1,9 +1,11 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show, createSignal } from 'solid-js'
-import { signIn, useAuthGuard } from '@/lib/auth-client'
-import { LoadingScreen, useNotifications } from '@/components'
 
+import { signIn, useAuthGuard } from '@/lib/auth-client'
 import AdULogo from '@/adulogo.png'
+
+import { LoadingScreen } from '@/components/LoadingScreen'
+import { useNotifications } from '@/components/Notifications'
 
 export const Route = createFileRoute('/')({ component: Index })
 

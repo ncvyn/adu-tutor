@@ -1,23 +1,26 @@
 import { ErrorBoundary, Show, createMemo, createSignal } from 'solid-js'
 import { createFileRoute, useNavigate } from '@tanstack/solid-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
+
 import type { InfoCardWithVotes } from '@/schemas/info'
 import { useAuthGuard } from '@/lib/auth-client'
 
-import { LoadingScreen, useChatContext, useNotifications } from '@/components'
+import { LoadingScreen } from '@/components/LoadingScreen'
+import { useNotifications } from '@/components/Notifications'
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import { BadgeWatcher } from '@/components/BadgeWatcher'
-import {
-  CardList,
-  DeleteDialog,
-  EditDialog,
-  ErrorFallback,
-  Fab,
-  Filter,
-  Header,
-  ShareDialog,
-  TutorSearchModal,
-} from '@/components/info-hub'
+
+import { CardList } from '@/components/info-hub/CardList'
+import { DeleteDialog } from '@/components/info-hub/DeleteDialog'
+import { EditDialog } from '@/components/info-hub/EditDialog'
+import { ErrorFallback } from '@/components/info-hub/ErrorFallback'
+import { Fab } from '@/components/info-hub/Fab'
+import { Filter } from '@/components/info-hub/Filter'
+import { Header } from '@/components/info-hub/Header'
+import { ShareDialog } from '@/components/info-hub/ShareDialog'
+import { TutorSearchModal } from '@/components/info-hub/TutorSearchModal'
+
+import { useChatContext } from '@/components/messages/ChatContext'
 
 import {
   deleteInfoCard,

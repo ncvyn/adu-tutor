@@ -1,15 +1,16 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Show, createSignal } from 'solid-js'
-import type { UserResult } from '@/components/messages/SearchUsers'
+
 import { useAuthGuard } from '@/lib/auth-client'
-import {
-  AuthenticatedLayout,
-  ChatPanel,
-  LoadingScreen,
-  SearchUsers,
-} from '@/components'
-import { useChatContext } from '@/components/messages/ChatContext'
+
+import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
 import { BadgeWatcher } from '@/components/BadgeWatcher'
+import { LoadingScreen } from '@/components/LoadingScreen'
+
+import { type UserResult } from '@/components/messages/SearchUsers'
+import { ChatPanel } from '@/components/messages/ChatPanel'
+import { SearchUsers } from '@/components/messages/SearchUsers'
+import { useChatContext } from '@/components/messages/ChatContext'
 
 export const Route = createFileRoute('/messages')({
   ssr: false,

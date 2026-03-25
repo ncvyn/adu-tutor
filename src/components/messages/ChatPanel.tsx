@@ -8,7 +8,7 @@ import {
 } from 'solid-js'
 import { SolidMarkdown } from 'solid-markdown'
 import { setDockVisible } from '@/lib/dock-visible'
-import type { UserResult } from '@/components'
+import { type UserResult } from '@/components/messages/SearchUsers'
 import { useChat } from '@/lib/use-chat'
 import { getInitials } from '@/lib/helper'
 import { markdownClass } from '@/lib/markdown'

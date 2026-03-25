@@ -1,11 +1,14 @@
-import { For, Show, createSignal } from 'solid-js'
-import { getInitials } from '@/lib/helper'
-import { UserBadges } from '@/components'
-import { APP_VERSION } from '@/lib/version.ts'
-import { Info, LogOut } from 'lucide-solid'
-import { signOut } from '@/lib/auth-client'
-import { useNotifications } from '@/components/Notifications'
 import { useNavigate } from '@tanstack/solid-router'
+import { For, Show, createSignal } from 'solid-js'
+import { Info, LogOut } from 'lucide-solid'
+
+import { getInitials } from '@/lib/helper'
+import { APP_VERSION } from '@/lib/version.ts'
+import { signOut } from '@/lib/auth-client'
+
+import { useNotifications } from '@/components/Notifications'
+
+import { UserBadges } from './UserBadges'
 import { AboutUsModal } from './AboutUsModal'
 
 export default function UserProfile(props: { profile: any }) {
