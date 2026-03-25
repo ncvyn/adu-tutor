@@ -1,9 +1,13 @@
 import { For, Show, createEffect, createMemo, createSignal, on } from 'solid-js'
 import { useMutation, useQueryClient } from '@tanstack/solid-query'
+import EasyMDE from 'easymde'
+
 import { SUBJECTS } from '@/lib/constants'
-import { useNotifications } from '@/components/Notifications'
 import { updateInfoCard } from '@/server/info-cards.functions'
 import type { InfoCardWithVotes } from '@/schemas/info'
+
+import { MarkdownEditor } from '@/components/MarkdownEditor'
+import { useNotifications } from '@/components/Notifications'
 
 interface EditDialogProps {
   ref: (el: HTMLDialogElement) => void
@@ -23,6 +27,8 @@ export function EditDialog(props: EditDialogProps) {
   let editDialogRef: HTMLDialogElement | null
   let confirmDialogRef: HTMLDialogElement | null
 
+  let easyMDEInstance: EasyMDE | undefined
+
   function syncFromCard(card: InfoCardWithVotes) {
     setNewTitle(card.title)
     setNewContent(card.content)
@@ -34,7 +40,9 @@ export function EditDialog(props: EditDialogProps) {
       () => props.openCount?.() ?? 0,
       () => {
         const card = props.card()
-        if (card) syncFromCard(card)
+        if (card) {
+          syncFromCard(card)
+        }
       },
     ),
   )
@@ -170,11 +178,18 @@ export function EditDialog(props: EditDialogProps) {
 
             <fieldset class="fieldset w-full">
               <legend class="fieldset-legend">Content</legend>
-              <textarea
-                class="textarea-bordered textarea min-h-32 w-full"
+              <MarkdownEditor
                 value={newContent()}
-                onInput={(e) => setNewContent(e.currentTarget.value)}
-                placeholder="Use markdown..."
+                onChange={setNewContent}
+                placeholder={
+                  'Use **bold**, *italics*, lists, and [links](https://...)'
+                }
+                options={{
+                  spellChecker: false,
+                }}
+                editorRef={(instance) => {
+                  easyMDEInstance = instance
+                }}
               />
             </fieldset>
           </div>

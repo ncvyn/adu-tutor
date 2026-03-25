@@ -1,8 +1,13 @@
 import { For, Show, createMemo, createSignal } from 'solid-js'
 import { useMutation, useQueryClient } from '@tanstack/solid-query'
+
 import { SUBJECTS } from '@/lib/constants'
+
 import { createInfoCard } from '@/server/info-cards.functions'
+
 import { useNotifications } from '@/components/Notifications'
+import { MarkdownEditor } from '@/components/MarkdownEditor'
+
 import { DiscardDialog } from './DiscardDialog'
 
 interface ShareDialogProps {
@@ -142,13 +147,15 @@ export function ShareDialog(props: ShareDialogProps) {
 
             <fieldset class="fieldset w-full">
               <legend class="fieldset-legend">Content</legend>
-              <textarea
-                class="textarea-bordered textarea min-h-32 w-full"
+              <MarkdownEditor
                 value={newContent()}
-                onInput={(e) => setNewContent(e.currentTarget.value)}
+                onChange={setNewContent}
                 placeholder={
                   'Use **bold**, *italics*, lists, and [links](https://...)'
                 }
+                options={{
+                  spellChecker: false,
+                }}
               />
             </fieldset>
           </div>
