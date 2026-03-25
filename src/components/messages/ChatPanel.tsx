@@ -86,7 +86,7 @@ export const ChatPanel = (props: {
   onCleanup(() => setDockVisible(true))
 
   return (
-    <section class="pt-safe fixed inset-0 z-50 flex h-full max-h-dvh min-h-0 flex-col rounded-box border border-base-300 bg-base-100 pb-20 md:z-0 md:h-full md:max-h-none md:rounded-box md:pt-0 md:pb-0">
+    <section class="pt-safe fixed inset-0 z-50 flex h-full max-h-dvh min-h-0 w-screen max-w-full flex-col overflow-x-hidden rounded-box border border-base-300 bg-base-100 md:static md:z-0 md:max-h-none md:w-auto md:rounded-box md:pt-0">
       <header class="flex items-center justify-between border-b border-base-300 px-6 py-4">
         <div class="flex items-center gap-3">
           <div class="avatar avatar-placeholder">
@@ -170,7 +170,7 @@ export const ChatPanel = (props: {
                     </Show>
 
                     <div
-                      class="chat-bubble cursor-pointer wrap-break-word whitespace-normal"
+                      class="chat-bubble cursor-pointer whitespace-normal"
                       classList={{
                         'chat-bubble-primary': isSender,
                         'bg-base-200': !isSender,
@@ -184,7 +184,9 @@ export const ChatPanel = (props: {
                       aria-label={isSender ? 'Show delete' : 'Show report'}
                     >
                       <div class={markdownClass}>
-                        <SolidMarkdown>{msg.content}</SolidMarkdown>
+                        <SolidMarkdown class="wrap-anywhere">
+                          {msg.content}
+                        </SolidMarkdown>
                       </div>
                     </div>
 
