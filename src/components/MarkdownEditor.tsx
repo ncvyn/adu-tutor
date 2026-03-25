@@ -1,4 +1,4 @@
-import { onCleanup, onMount, createEffect } from 'solid-js'
+import { createEffect, onCleanup, onMount } from 'solid-js'
 import { type JSX } from 'solid-js'
 import EasyMDE from 'easymde'
 import 'easymde/dist/easymde.min.css'
@@ -8,7 +8,6 @@ interface MarkdownEditorProps {
   onChange: (val: string) => void
   placeholder?: string
   options?: Partial<EasyMDE.Options>
-  editorRef?: (editor: EasyMDE) => void
 }
 
 export function MarkdownEditor(props: MarkdownEditorProps): JSX.Element {
@@ -16,16 +15,18 @@ export function MarkdownEditor(props: MarkdownEditorProps): JSX.Element {
   let editor: EasyMDE | undefined
 
   onMount(() => {
+    if (!textareaRef) return
+
     editor = new EasyMDE({
-      element: textareaRef!,
+      element: textareaRef,
       initialValue: props.value,
       placeholder: props.placeholder,
       ...props.options,
     })
+
     editor.codemirror.on('change', () => {
       props.onChange(editor!.value())
     })
-    props.editorRef?.(editor)
   })
 
   createEffect(() => {
@@ -39,5 +40,5 @@ export function MarkdownEditor(props: MarkdownEditorProps): JSX.Element {
     editor = undefined
   })
 
-  return <textarea ref={textareaRef} />
+  return <textarea ref={(el) => (textareaRef = el)} />
 }
