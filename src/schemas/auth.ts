@@ -18,7 +18,7 @@ export const user = sqliteTable('user', {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   banned: integer('banned', { mode: 'boolean' }).default(false).notNull(),
-  role: text({ enum: ['tutor', 'tutee'] })
+  role: text({ enum: ['tutor', 'tutee', 'mod'] })
     .default('tutee')
     .notNull(),
   bio: text('bio').default('').notNull(),
