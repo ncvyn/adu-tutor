@@ -1,5 +1,13 @@
-import { For, Show, createEffect, createSignal } from 'solid-js'
+import {
+  For,
+  Show,
+  createEffect,
+  createSignal,
+  onMount,
+  onCleanup,
+} from 'solid-js'
 import { SolidMarkdown } from 'solid-markdown'
+import { setDockVisible } from '@/lib/dock-visible'
 import type { UserResult } from '@/components'
 import { useChat } from '@/lib/use-chat'
 import { getInitials } from '@/lib/helper'
@@ -74,8 +82,11 @@ export const ChatPanel = (props: {
   const isConnected = () => chat.isConnected()
   const isSending = () => chat.isSending()
 
+  onMount(() => setDockVisible(false))
+  onCleanup(() => setDockVisible(true))
+
   return (
-    <section class="pt-safe fixed inset-0 z-50 flex h-full max-h-[100dvh] min-h-0 flex-col rounded-box border border-base-300 bg-base-100 pb-[5rem] md:relative md:static md:z-0 md:h-full md:max-h-none md:rounded-box md:pt-0 md:pb-0">
+    <section class="pt-safe fixed inset-0 z-50 flex h-full max-h-dvh min-h-0 flex-col rounded-box border border-base-300 bg-base-100 pb-20 md:z-0 md:h-full md:max-h-none md:rounded-box md:pt-0 md:pb-0">
       <header class="flex items-center justify-between border-b border-base-300 px-6 py-4">
         <div class="flex items-center gap-3">
           <div class="avatar avatar-placeholder">
