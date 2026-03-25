@@ -4,14 +4,17 @@ import {
   EllipsisVertical,
   Search,
   Share,
+  Shield,
 } from 'lucide-solid'
 import { createSignal, Show } from 'solid-js'
 import { createMutation } from '@tanstack/solid-query'
 
-import { submitTutorApplication } from '@/server/mod.functions'
+import { fetchData, submitTutorApplication } from '@/server/mod.functions'
 import { type User } from '@/schemas/auth'
+import { type Report, type TutorApplication } from '@/schemas/mod'
 
 import { TutorApplicationModal } from './TutorApplicationModal'
+import { ModPanel } from './ModPanel'
 
 const tooltipClass = 'tooltip tooltip-neutral tooltip-left'
 
@@ -23,6 +26,11 @@ interface FabProps {
 
 export function Fab(props: FabProps) {
   const [reason, setReason] = createSignal('')
+  const [modData, setModData] = createSignal<{
+    tutorApplications: TutorApplication[]
+    reports: Report[]
+  } | null>(null)
+  const [loadingModData, setLoadingModData] = createSignal(false)
 
   const mutation = createMutation(() => ({
     mutationFn: (r: string) => submitTutorApplication({ data: r }),
@@ -33,9 +41,22 @@ export function Fab(props: FabProps) {
     },
   }))
 
-  const openModal = () => {
+  const openTutorModal = () => {
     const modal = document.getElementById('tutor_modal') as HTMLDialogElement
     modal.showModal()
+  }
+
+  const openModPanel = async () => {
+    const modal = document.getElementById('mod_panel') as HTMLDialogElement
+    setLoadingModData(true)
+
+    try {
+      const data = await fetchData()
+      setModData(data)
+      modal.showModal()
+    } finally {
+      setLoadingModData(false)
+    }
   }
 
   return (
@@ -82,15 +103,29 @@ export function Fab(props: FabProps) {
                 <Search />
               </button>
             </div>
-            <Show when={props.user.role !== 'tutor'}>
+
+            <Show when={props.user.role === 'tutee'}>
               <div class={tooltipClass} data-tip="Apply for tutor">
                 <button
                   class="btn btn-circle btn-lg"
                   type="button"
-                  onClick={openModal}
+                  onClick={openTutorModal}
                   aria-label="Apply for tutor"
                 >
                   <ClipboardPen />
+                </button>
+              </div>
+            </Show>
+
+            <Show when={props.user.role === 'mod'}>
+              <div class={tooltipClass} data-tip="Open mod panel">
+                <button
+                  class="btn btn-circle btn-lg"
+                  type="button"
+                  onClick={openModPanel}
+                  aria-label="Open mod panel"
+                >
+                  <Shield />
                 </button>
               </div>
             </Show>
@@ -104,6 +139,8 @@ export function Fab(props: FabProps) {
         onSubmit={() => mutation.mutate(reason())}
         isPending={mutation.isPending}
       />
+
+      <ModPanel data={modData()} isLoading={loadingModData()} />
     </>
   )
 }

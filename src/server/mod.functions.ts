@@ -34,3 +34,14 @@ export const submitReport = createServerFn({ method: 'POST' })
     })
     return { success: true }
   })
+
+export const fetchData = createServerFn({ method: 'GET' }).handler(async () => {
+  const headers = getRequestHeaders()
+  const session = await auth.api.getSession({ headers })
+  if (!session) throw new Error('Unauthorized')
+
+  const tutorApplications = await db.select().from(tutorApplication)
+  const reports = await db.select().from(report)
+
+  return { tutorApplications, reports }
+})

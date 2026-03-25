@@ -13,6 +13,7 @@ export const tutorApplication = sqliteTable('tutor_application', {
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .notNull(),
 })
+export type TutorApplication = typeof tutorApplication.$inferSelect
 
 export const report = sqliteTable('report', {
   id: text('id').primaryKey(),
@@ -27,3 +28,4 @@ export const report = sqliteTable('report', {
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .notNull(),
 })
+export type Report = typeof report.$inferSelect
