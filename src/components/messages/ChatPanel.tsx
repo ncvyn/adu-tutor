@@ -7,12 +7,14 @@ import {
   onCleanup,
 } from 'solid-js'
 import { SolidMarkdown } from 'solid-markdown'
+import { ArrowLeft } from 'lucide-solid'
+
 import { setDockVisible } from '@/lib/dock-visible'
-import { type UserResult } from '@/components/messages/SearchUsers'
 import { useChat } from '@/lib/use-chat'
-import { getInitials } from '@/lib/helper'
 import { markdownClass } from '@/lib/markdown'
 import { unixToLocale } from '@/lib/format-date'
+
+import { type UserResult } from './SearchUsers'
 import { ReportMessageModal } from './ReportMessageModal'
 
 const THRESHOLD_MS = 3 * 60_000
@@ -20,6 +22,7 @@ const THRESHOLD_MS = 3 * 60_000
 export const ChatPanel = (props: {
   senderId: string
   recipient: UserResult
+  onClose: () => void
 }) => {
   const chat = useChat({
     senderId: props.senderId,
@@ -87,21 +90,23 @@ export const ChatPanel = (props: {
 
   return (
     <section class="pt-safe fixed inset-0 z-50 flex h-full max-h-dvh min-h-0 w-screen max-w-full flex-col overflow-x-hidden rounded-box border border-base-300 bg-base-100 md:static md:z-0 md:max-h-none md:w-auto md:rounded-box md:pt-0">
-      <header class="flex items-center justify-between border-b border-base-300 px-6 py-4">
+      <header class="flex items-center justify-between border-b border-base-300 px-3 py-3">
         <div class="flex items-center gap-3">
-          <div class="avatar avatar-placeholder">
-            <div class="w-12 rounded-full bg-neutral text-neutral-content">
-              <span class="text-md font-semibold">
-                {getInitials(props.recipient.name)}
-              </span>
-            </div>
-          </div>
-          <div class="flex flex-col">
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm md:hidden"
+            aria-label="Close chat"
+            onClick={props.onClose}
+          >
+            <ArrowLeft class="h-6 w-6" />
+          </button>
+
+          <div class="flex flex-col pl-3">
             <h2 class="text-lg font-semibold">{props.recipient.name}</h2>
             <div class="flex flex-row items-center gap-2">
               <Show
                 when={!isConnected()}
-                fallback={<div class="status status-success"></div>}
+                fallback={<div class="status status-secondary"></div>}
               >
                 <div class="inline-grid *:[grid-area:1/1]">
                   <div class="status animate-ping status-warning"></div>

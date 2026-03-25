@@ -54,19 +54,16 @@ function Messages() {
 
             {/* Chat area */}
             <div class="min-h-0 flex-1">
-              <Show
-                when={activeRecipient()}
-                keyed
-                fallback={
-                  <section class="flex h-full items-center justify-center rounded-box border border-base-300 bg-base-100">
-                    <p class="text-sm opacity-60">
-                      Search for a user to start a conversation
-                    </p>
-                  </section>
-                }
-              >
+              <Show when={activeRecipient()} keyed>
                 {(recipient) => (
-                  <ChatPanel senderId={data().user.id} recipient={recipient} />
+                  <ChatPanel
+                    senderId={data().user.id}
+                    recipient={recipient}
+                    onClose={() => {
+                      setSelectedRecipient(null)
+                      setMobileSelectedUser(null)
+                    }}
+                  />
                 )}
               </Show>
             </div>
