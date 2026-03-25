@@ -57,9 +57,7 @@ export function Filter(props: FilterProps) {
               return (
                 <button
                   class={`badge cursor-pointer badge-lg transition-colors ${
-                    isSelected()
-                      ? 'badge-primary'
-                      : 'hover:badge-primary/50 badge-outline'
+                    isSelected() ? 'badge-primary' : 'badge-soft'
                   }`}
                   onClick={() => props.onSubjectToggle(subject)}
                 >
