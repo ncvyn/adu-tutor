@@ -38,7 +38,10 @@ export function Fab(props: FabProps) {
     <>
       <div class="fixed right-8 bottom-8 z-50">
         <div class="fab">
-          <div class={tooltipClass} data-tip="Open quick actions">
+          <div
+            class={`hidden md:inline-block ${tooltipClass}`}
+            data-tip="Open quick actions"
+          >
             <div
               tabindex={0}
               role="button"
