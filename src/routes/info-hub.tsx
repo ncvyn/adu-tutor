@@ -8,8 +8,9 @@ import {
 import { createFileRoute, useNavigate } from '@tanstack/solid-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 
-import type { InfoCardWithVotes } from '@/schemas/info'
+import { type InfoCardWithVotes } from '@/schemas/info'
 import { useAuthGuard } from '@/lib/auth-client'
+import { getUser } from '@/server/get-user.functions'
 
 import { LoadingScreen } from '@/components/LoadingScreen'
 import { useNotifications } from '@/components/Notifications'
@@ -180,6 +181,12 @@ function InfoHub() {
     navigate({ to: '/messages' })
   }
 
+  const userQuery = useQuery(() => ({
+    queryKey: ['user', session().data?.user.id] as const,
+    enabled: isClient() && !!session().data?.user.id,
+    queryFn: async () => getUser(),
+  }))
+
   return (
     <Show when={isClient()} fallback={<LoadingScreen />}>
       <AuthenticatedLayout>
@@ -219,10 +226,15 @@ function InfoHub() {
                   onRequestEdit={requestEditCard}
                 />
 
-                <Fab
-                  onShare={openShareDialog}
-                  onSearchTutors={() => setIsTutorSearchModalOpen(true)}
-                />
+                <Show when={userQuery.data}>
+                  {(user) => (
+                    <Fab
+                      onShare={openShareDialog}
+                      onSearchTutors={() => setIsTutorSearchModalOpen(true)}
+                      user={user()}
+                    />
+                  )}
+                </Show>
 
                 <TutorSearchModal
                   isOpen={isTutorSearchModalOpen()}

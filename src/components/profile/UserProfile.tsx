@@ -5,13 +5,14 @@ import { Info, LogOut } from 'lucide-solid'
 import { getInitials } from '@/lib/helper'
 import { APP_VERSION } from '@/lib/version.ts'
 import { signOut } from '@/lib/auth-client'
+import { type User } from '@/schemas/auth'
 
 import { useNotifications } from '@/components/Notifications'
 
 import { UserBadges } from './UserBadges'
 import { AboutUsModal } from './AboutUsModal'
 
-export default function UserProfile(props: { user: any }) {
+export default function UserProfile(props: { user: User }) {
   const { user } = props
 
   const subjects: Array<string> = Array.isArray(user.preferredSubjects)

@@ -25,6 +25,7 @@ export const user = sqliteTable('user', {
   preferredSubjects: text('preferred_subjects').default('[]').notNull(),
   availability: text('availability').default(''),
 })
+export type User = typeof user.$inferSelect
 
 export const session = sqliteTable(
   'session',

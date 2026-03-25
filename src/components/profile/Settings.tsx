@@ -2,13 +2,14 @@ import type { AvailabilityMap } from '@/routes/profile'
 import { DAYS, SUBJECTS } from '@/lib/constants'
 import { For, Show, createSignal, onMount } from 'solid-js'
 import { applyTheme } from '@/lib/theme'
+import { type User } from '@/schemas/auth'
 import { updateSettings } from '@/server/update-settings.functions'
 import { deleteMyAccount } from '@/server/delete-account.functions'
 import { useNavigate } from '@tanstack/solid-router'
 import { useNotifications } from '@/components/Notifications'
 
 interface SettingsProps {
-  user: any
+  user: User
   refetchUser: () => Promise<unknown>
 }
 

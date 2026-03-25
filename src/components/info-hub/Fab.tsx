@@ -5,9 +5,12 @@ import {
   Search,
   Share,
 } from 'lucide-solid'
-import { createSignal } from 'solid-js'
+import { createSignal, Show } from 'solid-js'
 import { createMutation } from '@tanstack/solid-query'
+
 import { submitTutorApplication } from '@/server/mod.functions'
+import { type User } from '@/schemas/auth'
+
 import { TutorApplicationModal } from './TutorApplicationModal'
 
 const tooltipClass = 'tooltip tooltip-neutral tooltip-left'
@@ -15,6 +18,7 @@ const tooltipClass = 'tooltip tooltip-neutral tooltip-left'
 interface FabProps {
   onShare: () => void
   onSearchTutors: () => void
+  user: User
 }
 
 export function Fab(props: FabProps) {
@@ -78,17 +82,18 @@ export function Fab(props: FabProps) {
                 <Search />
               </button>
             </div>
-
-            <div class={tooltipClass} data-tip="Apply for tutor">
-              <button
-                class="btn btn-circle btn-lg"
-                type="button"
-                onClick={openModal}
-                aria-label="Apply for tutor"
-              >
-                <ClipboardPen />
-              </button>
-            </div>
+            <Show when={props.user.role !== 'tutor'}>
+              <div class={tooltipClass} data-tip="Apply for tutor">
+                <button
+                  class="btn btn-circle btn-lg"
+                  type="button"
+                  onClick={openModal}
+                  aria-label="Apply for tutor"
+                >
+                  <ClipboardPen />
+                </button>
+              </div>
+            </Show>
           </div>
         </div>
       </div>
