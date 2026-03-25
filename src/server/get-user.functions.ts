@@ -6,7 +6,7 @@ import { user } from '@/schemas/auth'
 import { middleware } from '@/lib/middleware'
 import { db } from '@/lib/db'
 
-export const getUserProfile = createServerFn({ method: 'GET' })
+export const getUser = createServerFn({ method: 'GET' })
   .middleware([middleware])
   .handler(async () => {
     const headers = getRequestHeaders()
@@ -14,11 +14,11 @@ export const getUserProfile = createServerFn({ method: 'GET' })
 
     if (!session) throw new Error('Unauthorized')
 
-    const [userProfile] = await db
+    const [foundUser] = await db
       .select()
       .from(user)
       .where(eq(user.id, session.user.id))
       .limit(1)
 
-    return userProfile
+    return foundUser
   })

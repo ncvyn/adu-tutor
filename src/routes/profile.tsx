@@ -5,7 +5,7 @@ import { Undo2, UserRoundCog } from 'lucide-solid'
 
 import { useAuthGuard } from '@/lib/auth-client'
 import { type DAYS } from '@/lib/constants'
-import { getUserProfile } from '@/server/get-user-profile.functions'
+import { getUser } from '@/server/get-user.functions'
 
 import { LoadingScreen } from '@/components/LoadingScreen'
 import { AuthenticatedLayout } from '@/components/AuthenticatedLayout'
@@ -39,10 +39,10 @@ function Profile() {
   const session = useAuthGuard({ requireAuth: true })
   const [isSettingsOpen, setIsSettingsOpen] = createSignal(false)
 
-  const userProfileQuery = useQuery(() => ({
-    queryKey: ['user-profile', session().data?.user.id] as const,
+  const userQuery = useQuery(() => ({
+    queryKey: ['user', session().data?.user.id] as const,
     enabled: isClient() && !!session().data?.user.id,
-    queryFn: async () => getUserProfile(),
+    queryFn: async () => getUser(),
   }))
 
   return (
@@ -52,8 +52,8 @@ function Profile() {
         <Show when={session().data} fallback={<LoadingScreen />}>
           <ErrorBoundary fallback={<ProfileErrorFallback />}>
             <Suspense fallback={<LoadingScreen />}>
-              <Show when={userProfileQuery.data}>
-                {(profile) => (
+              <Show when={userQuery.data}>
+                {(user) => (
                   <div class="my-10 flex flex-col items-center px-4">
                     <div class="card w-full max-w-3xl bg-base-100 shadow-xl">
                       <div class="card-body">
@@ -81,12 +81,12 @@ function Profile() {
                           when={!isSettingsOpen()}
                           fallback={
                             <Settings
-                              profile={profile()}
-                              refetchProfile={() => userProfileQuery.refetch()}
+                              user={user()}
+                              refetchUser={() => userQuery.refetch()}
                             />
                           }
                         >
-                          <UserProfile profile={profile()} />
+                          <UserProfile user={user()} />
                         </Show>
                       </div>
                     </div>

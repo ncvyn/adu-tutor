@@ -8,8 +8,8 @@ import { useNavigate } from '@tanstack/solid-router'
 import { useNotifications } from '@/components/Notifications'
 
 interface SettingsProps {
-  profile: any
-  refetchProfile: () => Promise<unknown>
+  user: any
+  refetchUser: () => Promise<unknown>
 }
 
 const MAXIMUM_SUBJECTS = 5
@@ -23,16 +23,16 @@ const THEME_OPTIONS: Array<{ label: string; value: string }> = [
 ]
 
 export default function Settings(props: SettingsProps) {
-  const { profile, refetchProfile } = props
+  const { user, refetchUser } = props
   const { notify } = useNotifications()
   const navigate = useNavigate()
 
-  const [bio, setBio] = createSignal(profile.bio ?? '')
+  const [bio, setBio] = createSignal(user.bio ?? '')
   const [preferredSubjects, setPreferredSubjects] = createSignal<Array<string>>(
-    Array.isArray(profile.preferredSubjects)
-      ? profile.preferredSubjects
-      : typeof profile.preferredSubjects === 'string'
-        ? JSON.parse(profile.preferredSubjects || '[]')
+    Array.isArray(user.preferredSubjects)
+      ? user.preferredSubjects
+      : typeof user.preferredSubjects === 'string'
+        ? JSON.parse(user.preferredSubjects || '[]')
         : [],
   )
   const [theme, setTheme] = createSignal('system')
@@ -42,8 +42,8 @@ export default function Settings(props: SettingsProps) {
   })
 
   // Parse existing availability string "09:00-12:00, 14:00-17:00" into structured UI state
-  const initialAvailability = profile.availability
-    ? (JSON.parse(profile.availability) as AvailabilityMap)
+  const initialAvailability = user.availability
+    ? (JSON.parse(user.availability) as AvailabilityMap)
     : {}
   const initialSchedule: Record<string, Array<TimeWindow>> = {}
   DAYS.forEach((day) => {
@@ -80,13 +80,11 @@ export default function Settings(props: SettingsProps) {
           bio: bio().trim(),
           preferredSubjects: preferredSubjects(),
           availability:
-            profile.role === 'tutor'
-              ? JSON.stringify(serializedAvailability)
-              : '',
+            user.role === 'tutor' ? JSON.stringify(serializedAvailability) : '',
         },
       })
       notify({ type: 'success', message: 'Settings saved.' })
-      await refetchProfile()
+      await refetchUser()
     } catch (error) {
       notify({
         type: 'error',
@@ -176,7 +174,7 @@ export default function Settings(props: SettingsProps) {
           <fieldset class="fieldset w-full">
             <legend class="fieldset-legend">
               Preferred subjects{' '}
-              {profile.role === 'tutor' ? 'to teach' : 'to learn'}
+              {user.role === 'tutor' ? 'to teach' : 'to learn'}
             </legend>
             <div class="flex flex-wrap gap-2">
               <For each={SUBJECTS}>
@@ -223,7 +221,7 @@ export default function Settings(props: SettingsProps) {
             </fieldset>
           </fieldset>
 
-          <Show when={profile.role === 'tutor'}>
+          <Show when={user.role === 'tutor'}>
             <fieldset class="fieldset w-full">
               <legend class="fieldset-legend">Availability schedule</legend>
               <p class="label">

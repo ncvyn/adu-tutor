@@ -11,13 +11,13 @@ import { useNotifications } from '@/components/Notifications'
 import { UserBadges } from './UserBadges'
 import { AboutUsModal } from './AboutUsModal'
 
-export default function UserProfile(props: { profile: any }) {
-  const { profile } = props
+export default function UserProfile(props: { user: any }) {
+  const { user } = props
 
-  const subjects: Array<string> = Array.isArray(profile.preferredSubjects)
-    ? profile.preferredSubjects
-    : typeof profile.preferredSubjects === 'string'
-      ? JSON.parse(profile.preferredSubjects || '[]')
+  const subjects: Array<string> = Array.isArray(user.preferredSubjects)
+    ? user.preferredSubjects
+    : typeof user.preferredSubjects === 'string'
+      ? JSON.parse(user.preferredSubjects || '[]')
       : []
 
   const { notify } = useNotifications()
@@ -63,12 +63,12 @@ export default function UserProfile(props: { profile: any }) {
     <div class="flex flex-col items-center text-center">
       <div class="avatar mb-4 avatar-placeholder">
         <div class="w-12 rounded-full bg-neutral text-neutral-content">
-          <span class="text-md font-semibold">{getInitials(profile.name)}</span>
+          <span class="text-md font-semibold">{getInitials(user.name)}</span>
         </div>
       </div>
-      <h3 class="text-xl font-semibold">{profile.name}</h3>
+      <h3 class="text-xl font-semibold">{user.name}</h3>
       <div class="mt-2 badge font-semibold tracking-wide uppercase badge-primary">
-        {profile.role}
+        {user.role}
       </div>
       <Show when={subjects.length > 0}>
         <div class="mt-2 flex flex-wrap justify-center gap-2">
@@ -81,10 +81,10 @@ export default function UserProfile(props: { profile: any }) {
           </For>
         </div>
       </Show>
-      <Show when={profile.bio}>
-        <p class="mt-4 max-w-lg text-sm opacity-80">{profile.bio}</p>
+      <Show when={user.bio}>
+        <p class="mt-4 max-w-lg text-sm opacity-80">{user.bio}</p>
       </Show>
-      <UserBadges userId={profile.id} />
+      <UserBadges userId={user.id} />
       <p class="mt-6 text-xs opacity-60">AdU-Tutor v{APP_VERSION}</p>
 
       <div class="mt-6 flex flex-col gap-2 md:hidden">
