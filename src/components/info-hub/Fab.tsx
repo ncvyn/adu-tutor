@@ -93,18 +93,18 @@ export function Fab(props: FabProps) {
               </button>
             </div>
 
-            <div class={tooltipClass} data-tip="Search tutors">
-              <button
-                class="btn btn-circle btn-lg"
-                type="button"
-                onClick={props.onSearchTutors}
-                aria-label="Search tutors"
-              >
-                <Search />
-              </button>
-            </div>
+            <Show when={props.user.role !== 'tutor'}>
+              <div class={tooltipClass} data-tip="Search tutors">
+                <button
+                  class="btn btn-circle btn-lg"
+                  type="button"
+                  onClick={props.onSearchTutors}
+                  aria-label="Search tutors"
+                >
+                  <Search />
+                </button>
+              </div>
 
-            <Show when={props.user.role === 'tutee'}>
               <div class={tooltipClass} data-tip="Apply for tutor">
                 <button
                   class="btn btn-circle btn-lg"
