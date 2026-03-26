@@ -123,3 +123,41 @@ export const searchTutors = createServerFn({ method: 'GET' })
       availability: parseAvailability(tutor.availability),
     }))
   })
+
+export const searchTutees = createServerFn({ method: 'GET' })
+  .inputValidator((query: string) => query)
+  .handler(async ({ data: query }) => {
+    const headers = getRequestHeaders()
+    const session = await auth.api.getSession({ headers })
+
+    if (!session || session.user.role === 'tutee') {
+      throw new Error('Unauthorized')
+    }
+
+    const trimmed = query.trim()
+    if (!trimmed) return []
+
+    const results = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        preferredSubjects: user.preferredSubjects,
+        availability: user.availability,
+      })
+      .from(user)
+      .where(
+        and(
+          like(user.name, `%${trimmed}%`),
+          ne(user.id, session.user.id),
+          eq(user.role, 'tutee'),
+          eq(user.banned, false),
+        ),
+      )
+      .limit(10)
+
+    return results.map((tutee) => ({
+      id: tutee.id,
+      name: tutee.name,
+      preferredSubjects: parseJsonArray(tutee.preferredSubjects),
+    }))
+  })

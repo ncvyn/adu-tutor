@@ -6,11 +6,18 @@ import { db } from '@/lib/db'
 import { badge, userBadge } from '@/schemas/badge'
 import { middleware } from '@/lib/middleware'
 
-export const getAllBadges = createServerFn({ method: 'GET' }).handler(
-  async () => {
+export const getAllBadges = createServerFn({ method: 'GET' })
+  .middleware([middleware])
+  .handler(async () => {
+    const headers = getRequestHeaders()
+    const session = await auth.api.getSession({ headers })
+
+    if (!session) {
+      throw new Error('Unauthorized')
+    }
+
     return await db.select().from(badge)
-  },
-)
+  })
 
 export const getUserBadges = createServerFn({ method: 'GET' })
   .inputValidator((input: { userId: string }) => input)
@@ -61,10 +68,13 @@ export const getMyBadges = createServerFn({ method: 'GET' })
     return rows
   })
 
+export type AssignBadgeResult =
+  | { success: true; alreadyAssigned: boolean }
+  | { success: false; error: string; alreadyAssigned?: boolean }
 export const assignBadge = createServerFn({ method: 'POST' })
   .inputValidator((input: { userId: string; badgeSlug: string }) => input)
   .middleware([middleware])
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<AssignBadgeResult> => {
     const headers = getRequestHeaders()
     const session = await auth.api.getSession({ headers })
 
@@ -73,7 +83,10 @@ export const assignBadge = createServerFn({ method: 'POST' })
     }
 
     if (session.user.role === 'tutee') {
-      throw new Error('Forbidden: only tutors or mods can assign badges')
+      return {
+        success: false,
+        error: 'Sorry, but only tutors or mods can assign badges.',
+      }
     }
 
     const badges = await db
@@ -83,7 +96,10 @@ export const assignBadge = createServerFn({ method: 'POST' })
       .limit(1)
 
     if (badges.length === 0) {
-      throw new Error(`Badge not found: ${data.badgeSlug}`)
+      return {
+        success: false,
+        error: `Badge not found with slug ${data.badgeSlug}.`,
+      }
     }
 
     const [targetBadge] = badges
@@ -99,10 +115,10 @@ export const assignBadge = createServerFn({ method: 'POST' })
       .limit(1)
 
     if (rows.length > 0) {
-      return { alreadyAssigned: true, userBadge: rows[0] }
+      return { success: true, alreadyAssigned: true }
     }
 
-    const [newUserBadge] = await db
+    const result = await db
       .insert(userBadge)
       .values({
         id: crypto.randomUUID(),
@@ -111,7 +127,13 @@ export const assignBadge = createServerFn({ method: 'POST' })
       })
       .returning()
 
-    return { alreadyAssigned: false, userBadge: newUserBadge }
+    return result.length > 0
+      ? { success: true, alreadyAssigned: false }
+      : {
+          success: false,
+          error: 'Failed to assign badge, try again.',
+          alreadyAssigned: false,
+        }
   })
 
 export const revokeBadge = createServerFn({ method: 'POST' })

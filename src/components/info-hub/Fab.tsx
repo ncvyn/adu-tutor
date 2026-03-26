@@ -1,4 +1,5 @@
 import {
+  BadgePlus,
   ClipboardPen,
   Ellipsis,
   EllipsisVertical,
@@ -15,6 +16,7 @@ import { type Report, type TutorApplication } from '@/schemas/mod'
 
 import { TutorApplicationModal } from './TutorApplicationModal'
 import { ModPanel } from './ModPanel'
+import { AssignBadgeModal } from './AssignBadgeModal'
 
 const tooltipClass = 'tooltip tooltip-neutral tooltip-left'
 
@@ -43,6 +45,11 @@ export function Fab(props: FabProps) {
 
   const openTutorModal = () => {
     const modal = document.getElementById('tutor_modal') as HTMLDialogElement
+    modal.showModal()
+  }
+
+  const openBadgeModal = () => {
+    const modal = document.getElementById('badge_modal') as HTMLDialogElement
     modal.showModal()
   }
 
@@ -93,7 +100,7 @@ export function Fab(props: FabProps) {
               </button>
             </div>
 
-            <Show when={props.user.role !== 'tutor'}>
+            <Show when={props.user.role === 'tutee'}>
               <div class={tooltipClass} data-tip="Search tutors">
                 <button
                   class="btn btn-circle btn-lg"
@@ -113,6 +120,21 @@ export function Fab(props: FabProps) {
                   aria-label="Apply for tutor"
                 >
                   <ClipboardPen />
+                </button>
+              </div>
+            </Show>
+
+            <Show
+              when={props.user.role === 'tutor' || props.user.role === 'mod'}
+            >
+              <div class={tooltipClass} data-tip="Assign badge">
+                <button
+                  class="btn btn-circle btn-lg"
+                  type="button"
+                  onClick={openBadgeModal}
+                  aria-label="Assign badge"
+                >
+                  <BadgePlus />
                 </button>
               </div>
             </Show>
@@ -141,6 +163,7 @@ export function Fab(props: FabProps) {
       />
 
       <ModPanel data={modData()} isLoading={loadingModData()} />
+      <AssignBadgeModal />
     </>
   )
 }
