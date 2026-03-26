@@ -109,9 +109,9 @@ export const createInfoCard = createServerFn({ method: 'POST' })
 
     if (isFirstCard) {
       try {
-        await awardBadge(session.user.id, 'first-post')
+        await awardBadge(session.user.id, 'first-share')
       } catch (error) {
-        console.error('Failed to award first post badge:', error)
+        console.error('Failed to award first share badge:', error)
       }
     }
 
