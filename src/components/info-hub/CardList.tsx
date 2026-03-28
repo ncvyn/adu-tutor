@@ -14,8 +14,14 @@ interface CardListProps {
 }
 
 const PREVIEW_LENGTH = 128
+const PREVIEW_LINES = 4
 function getPreviewContent(content: string) {
-  const trimmed = content.trim()
+  const trimmed = content
+    .trim()
+    .split(/\r?\n/)
+    .slice(0, PREVIEW_LINES)
+    .join('\n')
+
   if (trimmed.length <= PREVIEW_LENGTH) return trimmed
   return `${trimmed.slice(0, PREVIEW_LENGTH).trimEnd()}...`
 }
