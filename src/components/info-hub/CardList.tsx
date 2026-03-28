@@ -96,9 +96,12 @@ export function CardList(props: CardListProps) {
                             </div>
                           </button>
 
-                          <div class="mt-3 prose w-full max-w-none overflow-hidden wrap-break-word">
+                          <div class="mt-3 prose w-full max-w-none overflow-hidden">
                             <div class={`overflow-x-auto ${markdownClass}`}>
-                              <SolidMarkdown components={{ a: Link }}>
+                              <SolidMarkdown
+                                class="wrap-anywhere"
+                                components={{ a: Link }}
+                              >
                                 {getPreviewContent(card.content)}
                               </SolidMarkdown>
                             </div>
@@ -115,12 +118,16 @@ export function CardList(props: CardListProps) {
                           </Show>
                         </div>
 
-                        <div class="flex shrink-0 flex-col items-center justify-center gap-2">
-                          <For each={card.subjects}>
-                            {(s) => (
-                              <span class="badge badge-soft badge-sm">{s}</span>
-                            )}
-                          </For>
+                        <div class="flex shrink-0 flex-col items-end justify-center gap-2">
+                          <div class="flex flex-row justify-end gap-1">
+                            <For each={card.subjects}>
+                              {(s) => (
+                                <span class="badge badge-soft badge-sm">
+                                  {s}
+                                </span>
+                              )}
+                            </For>
+                          </div>
                           <Show when={card.authorId === props.currentUserId}>
                             <>
                               <button

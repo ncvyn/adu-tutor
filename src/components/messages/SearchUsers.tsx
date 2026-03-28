@@ -177,7 +177,7 @@ export function SearchUsers(props: { onSelect?: (user: UserResult) => void }) {
                         </span>
                       </div>
                     </div>
-                    <div class="flex flex-1 items-center justify-between overflow-hidden py-3 md:flex-col md:items-start md:justify-center">
+                    <div class="flex flex-1 items-center justify-between overflow-hidden py-2 md:flex-col md:items-start md:justify-center">
                       <span class="truncate text-sm font-medium">
                         {user.name}
                       </span>

@@ -12,9 +12,9 @@ export function Sidebar() {
   }
 
   return (
-    <aside class="flex h-full w-full flex-col border-r border-base-300 bg-base-100">
+    <aside class="flex h-full w-full flex-col bg-base-100">
       {/* AdU-Tutor logo */}
-      <div class="flex items-center gap-2 border-b border-base-300 px-15 py-2">
+      <div class="flex items-center gap-2 px-15 py-2">
         <div
           class="tooltip-neutral tooltip tooltip-right"
           data-tip="Go to Info Hub"

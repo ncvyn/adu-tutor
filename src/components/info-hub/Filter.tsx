@@ -43,7 +43,7 @@ export function Filter(props: FilterProps) {
           </span>
           <Show when={props.selectedSubjects.length > 0}>
             <button
-              class="btn text-error btn-ghost btn-xs"
+              class="btn max-h-5 text-error btn-ghost btn-xs"
               onClick={props.onClearSubjects}
             >
               Clear
