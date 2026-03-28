@@ -86,10 +86,11 @@ export default function Settings(props: SettingsProps) {
       })
       notify({ type: 'success', message: 'Settings saved.' })
       await refetchUser()
-    } catch (error) {
+    } catch (e) {
+      const err = e instanceof Error ? e.message : String(e)
       notify({
         type: 'error',
-        message: `Error saving settings: ${error instanceof Error ? error.message : String(error)}`,
+        message: `Error saving settings: ${err}`,
       })
     } finally {
       setIsSaving(false)
@@ -134,10 +135,11 @@ export default function Settings(props: SettingsProps) {
       await deleteMyAccount()
       notify({ type: 'success', message: 'Account deleted.' })
       await navigate({ to: '/', replace: true })
-    } catch (error) {
+    } catch (e) {
+      const err = e instanceof Error ? e.message : String(e)
       notify({
         type: 'error',
-        message: `Error deleting account: ${error instanceof Error ? error.message : String(error)}`,
+        message: `Error deleting account: ${err}`,
       })
     }
   }

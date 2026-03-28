@@ -38,10 +38,11 @@ export function ShareDialog(props: ShareDialogProps) {
       await queryClient.invalidateQueries({ queryKey: ['info-cards'] })
       closeShareDialog()
     },
-    onError: (err) => {
+    onError: (e) => {
+      const err = e instanceof Error ? e.message : String(e)
       notify({
         type: 'error',
-        message: `Error creating info card: ${String(err)}`,
+        message: `Error creating info card: ${err}`,
       })
     },
   }))

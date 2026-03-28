@@ -74,10 +74,11 @@ export function AssignBadgeModal() {
         type: 'error',
         message: result.error,
       })
-    } catch {
+    } catch (e) {
+      const err = e instanceof Error ? e.message : String(e)
       setFeedback({
         type: 'error',
-        message: 'Failed to assign badge.',
+        message: `Failed to assign badge: ${err}`,
       })
     } finally {
       setIsAssigning(false)

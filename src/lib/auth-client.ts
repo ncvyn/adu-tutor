@@ -69,10 +69,11 @@ export async function signIn(
     })
 
     notify({ type: 'success', message: 'Redirecting...' })
-  } catch (error) {
+  } catch (e) {
+    const err = e instanceof Error ? e.message : String(e)
     notify({
       type: 'error',
-      message: `Error! Signing in failed with error ${error instanceof Error ? error.message : String(error)}`,
+      message: `Error! Signing in failed: ${err}`,
     })
   }
 }
@@ -88,10 +89,11 @@ export async function signOut(
     await authClient.signOut()
     notify({ type: 'success', message: 'Redirecting...' })
     await navigate({ to: '/', replace: true })
-  } catch (error) {
+  } catch (e) {
+    const err = e instanceof Error ? e.message : String(e)
     notify({
       type: 'error',
-      message: `Error! Signing out failed with error ${error instanceof Error ? error.message : String(error)}`,
+      message: `Error! Signing out failed: ${err}`,
     })
   }
 }

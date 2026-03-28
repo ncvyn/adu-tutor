@@ -91,10 +91,11 @@ function InfoHub() {
       setPendingDeleteTitle(null)
       deleteDialogRef?.close()
     },
-    onError: (err) => {
+    onError: (e) => {
+      const err = e instanceof Error ? e.message : String(e)
       notify({
         type: 'error',
-        message: `Error deleting info card: ${String(err)}`,
+        message: `Error deleting info card: ${err}`,
       })
     },
   }))
@@ -106,8 +107,9 @@ function InfoHub() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['info-cards'] })
     },
-    onError: (err) => {
-      notify({ type: 'error', message: `Error voting: ${String(err)}` })
+    onError: (e) => {
+      const err = e instanceof Error ? e.message : String(e)
+      notify({ type: 'error', message: `Error voting: ${err}` })
     },
   }))
 

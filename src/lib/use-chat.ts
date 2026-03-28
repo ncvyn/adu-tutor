@@ -122,10 +122,11 @@ export function useChat(options: ChatOptions) {
 
       await queryClient.invalidateQueries({ queryKey: ['recipients'] })
     },
-    onError: (error) => {
+    onError: (e) => {
+      const err = e instanceof Error ? e.message : String(e)
       notify({
         type: 'error',
-        message: `Failed to send message: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        message: `Failed to send message: ${err}`,
       })
     },
   }))
@@ -139,10 +140,11 @@ export function useChat(options: ChatOptions) {
     onSuccess: (_, deletedMessageId) => {
       removeMessageFromCache(deletedMessageId)
     },
-    onError: (error) => {
+    onError: (e) => {
+      const err = e instanceof Error ? e.message : String(e)
       notify({
         type: 'error',
-        message: `Failed to delete message: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        message: `Failed to delete message: ${err}`,
       })
     },
   }))
